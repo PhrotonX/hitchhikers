@@ -1,0 +1,54 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hitchhikers_app
+    volumes:
+      - .:/var/www
+    env_file:
+      - .env
+    networks:
+      - laravel
+    #NGINX
+    expose:
+      - "9000"
+
+  webserver:
+    image: nginx:alpine
+    container_name: hitchhikers_web
+    env_file:
+      - .env
+    volumes:
+      - .:/var/www
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8000:80"
+    depends_on:
+      - app
+    networks:
+      - laravel
+
+  db:
+    image: mysql:8.0
+    container_name: hitchhikers_db
+    env_file:
+      - .env
+    environment:
+      # MYSQL_ROOT_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_DATABASE: ${DB_DATABASE}
+      # MYSQL_USER: ${DB_USERNAME}
+      # MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "3307:3306" #External port:Internal port
+    networks:
+      - laravel
+
+networks:
+  laravel:
+
+volumes:
+  dbdata:
