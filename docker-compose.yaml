@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: hitchhikers_app
+    # ports:
+    #   - "5173:5173"   # Vite dev server
     volumes:
       - .:/var/www
     env_file:
@@ -13,6 +15,10 @@ services:
     #NGINX
     expose:
       - "9000"
+    command: >
+      sh -c "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache &&
+             chmod -R 775 /var/www/storage /var/www/bootstrap/cache &&
+             php-fpm"
 
   webserver:
     image: nginx:alpine
@@ -44,6 +50,20 @@ services:
       - dbdata:/var/lib/mysql
     ports:
       - "3307:3306" #External port:Internal port
+    networks:
+      - laravel
+
+  vite:
+    build:
+      context: .
+      dockerfile: Dockerfile.vite
+    container_name: hitchhikers_vite
+    working_dir: /var/www
+    volumes:
+      - .:/var/www
+      - /var/www/node_modules
+    ports:
+      - "5173:5173"
     networks:
       - laravel
 
