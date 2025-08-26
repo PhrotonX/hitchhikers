@@ -10,6 +10,7 @@ services:
       - .:/var/www
     env_file:
       - .env
+    # user: "${UID}:${GID}"
     networks:
       - laravel
     #NGINX

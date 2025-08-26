@@ -6,6 +6,10 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd
 
+# RUN useradd -u 1000 -m user
+
+# USER user
+
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
