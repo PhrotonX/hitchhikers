@@ -1,6 +1,7 @@
 # Getting Started into Contribution
 Before you start, please clone or download this repository from GitHub.
-After 
+
+_This article assumes that you are using Windows 10 or 11 PC._
 
 ## If you don't want to use Docker
 Please make sure that the following dependencies and software are installed:
@@ -20,14 +21,14 @@ and
 npm run dev
 ```
 
-## If you want to use DOcker
+## If you want to use Docker
 Please make sure that the following dependencies and software are installed:
 - Git (account needed)
 - WSL2 or Windows Subsystem for Linux (Optional, but recommended for performance)
 - Docker
 - VS Code or any other code editors
 
-After installation and configuration, clone or move the cloned repository within home directory of WSL2 and run the commands that is available in [this file](../docker-rebuild.sh).
+After installation and configuration, clone or move the cloned repository within home directory of WSL2 and run the commands that is available in [this file](../docker-rebuild.sh). This step is recommended in order to improve the website performance.
 
 If you are on production, please be sure to change the APP_ENV of [docker-compose file](../docker-compose.yaml) into **production** (case-sensitive). Otherwise, if you are on development, please make sure it is set on **development**.
 
