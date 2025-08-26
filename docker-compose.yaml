@@ -3,11 +3,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        APP_ENV: development #development or production
     container_name: hitchhikers_app
     # ports:
     #   - "5173:5173"   # Vite dev server
     volumes:
       - .:/var/www
+      - app_storage:/var/www/storage
+      - app_cache:/var/www/bootstrap/cache
     env_file:
       - .env
     # user: "${UID}:${GID}"
@@ -16,10 +20,10 @@ services:
     #NGINX
     expose:
       - "9000"
-    command: >
-      sh -c "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache &&
-             chmod -R 775 /var/www/storage /var/www/bootstrap/cache &&
-             php-fpm"
+    # command: >
+    #   sh -c "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache &&
+    #          chmod -R 775 /var/www/storage /var/www/bootstrap/cache &&
+    #          php-fpm"
 
   webserver:
     image: nginx:alpine
@@ -73,3 +77,5 @@ networks:
 
 volumes:
   dbdata:
+  app_storage:
+  app_cache:

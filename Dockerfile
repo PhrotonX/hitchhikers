@@ -23,9 +23,20 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
 RUN composer install
 
 # Set proper permissions
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
+ARG APP_ENV=production
+RUN if [ "$APP_ENV" = "production" ]; then \
+        chown -R www-data:www-data /var/www \
+        && chmod -R 755 /var/www/storage \
+        && chmod -R 755 /var/www/bootstrap/cache ; \
+    else \
+        chown -R www-data:www-data /var/www \
+        && chmod -R 777 /var/www/storage/ /var/www/bootstrap/cache ; \
+    fi
+
+# Set proper permissions (former code)
+# RUN chown -R www-data:www-data /var/www \
+#     && chmod -R 755 /var/www/storage \
+#     && chmod -R 755 /var/www/bootstrap/cache
 
 # RUN chown -R www-data:www-data .
 
