@@ -58,11 +58,11 @@ services:
     networks:
       - laravel
 
-  vite:
+  node:
     build:
       context: .
-      dockerfile: Dockerfile.vite
-    container_name: hitchhikers_vite
+      dockerfile: Dockerfile.node
+    container_name: hitchhikers_node
     working_dir: /var/www
     volumes:
       - .:/var/www
