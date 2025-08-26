@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('user_addresses', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('addresses_id');
-            $table->primary(['user_id', 'addresses_id']);
+            $table->unsignedBigInteger('address_id');
+            $table->primary(['user_id', 'address_id']);
         });
     }
 
