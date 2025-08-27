@@ -53,9 +53,10 @@ After installation and configuration, go into the folder or directory where you 
 git clone git@github.com:PhrotonX/hitchhikers.git
 ```
 
-(Optional) If you have an installation of WSL2, move the cloned repository within home directory of your WSL2 distro and then [configure environment variables](../docs/configure_env.md). This step is recommended in order to improve the website performance.
+(Optional) If you have an installation of WSL2, move the cloned repository within home ```~``` directory of your WSL2 distro. This step is recommended in order to improve the website performance.
 
 ### Configuring Docker
+First, [configure environment variables](../docs/configure_env.md).
 Run the commands that is available in [docker-rebuild-batch-1.sh](../docker-rebuild-batch-1.sh) and then [docker-rebuild-batch-2.sh](../docker-rebuild-batch-2.sh) to build docker containers to be run.
 
 If you are on production, please be sure to change the APP_ENV of [docker-compose file](../docker-compose.yaml) into **production** (case-sensitive). Otherwise, if you are on development, please make sure it is set on **development**.
@@ -84,7 +85,7 @@ docker exec -it hitchhike_node npm run dev
 docker exec -it hitchhike_db mysql -u root -p
 ```
 
-To visit the website with Local VS Code, open (http://localhost:8000/)[http://localhost:8000] to view the website. ```php artisan serve``` is already run after running the built docker containers.
+To visit the website with Local VS Code, open [http://localhost:8000/](http://localhost:8000) to view the website. ```php artisan serve``` is already run after running the built docker containers.
 
 To visit the website with Github Codespaces, Press Ctrl+\` > Ports > Hover port 8000 > Ctrl+Click or Click "Open in Browser" button.
 
