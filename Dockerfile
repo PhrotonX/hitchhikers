@@ -15,12 +15,15 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
+COPY composer.json composer.lock ./
+
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Copy entire project
 COPY . .
 
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
-
-RUN composer install
+# Run post-install scripts after artisan is  available
+RUN composer run-script post-autoload-dump
 
 # Set proper permissions
 ARG APP_ENV=production

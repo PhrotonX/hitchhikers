@@ -10,6 +10,7 @@ services:
     #   - "5173:5173"   # Vite dev server
     volumes:
       - .:/var/www
+      - vendor_dir:/var/www/vendor
       - app_storage:/var/www/storage
       - app_cache:/var/www/bootstrap/cache
     env_file:
@@ -79,3 +80,4 @@ volumes:
   dbdata:
   app_storage:
   app_cache:
+  vendor_dir:
