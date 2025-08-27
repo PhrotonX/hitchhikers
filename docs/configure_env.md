@@ -36,6 +36,10 @@ php artisan config:clear
 php artisan cache:clear
 php artisan config:cache
 ```
+Then manually restart the server by pressing Ctrl+C on terminal where Laravel is running and then run a migration:
+```
+php artisan migrate
+```
 
 ### I am using Docker
 You can append an APP_KEY value by running [docker-generate-key.sh](../docker-generate-key.sh) or by running the commands below:
@@ -44,7 +48,17 @@ docker exec -it hitchhikers_app php artisan key:generate
 docker exec -it hitchhikers_app php artisan config:clear
 docker exec -it hitchhikers_app php artisan cache:clear
 docker exec -it hitchhikers_app php artisan config:cache
+docker compose down -v
+docker compose up -d
 ```
+
+Then run a migration:
+```
+docker exec -it hitchhikers_app php artisan migrate
+```
+
+**Note:**
+ - Check for possible duplicates within APP_KEY.
 
 ## Setting up the Database Credentials
 ### I do not use Docker

@@ -1,0 +1,1 @@
+docker exec -it hitchhikers_app php artisan migrate
