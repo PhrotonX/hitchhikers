@@ -19,6 +19,8 @@ After installation and configuration, [configure environment variables](../docs/
 
 Then, run the [nondocker-rebuild.sh](../nondocker-rebuild.sh) file to configure the frameworks.
 
+Before visiting the website, please continue [configuring environment variables](configure_env.md).
+
 Then, open the root folder of the repository, run VS Code, open a terminal and run the following commands:
 
 ```
@@ -28,6 +30,8 @@ and
 ```
 npm run dev
 ```
+
+To visit the website, open [http://localhost:8000/](http://localhost:8000).
 
 ## If you want to use Docker and Git
 There are two ways to get started with contribution with Docker.
@@ -86,7 +90,9 @@ docker exec -it hitchhike_node npm run dev
 docker exec -it hitchhike_db mysql -u root -p
 ```
 
-To visit the website with Local VS Code, open [http://localhost:8000/](http://localhost:8000) to view the website. ```php artisan serve``` is already run after running the built docker containers.
+Before visiting the website, please continue [configuring environment variables](configure_env.md).
+
+To visit the website with Local VS Code, open [http://localhost:8000/](http://localhost:8000). ```php artisan serve``` is already run after running the built docker containers.
 
 To visit the website with Github Codespaces, Press Ctrl+\` > Ports > Hover port 8000 > Ctrl+Click or Click "Open in Browser" button.
 

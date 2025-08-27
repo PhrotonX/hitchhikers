@@ -21,10 +21,13 @@ APP_ENV is used to change the behavior of the website depending on the type of e
 | **production** | Use if the website is under production, where the website is deployed on a real server and publicly available. |
 
 **Note:**
-These values are different from docker-compose.yaml and Dockerfile. In Dockerfile, **development** is used if APP_ENV is under **local** and **testing**. Whereas, **production** is used when APP_ENV is under **staging** and **production**.
+- These values are different from docker-compose.yaml and Dockerfile. In Dockerfile, **development** is used if APP_ENV is under **local** and **testing**. Whereas, **production** is used when APP_ENV is under **staging** and **production**.
+
+**Important:**
+- You need to [Set up APP_KEY](#setting-up-app_key) before continuing with configurations at [Getting Started into Contribution](get_started.md). After configuring, you need to set up [APP_KEY](#setting-up-app_key) and [database credentials](#setting-up-the-database-credentials).
+
 
 ## Setting up APP_KEY
-App key
 You may only generate keys once unless the .env file has been lost. You may lose these files after creating another GitHub codespace or cloning the repository.
 ### I do not use Docker
 If you do not have Docker installed, you might not need to modify many of .env configurations with some exceptions such as the need to set APP_KEY. You can append an APP_KEY value by running [nondocker-generate-key.sh](../nondocker-generate-key.sh) or by running the commands below:
