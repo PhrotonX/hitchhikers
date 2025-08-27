@@ -11,6 +11,9 @@ To begin, copy ```.env.example``` file and rename it into ```.env``` then procee
 - Do not add your .env to Git. These files are tracked on .gitignore file which prevents them from being exposed to the Git repository.
 - If you have Docker installed, you might not need to modify many of .env configurations with some exceptions such as the need to set APP_KEY. 
 
+**Important:**
+- You need to [Set up APP_KEY](#setting-up-app_key) before continuing with configurations at [Getting Started into Contribution](get_started.md). After configuring, you need to set up [APP_KEY](#setting-up-app_key) and [database credentials](#setting-up-the-database-credentials).
+
 ## Setting up APP_ENV
 APP_ENV is used to change the behavior of the website depending on the type of environment where the website is deployed. The APP_ENV variable can have the following values:
 | Value | Description |
@@ -22,10 +25,6 @@ APP_ENV is used to change the behavior of the website depending on the type of e
 
 **Note:**
 - These values are different from docker-compose.yaml and Dockerfile. In Dockerfile, **development** is used if APP_ENV is under **local** and **testing**. Whereas, **production** is used when APP_ENV is under **staging** and **production**.
-
-**Important:**
-- You need to [Set up APP_KEY](#setting-up-app_key) before continuing with configurations at [Getting Started into Contribution](get_started.md). After configuring, you need to set up [APP_KEY](#setting-up-app_key) and [database credentials](#setting-up-the-database-credentials).
-
 
 ## Setting up APP_KEY
 You may only generate keys once unless the .env file has been lost. You may lose these files after creating another GitHub codespace or cloning the repository.
