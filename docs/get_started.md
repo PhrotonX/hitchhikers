@@ -57,6 +57,7 @@ git clone git@github.com:PhrotonX/hitchhikers.git
 
 ### Configuring Docker
 First, [configure environment variables](../docs/configure_env.md).
+
 Run the commands that is available in [docker-rebuild-batch-1.sh](../docker-rebuild-batch-1.sh) and then [docker-rebuild-batch-2.sh](../docker-rebuild-batch-2.sh) to build docker containers to be run.
 
 If you are on production, please be sure to change the APP_ENV of [docker-compose file](../docker-compose.yaml) into **production** (case-sensitive). Otherwise, if you are on development, please make sure it is set on **development**.
