@@ -3,22 +3,28 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        APP_ENV: development #development or production
     container_name: hitchhikers_app
     # ports:
     #   - "5173:5173"   # Vite dev server
     volumes:
       - .:/var/www
+      - vendor_dir:/var/www/vendor
+      - app_storage:/var/www/storage
+      - app_cache:/var/www/bootstrap/cache
     env_file:
       - .env
+    # user: "${UID}:${GID}"
     networks:
       - laravel
     #NGINX
     expose:
       - "9000"
-    command: >
-      sh -c "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache &&
-             chmod -R 775 /var/www/storage /var/www/bootstrap/cache &&
-             php-fpm"
+    # command: >
+    #   sh -c "chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache &&
+    #          chmod -R 775 /var/www/storage /var/www/bootstrap/cache &&
+    #          php-fpm"
 
   webserver:
     image: nginx:alpine
@@ -53,11 +59,11 @@ services:
     networks:
       - laravel
 
-  vite:
+  node:
     build:
       context: .
-      dockerfile: Dockerfile.vite
-    container_name: hitchhikers_vite
+      dockerfile: Dockerfile.node
+    container_name: hitchhikers_node
     working_dir: /var/www
     volumes:
       - .:/var/www
@@ -72,3 +78,6 @@ networks:
 
 volumes:
   dbdata:
+  app_storage:
+  app_cache:
+  vendor_dir:

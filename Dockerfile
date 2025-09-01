@@ -6,22 +6,40 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql gd
 
+# RUN useradd -u 1000 -m user
+
+# USER user
+
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
+COPY composer.json composer.lock ./
+
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Copy entire project
 COPY . .
 
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
-
-RUN composer install
+# Run post-install scripts after artisan is  available
+RUN composer run-script post-autoload-dump
 
 # Set proper permissions
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
+ARG APP_ENV=production
+RUN if [ "$APP_ENV" = "production" ]; then \
+        chown -R www-data:www-data /var/www \
+        && chmod -R 755 /var/www/storage \
+        && chmod -R 755 /var/www/bootstrap/cache ; \
+    else \
+        chown -R www-data:www-data /var/www \
+        && chmod -R 777 /var/www/storage/ /var/www/bootstrap/cache ; \
+    fi
+
+# Set proper permissions (former code)
+# RUN chown -R www-data:www-data /var/www \
+#     && chmod -R 755 /var/www/storage \
+#     && chmod -R 755 /var/www/bootstrap/cache
 
 # RUN chown -R www-data:www-data .
 
