@@ -37,3 +37,7 @@ sleep 15
 
 # Migrate
 docker exec -it hitchhikers_app php artisan migrate
+
+# Run npm
+docker exec -it hitchhikers_node npm run build
+docker exec -it hitchhikers_node npm run dev
