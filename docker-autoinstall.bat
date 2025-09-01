@@ -39,3 +39,7 @@ timeout /t 15 >nul
 
 REM Migrate
 docker exec -it hitchhikers_app php artisan migrate
+
+REM Run NPM
+docker exec -it hitchhikers_node npm run build
+docker exec -it hitchhikers_node npm run dev
