@@ -8,5 +8,5 @@
         <input type="password" name="password">
         <button type="submit">Submit</button>
     </form>
-    <button type="button">Create an account</button>
+    <button type="button" onclick="window.location.href='/register'">Create an account</button>
 @endsection
