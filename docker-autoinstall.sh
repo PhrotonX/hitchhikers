@@ -36,7 +36,7 @@ echo "Please wait..."
 
 # Wait for 15-20 seconds then migrate. Oftentimes, it needs
 # re-running to fully migrate the database.
-sleep 20
+sleep 45
 
 docker exec -it hitchhikers_app php artisan migrate
 
