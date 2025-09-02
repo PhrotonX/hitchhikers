@@ -17,7 +17,8 @@ WORKDIR /var/www
 
 COPY composer.json composer.lock ./
 
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+#RUN composer install --no-dev --optimize-autoloader --no-scripts
+RUN composer install --optimize-autoloader --no-scripts
 
 # Copy entire project
 COPY . .
