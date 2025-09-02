@@ -43,13 +43,27 @@ class RegisteredUserController extends Controller
      */
     protected function onStore(){
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'ext_name' => ['string', 'max:255'],
+            'birthdate' => ['required', Rule::date()->beforeOrEqual(today()->subYears(18))],
+            'gender' => ['required', 'string'],
+            'user_type' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:255', 'unique:'.User::class],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
+            'first_name' => $request->first_name,
+            'middle_name' => $request->middle_name,
+            'last_name' => $request->last_name,
+            'ext_name' => $request->ext_name,
+            'birthdate' => $request->birthdate,
+            'gender' => $request->gender,
+            'user_type' => $request->user_type,
+            'phone' => $request->phone,
             'email' => $request->email,
             'password' => Hash::make($request->string('password')),
         ]);
