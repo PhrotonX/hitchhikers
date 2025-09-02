@@ -11,11 +11,34 @@ use Illuminate\Validation\ValidationException;
 class PasswordResetLinkController extends Controller
 {
     /**
+     * Display the password reset link request view.
+     */
+    public function create(): View
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function store(Request $request): RedirectResponse{
+        $this->onStore($request);
+
+        return $status == Password::RESET_LINK_SENT
+                    ? back()->with('status', __($status))
+                    : back()->withInput($request->only('email'))
+                        ->withErrors(['email' => __($status)]);
+    }
+
+    public function storeAPI(Request $request): JsonResponse{
+        $this->onStore($request);
+
+        return response()->json(['status' => __($status)]);
+    }
+
+    /**
      * Handle an incoming password reset link request.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): JsonResponse
+    protected function onStore(Request $request): JsonResponse
     {
         $request->validate([
             'email' => ['required', 'email'],
@@ -33,7 +56,5 @@ class PasswordResetLinkController extends Controller
                 'email' => [__($status)],
             ]);
         }
-
-        return response()->json(['status' => __($status)]);
     }
 }
