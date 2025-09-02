@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 
 class RegisteredUserController extends Controller
@@ -23,7 +24,7 @@ class RegisteredUserController extends Controller
     
     public function store(Request $request): Response
     {
-        $this->onStore();
+        $this->onStore($request);
 
         return response()->noContent();
     }
@@ -31,7 +32,7 @@ class RegisteredUserController extends Controller
     
     public function storeAPI(Request $request): Response
     {
-        $this->onStore();
+        $this->onStore($request);
 
         return response()->noContent();
     }
@@ -41,16 +42,15 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function onStore(){
+    protected function onStore(Request $request){
         $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
-            'middle_name' => ['string', 'max:255'],
+            'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'ext_name' => ['string', 'max:255'],
+            'ext_name' => ['nullable', 'string', 'max:255'],
             'birthdate' => ['required', Rule::date()->beforeOrEqual(today()->subYears(18))],
             'gender' => ['required', 'string'],
-            'user_type' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'string', 'max:255', 'unique:'.User::class],
+            'phone' => ['nullable', 'string', 'max:255', 'unique:'.User::class],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
@@ -62,7 +62,7 @@ class RegisteredUserController extends Controller
             'ext_name' => $request->ext_name,
             'birthdate' => $request->birthdate,
             'gender' => $request->gender,
-            'user_type' => $request->user_type,
+            'user_type' => 'member',
             'phone' => $request->phone,
             'email' => $request->email,
             'password' => Hash::make($request->string('password')),

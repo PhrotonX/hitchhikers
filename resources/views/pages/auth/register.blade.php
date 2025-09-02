@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('content')
-    <form action="api/register" method="POST">
+    <form action="register" method="POST">
+        @method('POST')
         @csrf
         <label>First Name</label>
         <input type="text" name="first_name" required><br>
@@ -19,9 +20,16 @@
         <input type="date" name="birthdate" required><br>
         <label>Email</label>
         <input type="email" name="email" required><br>
+        <label>Phone</label>
+        <input type="phone" name="phone" required><br>
         <label>Password</label>
         <input type="password" name="password" required><br>
+        <label>Password Confirmation</label>
+        <input type="password" name="password_confirmation" required><br>
         <button type="submit">Submit</button><br>
     </form>
     <button type="button">Create an account</button>
+    @isset($errors)
+        <p>{{$errors}}</p>
+    @endisset
 @endsection
