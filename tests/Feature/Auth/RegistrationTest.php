@@ -16,7 +16,7 @@ class RegistrationTest extends TestCase
             'middle_name' => 'Middle Name',
             'last_name' => 'Last Name',
             'ext_name' => 'Ext. Name',
-            'birthdate' => '01/01/2000',
+            'birthdate' => '2000-01-01',
             'user_type' => 'member',
             'gender' => 'male',
             'phone' => '0123-456-789',
