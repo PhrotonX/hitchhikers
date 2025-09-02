@@ -28,7 +28,7 @@ class ConfirmablePasswordController extends Controller
     {
         $this->onStore($request);
 
-        return redirect()->intended(route('home', absolute: false));
+        return redirect()->intended(route('/', absolute: false));
     }
 
     /**
