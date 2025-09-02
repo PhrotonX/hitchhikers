@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('content')
-    <form action="api/login" method="POST">
+    <form action="api/register" method="POST">
         @csrf
         <label>First Name</label>
         <input type="text" name="first_name" required><br>
