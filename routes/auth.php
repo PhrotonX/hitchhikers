@@ -63,6 +63,6 @@ Route::post('email/verification-notification', [EmailVerificationNotificationCon
     ->middleware(['auth', 'throttle:6,1'])
     ->name('verification.send');
 
-Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
+Route::get('logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
