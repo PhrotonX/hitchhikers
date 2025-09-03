@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
 class AuthenticatedSessionController extends Controller
@@ -15,7 +16,7 @@ class AuthenticatedSessionController extends Controller
      * 
      * @return Response No content
      */
-    public function storeAPI(LoginRequest $request): Response
+    public function storeAPI(LoginRequest $request): JsonResponse
     {
         $this->onStore($request);
 
@@ -27,7 +28,7 @@ class AuthenticatedSessionController extends Controller
      * 
      * @return Response route /home
      */
-    public function store(LoginRequest $request): Response
+    public function store(LoginRequest $request): RedirectResponse
     {
         $this->onStore($request);
 
@@ -37,23 +38,21 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    protected function onStore(LoginRequest $request): Response
+    protected function onStore(LoginRequest $request)
     {
         $request->authenticate();
 
         $request->session()->regenerate();
-
-        return response()->noContent();
     }
 
-    public function destroy(Request $request): Response
+    public function destroy(Request $request): RedirectResponse
     {
         $this->onDestroy($request);
 
         return redirect('/');
     }
 
-    public function destroyAPI(Request $request): Response
+    public function destroyAPI(Request $request): JsonResponse
     {
         $this->onDestroy($request);
 
