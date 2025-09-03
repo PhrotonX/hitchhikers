@@ -13,6 +13,7 @@ services:
       - ./routes:/var/www/routes
       - ./resources:/var/www/resources
       - ./.env:/var/www/.env
+      - ./public/build:/var/www/public/build
       - vendor_dir:/var/www/vendor
       - app_storage:/var/www/storage
       - app_cache:/var/www/bootstrap/cache
@@ -39,6 +40,7 @@ services:
       - ./app:/var/www/app
       - ./routes:/var/www/routes
       - ./resources:/var/www/resources
+      - ./public/build:/var/www/public/build
       - vendor_dir:/var/www/vendor
       - app_storage:/var/www/storage
       - app_cache:/var/www/bootstrap/cache
