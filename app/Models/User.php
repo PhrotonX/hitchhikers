@@ -52,4 +52,21 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function getFullName(): string{
+        $name = $this->first_name;
+        $name .= " " . $this->getMiddleInitial() ?? " ";
+        $name .= " $this->last_name";
+        $name .= " $this->ext_name" ?? "";
+
+        return $name;
+    }
+
+    public function getMiddleInitial(): ?string{
+        if(isset($this->middle_name)){
+            return $this->middle_name[0] . '.';
+        }else{
+            return null;
+        }
+    }
 }
