@@ -19,5 +19,6 @@ Route::get('register', function(){
 });
 
 Route::get('user/{user}', [UserController::class, 'show']);
+Route::get('user/{user}/edit', [UserController::class, 'edit']);
 
 require __DIR__.'/auth.php';
