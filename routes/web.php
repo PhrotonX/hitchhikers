@@ -18,7 +18,8 @@ Route::get('register', function(){
     return view('pages.auth.register');
 });
 
-Route::get('user/{user}', [UserController::class, 'show']);
+Route::get('user/{user}', [UserController::class, 'show'])->name('user.view');
 Route::get('user/{user}/edit', [UserController::class, 'edit']);
+Route::post('user/{user}/update', [UserController::class, 'update']);
 
 require __DIR__.'/auth.php';

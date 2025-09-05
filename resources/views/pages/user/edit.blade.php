@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
     <h1>Edit profile</h1>
-    <form action="user/{{Auth::user()}}/edit" method="POST">
+    <form action="/user/{{Auth::user()->id}}/update" method="POST">
         @method('POST')
         @csrf
         <label>First Name</label>
