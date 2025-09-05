@@ -28,7 +28,6 @@
         <input type="password" name="password_confirmation" required><br>
         <button type="submit">Submit</button><br>
     </form>
-    <button type="button">Create an account</button>
     @isset($errors)
         <p>{{$errors}}</p>
     @endisset
