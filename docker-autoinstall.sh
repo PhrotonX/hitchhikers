@@ -33,11 +33,13 @@ PID=$!
 wait $PID
 
 echo "Please wait..."
-sleep 15
 
-# Migrate
+# Wait for 15-20 seconds then migrate. Oftentimes, it needs
+# re-running to fully migrate the database.
+sleep 45
+
 docker exec -it hitchhikers_app php artisan migrate
 
 # Run npm
 docker exec -it hitchhikers_node npm run build
-docker exec -it hitchhikers_node npm run dev
+# docker exec -it hitchhikers_node npm run dev

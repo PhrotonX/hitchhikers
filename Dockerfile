@@ -17,7 +17,8 @@ WORKDIR /var/www
 
 COPY composer.json composer.lock ./
 
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+#RUN composer install --no-dev --optimize-autoloader --no-scripts
+RUN composer install --optimize-autoloader --no-scripts
 
 # Copy entire project
 COPY . .
@@ -26,15 +27,23 @@ COPY . .
 RUN composer run-script post-autoload-dump
 
 # Set proper permissions
-ARG APP_ENV=production
-RUN if [ "$APP_ENV" = "production" ]; then \
-        chown -R www-data:www-data /var/www \
-        && chmod -R 755 /var/www/storage \
-        && chmod -R 755 /var/www/bootstrap/cache ; \
-    else \
-        chown -R www-data:www-data /var/www \
-        && chmod -R 777 /var/www/storage/ /var/www/bootstrap/cache ; \
-    fi
+# Always ensure www-data can write to storage and cache
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
+    && chmod -R ug+rwX /var/www/storage /var/www/bootstrap/cache
+
+# Copy and set up entrypoint
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# ARG APP_ENV=production
+# RUN if [ "$APP_ENV" = "production" ]; then \
+#         chown -R www-data:www-data /var/www \
+#         && chmod -R 755 /var/www/storage \
+#         && chmod -R 755 /var/www/bootstrap/cache ; \
+#     else \
+#         chown -R www-data:www-data /var/www \
+#         && chmod -R 777 /var/www/storage/ /var/www/bootstrap/cache ; \
+#     fi
 
 # Set proper permissions (former code)
 # RUN chown -R www-data:www-data /var/www \
@@ -51,4 +60,5 @@ RUN echo "pm.max_children = 50" >> /usr/local/etc/php-fpm.d/www.conf \
 
 EXPOSE 9000
 
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm"]
