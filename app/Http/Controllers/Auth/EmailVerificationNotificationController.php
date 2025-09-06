@@ -34,7 +34,7 @@ class EmailVerificationNotificationController extends Controller
     /**
      * Send a new email verification notification.
      */
-    protected function onStore(Request $request): JsonResponse|RedirectResponse{
+    protected function onStore(Request $request){
         if ($request->user()->hasVerifiedEmail()) {
             return redirect()->intended('/');
         }

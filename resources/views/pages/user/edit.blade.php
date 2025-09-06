@@ -23,9 +23,41 @@
         <input type="email" name="email" required value="{{$user->email}}"><br>
         <label>Phone</label>
         <input type="phone" name="phone" required value="{{$user->phone}}"><br>
+        @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
+            <div>
+                <p>
+                    {{ __('credentials.email_unverified_msg') }}
+                </p>
+                <button type="button" id="verify-email-btn" onclick="window.location.href='{{route('verification.send')}}'">
+                    <p>{{ __('credentials.email_resend_verification') }}</p>
+                </button>
+
+                @if (session('status') === 'verification-link-sent')
+                    <p>{{ __('credentials.verification_link_sent') }}</p>
+                @endif
+            </div>
+        @endif
         <button type="submit">Submit</button><br>
     </form>
     @isset($errors)
         <p>{{$errors}}</p>
     @endisset
 @endsection
+{{-- 
+@push('scripts')
+    <script>
+        document.getElementById('verify-email-btn').addEventListener('click', () => {
+            fetch('{{route("verification.send")}}')
+                .then((response) => {
+                    document.getElementById('verify-email-btn').innerHTML = "<p>Email verification sent!</p>";
+                    console.log('Response on verify-email-btn' + response);
+                })
+                .then((data) => {
+                    console.log('Data on verify-email-btn' + data);
+                })
+                .catch((error) => {
+                    console.log("Error on verify-email-btn" + error);
+                });
+        })
+    </script>
+@endpush --}}

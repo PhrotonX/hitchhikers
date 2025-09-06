@@ -6,8 +6,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -69,4 +70,35 @@ class User extends Authenticatable
             return null;
         }
     }
+
+    public function isPrivileged(string $atLeast = null) : bool{
+        // There's probably a better way to deal with this.
+        switch($this->user_type){
+            case "member":
+                if($atLeast == "member"){
+                    return true;
+                }
+                return false;
+            case "moderator":
+                if($atLeast == "moderator" || $atLeast == "member"){
+                    return true;
+                }
+                return false;
+            case "staff":
+                if($atLeast == "staff" || $atLeast == "moderator" || $atLeast == "member"){
+                    return true;
+                }
+                return false;
+            case "owner":
+                if($atLeast == "owner" || $atLeast == "staff" || $atLeast == "moderator" || $atLeast == "member"){
+                    return true;
+                }
+                return false;
+            default:
+                return false;
+                break;
+        }
+    }
+
+    
 }
