@@ -19,7 +19,7 @@ Route::get('register', function(){
 });
 
 Route::get('user/{user}', [UserController::class, 'show'])->name('user.view');
-Route::get('user/{user}/edit', [UserController::class, 'edit'])->middleware('auth');
-Route::patch('user/{user}/update', [UserController::class, 'update'])->middleware('auth');
+Route::get('user/{user}/edit', [UserController::class, 'edit'])->middleware(['auth']);
+Route::patch('user/{user}/update', [UserController::class, 'update'])->middleware(['auth', 'verified']);
 
 require __DIR__.'/auth.php';
