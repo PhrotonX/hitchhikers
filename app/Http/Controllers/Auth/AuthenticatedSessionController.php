@@ -8,9 +8,18 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
+    /**
+     * Display the login view.
+     */
+    public function create(): View
+    {
+        return view('pages.auth.login');
+    }
+
     /**
      * Authenticate user or Login
      * 

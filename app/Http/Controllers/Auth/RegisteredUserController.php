@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
+use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
@@ -20,7 +21,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login');
+        return view('pages.auth.register');
     }
     
     public function store(Request $request): RedirectResponse
