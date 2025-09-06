@@ -1,3 +1,10 @@
+@props([
+    'gender' => [
+        'male' => __('gender.male'),
+        'female' => __('gender.female'),
+    ],
+])
+
 @extends('layouts.app')
 @section('content')
     <h1>Edit profile</h1>
@@ -14,8 +21,13 @@
         <input type="text" name="ext_name" value="{{$user->ext_name}}"><br>
         <label>Gender</label>
         <select name="gender" required>
-            <option value="male">{{__('gender.male')}}</option>
-            <option value="female">{{__('gender.female')}}</option>
+            @foreach ($gender as $key => $value)
+                @if (old('gender') == $key)
+                    <option value="{{$key}}" selected >{{$value}}</option>
+                @else
+                    <option value="{{$key}}">{{$value}}</option>
+                @endif
+            @endforeach
         </select><br>
         <label>Birthdate</label>
         <input type="date" name="birthdate" required value="{{$user->birthdate}}"><br>
