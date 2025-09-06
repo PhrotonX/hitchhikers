@@ -2,7 +2,7 @@
 @section('content')
     <h1>Edit profile</h1>
     <form action="/user/{{Auth::user()->id}}/update" method="POST">
-        @method('POST')
+        @method('PATCH')
         @csrf
         <label>First Name</label>
         <input type="text" name="first_name" required value="{{$user->first_name}}"><br>

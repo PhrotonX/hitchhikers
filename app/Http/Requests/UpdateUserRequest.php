@@ -32,9 +32,8 @@ class UpdateUserRequest extends FormRequest
             'ext_name' => ['nullable', 'string', 'max:255'],
             'birthdate' => ['required', Rule::date()->beforeOrEqual(today()->subYears(18))],
             'gender' => ['required', 'string'],
-            'phone' => ['nullable', 'string', 'max:255', 'unique:'.User::class],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Password::defaults()],
+            'phone' => ['nullable', 'string', 'max:255', Rule::unique(User::class)->ignore($this->route('user')->id)],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($this->route('user')->id)],
         ];
     }
 }
