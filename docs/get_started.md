@@ -78,16 +78,16 @@ This command will be used to run the Docker containers and their services. There
 docker exec -it [service_name] [command]
 ```
 in which **service_name** is either:
-- **hitchhike_app** for Laravel
-- **hitchhike_web** for Nginx
-- **hitchhike_db** for MySQL
-- **hitchhike_node** for NodeJS and npm
+- **hitchhikers_app** for Laravel
+- **hitchhikers_web** for Nginx
+- **hitchhikers_db** for MySQL
+- **hitchhikers_node** for NodeJS and npm
 
 ***Example***
 ```
-docker exec -it hitchhike_app php artisan serve
-docker exec -it hitchhike_node npm run dev
-docker exec -it hitchhike_db mysql -u root -p
+docker exec -it hitchhikers_app php artisan serve
+docker exec -it hitchhikers_node npm run dev
+docker exec -it hitchhikers_db mysql -u root -p
 ```
 
 Before visiting the website, please continue [configuring environment variables](configure_env.md).

@@ -1,5 +1,9 @@
+[Back](../README.md)
+
 # Contribute
 If you want to contribute, please visit [Getting Started](get_started.md).
+
+If you want to learn git, please visit [Working with Git](working_with_git.md).
 
 If you want to build the docker container for the website directly, run docker-autoinstall.sh under Linux or WSL2 **or** docker-autoinstall.bat for Windows.
 
