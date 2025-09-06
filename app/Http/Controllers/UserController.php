@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -49,7 +50,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user){
         $this->onUpdate($request, $user);
 
-        return redirect()->route('/user/{user}', $user->id)->with('success', __('Profile updated successfully.'));
+        return redirect()->route('user.view', ['user' => $user->id])->with('success', __('Profile updated successfully.'));
     }
 
     protected function onUpdate(UpdateUserRequest $request, User $user){
@@ -60,5 +61,13 @@ class UserController extends Controller
         if ($request->filled('password')) {
             $user->password = Hash::make($validated['password']);
         }
+
+        $user->fill($validated);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
     }
 }

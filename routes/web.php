@@ -20,6 +20,6 @@ Route::get('register', function(){
 
 Route::get('user/{user}', [UserController::class, 'show'])->name('user.view');
 Route::get('user/{user}/edit', [UserController::class, 'edit']);
-Route::post('user/{user}/update', [UserController::class, 'update']);
+Route::patch('user/{user}/update', [UserController::class, 'update']);
 
 require __DIR__.'/auth.php';
