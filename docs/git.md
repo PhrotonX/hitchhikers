@@ -1,14 +1,20 @@
 # Working with Git
 
-**Note:** You can use the Source Control tab on VS Code in place of commands.
+**Note:**
+- You can use the Source Control tab on VS Code in place of commands.
+- This article assumes that you have already cloned a branch in your local computer or are already using GitHub Codespace.
 
-## To switch branches
+## Definition of terms
+- **Repository** - Represents a code workspace. It can be on a local computer or a remote computer.
+- **Branch** - Represents a different version of code within a repository that can be merged into another branch. It is composed of a set of commits. It is the hallmark feature of a version control software.
+- **Commit** - Represents a certain point of code history on a branch.
 
 ## To contribute for a feature
 Make sure that you are switched to a dev branch by performing the following command on the terminal:
 ```
 git checkout dev
 ```
+The aforementioned command is the command to switch between different branches.
 
 Create a branch for each feature. To create a branch based on the currently checked-out branch, perform the following command:
 ```
@@ -71,10 +77,46 @@ Branches such as main, release/*, and dev branches are merge-protected to avoid 
 
 If you wanted your changes to be visible on merge-protected branches, [open the repository](https://github.com/PhrotonX/hitchhikers/) > Pull requests > New pull request.
 
-Do not forget to choose your base branch (typically dev) and then on compare button, choose the succeeding branch or the branch you wanted to merge onto base branch.
+Do not forget to choose your base branch (typically dev) and then on compare button, choose the succeeding branch or the branch you wanted to merge onto base branch. Then, press **Create pull request** button.
 ![Image of making a pull request on GitHub with base and compare branch buttons](git-github-merge-1.png)
 
+Then, add details into the pull request. Do not forget to add reviewers to review the code before merging.
+![Image of making a pull request on GitHub with input fields to include details](git-github-merge-2.png)
 
+Also, do not forget to click the **Create pull request** button. Your changes will be merged eventually after the code has been reviewed by other developers.
+
+After merging, do not forget to [sync your changes](#syncing-with-changes-pull-and-rebase). You may also delete your branch after [syncing with changes](#syncing-with-changes-pull-and-rebase) and then start a new branch after. You may also retain a branch if you wanted to.
+
+### To merge changes locally using VS Code
+To bring changes **into** a target branch, make sure that your active branch is the succeeding branch of target branch and then perform the merge operation by choosing a branch to merge with.
+
+To bring changes **from** a target branch, make sure that your active branch is the preceding branch of a succeeding branch and then perform the merge operation by choosing a branch to merge with.
+
+Please refer to the screenshots below:
+
+Accessing git merge through Source Control > More Actions (...) > Merge
+![Image of accessing git merge on VS Code](git-vscode-merge1.png)
+
+Then, a list of branches to merge with will be displayed. Select a branch to continue merging.
+![Image of a list of branches to merge with on VS Code](git-vscode-merge2.png)
+
+### To merge changes locally using Git Terminal
+To bring changes **into** a target branch, make sure that your active branch is the succeeding branch of target branch and then perform the following command:
+```bash
+git merge target_branch
+```
+For instance:
+```
+git merge dev
+```
+To bring changes **from** a target branch, make sure that your active branch is the preceding branch of a succeeding branch and then perform the following command:
+```bash
+git merge succeeding_branch
+```
+For instance:
+```
+git merge feature/new_branch
+```
 
 ## Syncing with changes (pull and rebase)
 It is recommended to always pull changes from the remote repository to obtain changes made by other developers or changes from other computers.
@@ -121,4 +163,19 @@ before performing a rebase, make sure that you are on the suceeding branch of a 
 To perform a rebase, perform the following command:
 ```
 git rebase target_branch_or_preceding_branch
+```
+
+## To delete branches
+- You may only delete a branch if the branch is not the active branch.
+- Avoid deleting major branches such as dev and main.
+### VS Code
+Go to Source Control Panel > More Actions (...) > Branch > Delete Branch... and then choose a branch you want to delete.
+![Image of accessing the delete branch feature in VS Code](git-vscode-delete-branch-1.png)
+
+![Image of a list of branches that can be deleted](git-vscode-delete-branch-2.png)
+
+### Git Terminal
+Perform the following commands to delete a branch:
+```
+git branch -d branch_name
 ```
