@@ -9,4 +9,7 @@
         <button type="submit">Submit</button>
     </form>
     <button type="button" onclick="window.location.href='/register'">Create an account</button>
+    @isset($errors)
+        <p>{{$errors}}</p>
+    @endisset
 @endsection

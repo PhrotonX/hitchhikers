@@ -8,15 +8,14 @@
 @section('content')
 <main>
     <div>
-        <x-form-section-content :title="__('auth.verify_email')">
-            <p>{{ __('auth.verify_email_message') }}</p>
+        <h1>Verify email</h1>
+        <p>{{ __('auth.verify_email_message') }}</p>
 
-            @if (session('status') == 'verification-link-sent')
-                <p>
-                    {{ __('auth.email_verification_sent') }}
-                </p>
-            @endif
-        </x-form-section-content>
+        @if (session('status') == 'verification-link-sent')
+            <p>
+                {{ __('auth.email_verification_sent') }}
+            </p>
+        @endif
 
         <div>
             <button type="button" id="logout-btn">
