@@ -12,9 +12,18 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class NewPasswordController extends Controller
 {
+    /**
+     * Display the password reset view.
+     */
+    public function create(Request $request): View
+    {
+        return view('pages.auth.reset-password', ['request' => $request]);
+    }
+
     /**
      * Handle an incoming new password request.
      *
@@ -22,7 +31,7 @@ class NewPasswordController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $this->onStore($request);
+        $status = $this->onStore($request);
 
         return $status == Password::PASSWORD_RESET
                     ? redirect()->route('login')->with('status', __($status))
@@ -37,7 +46,7 @@ class NewPasswordController extends Controller
      */
     public function storeAPI(Request $request): JsonResponse
     {
-        $this->onStore($request);
+        $status = $this->onStore($request);
 
         return response()->json(['status' => __($status)]);
     }

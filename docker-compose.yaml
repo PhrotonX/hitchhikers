@@ -16,7 +16,7 @@ services:
       - ./public/build:/var/www/public/build
       - vendor_dir:/var/www/vendor
       - app_storage:/var/www/storage
-      - app_cache:/var/www/bootstrap/cache
+      # - app_cache:/var/www/bootstrap/cache
     env_file:
       - .env
     # user: "${UID}:${GID}"
@@ -43,7 +43,7 @@ services:
       # - ./public/build:/var/www/public/build
       - vendor_dir:/var/www/vendor
       - app_storage:/var/www/storage
-      - app_cache:/var/www/bootstrap/cache
+      # - app_cache:/var/www/bootstrap/cache
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "8000:80"
@@ -81,6 +81,23 @@ services:
       - /var/www/node_modules
     ports:
       - "5173:5173"
+    networks:
+      - laravel
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: hitchhikers_mailpit
+    restart: unless-stopped
+    volumes:
+        - ./data:/data
+    ports:
+        - 8025:8025
+        - 1025:1025
+    environment:
+        MP_MAX_MESSAGES: 5000
+        MP_DATABASE: /data/mailpit.db
+        MP_SMTP_AUTH_ACCEPT_ANY: 1
+        MP_SMTP_AUTH_ALLOW_INSECURE: 1
     networks:
       - laravel
 
