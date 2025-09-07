@@ -29,7 +29,7 @@ class UserFactory extends Factory
             'last_name' => fake()->name(),
             'ext_name' => fake()->name(),
             'phone' => fake()->unique()->phoneNumber(),
-            'birthdate' => fake()->dateTime(),
+            'birthdate' => fake()->date(),
             'gender' => 'male',
             'user_type' => 'member',
             'email' => fake()->unique()->safeEmail(),

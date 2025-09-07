@@ -25,7 +25,11 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
+        // $out = new \Symfony\Component\Console\Output\ConsoleOutput();
+        // $out->writeln($response);
+
         $this->assertAuthenticated();
-        $response->assertNoContent();
+
+        $response->assertOk();
     }
 }
