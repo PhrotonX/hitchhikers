@@ -54,6 +54,8 @@
     @isset($errors)
         <p>{{$errors}}</p>
     @endisset
+
+    @include('pages.user.edit-password')
 @endsection
 {{-- 
 @push('scripts')
