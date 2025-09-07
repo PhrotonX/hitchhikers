@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Http\Requests\DeleteUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
@@ -69,5 +70,23 @@ class UserController extends Controller
         }
 
         $user->save();
+    }
+
+    public function delete(Request $request){
+        return view('pages.user.delete');
+    }
+
+    public function destroy(DeleteUserRequest $request, User $user){
+        auth()->logout();
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home');
+        // return response()->json([
+        //     'redirect' => 'home',
+        // ]);
     }
 }

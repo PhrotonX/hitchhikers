@@ -14,7 +14,7 @@
     <p>
         {{ __('credentials.delete_account_info') }}
     </p>
-    <form action="{{ route('profile.destroy') }}" method="POST">
+    <form action="{{ route('user.destroy', ['user' => Auth::user()->id]) }}" method="POST">
         @csrf
         @method('DELETE')
 
