@@ -22,7 +22,7 @@ class StoreDriverRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'account_status',
         ];
     }
 }

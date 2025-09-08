@@ -13,7 +13,7 @@ class DriverPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class DriverPolicy
      */
     public function view(User $user, Driver $driver): bool
     {
-        return false;
+        return true;
     }
 
     /**

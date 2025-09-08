@@ -29,7 +29,7 @@ class DriverController extends Controller
      */
     public function store(StoreDriverRequest $request)
     {
-        //
+        
     }
 
     /**
