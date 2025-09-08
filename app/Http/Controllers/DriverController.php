@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Http\Requests\StoreDriverRequest;
 use App\Http\Requests\UpdateDriverRequest;
 use App\Models\Driver;
@@ -13,7 +12,9 @@ class DriverController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json([
+            'redirect' => 'pages.driver.enroll_account',
+        ]);
     }
 
     /**
@@ -27,9 +28,21 @@ class DriverController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreDriverRequest $request)
+    public function store(StoreDriverRequest $request): JsonResponse
     {
-        
+        $validated = $request;
+
+        $driver = Driver::create([
+            'user_id' => Auth::user()->id,
+            'account_status' => $validated->account_status,
+        ]);
+
+        $driver->save();
+
+        return response()->json([
+            'redirect' => 'home',
+            'status' => 'You have sucessfully enrolled into the driving program!'
+        ]);
     }
 
     /**
