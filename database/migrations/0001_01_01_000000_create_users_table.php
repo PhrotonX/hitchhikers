@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('user_type');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('account_status')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
