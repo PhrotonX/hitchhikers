@@ -1,6 +1,14 @@
+@props([
+    'driver_type' => [
+        'ordinary_driver',
+        'company_driver'
+        'student_driver',
+    ],
+])
+
 @extends('layouts.app')
 @section('content')
-    <h1>Enroll to Driving Program</h1>
+    <h1>{{__('string.enroll_to_driving_program')}}</h1>
     <form action="#" method="POST">
         @csrf
         <x-input-label>{{__('credentials.driver_account_name')}}</x-input-label>
@@ -11,7 +19,26 @@
             :required="true"
         />
         <x-input-error :messages="$errors->get('driver_account_name')">
-        <button type="submit">Submit</button><br>
+
+        <x-input-label>{{__('string.company')}}</x-input-label>
+        <x-text-input
+            :name="'company'"
+            :placeholder="{{__('string.company')}}"
+            :value="{{old('company')}}"
+        />
+        <x-input-error :messages="$errors->get('string.company')">
+
+        <x-input-label>{{__('credentials.driver_type')}}</x-input-label>
+        <select name="driver_type" required></select>
+        @foreach ($driver_type as $value)
+            <option value="{{$value}}" @selected({{old('driver_type') == $value}})>{{__('credentials.$value')}}</option>
+        @endforeach
+
+        <strong>Notice:</strong>
+        <p>Please verify your driver account enrolling into driving program. Without verification,
+            the ability to make rides will be only available within 1 hour.</p>
+        
+        <button type="submit">{{__('string.submit')}}</button><br>
     </form>
     @isset($errors)
         <p>{{$errors}}</p>
