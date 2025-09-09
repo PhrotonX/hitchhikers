@@ -34,14 +34,17 @@ class DriverController extends Controller
 
         $driver = Driver::create([
             'user_id' => Auth::user()->id,
+            'driver_account_name' => $validated->driver_account_name,
+            'driver_type' => $validated->driver_type,
             'account_status' => $validated->account_status,
+            'company' => $validated->company,
         ]);
 
         $driver->save();
 
         return response()->json([
             'redirect' => 'home',
-            'status' => 'You have sucessfully enrolled into the driving program!'
+            'status' => __('string.driving_program_enrollment_success'),
         ]);
     }
 
