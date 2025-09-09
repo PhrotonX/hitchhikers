@@ -1,7 +1,7 @@
 @props([
     'driver_type' => [
         'ordinary_driver',
-        'company_driver'
+        'company_driver',
         'student_driver',
     ],
 ])
@@ -14,25 +14,32 @@
         <x-input-label>{{__('credentials.driver_account_name')}}</x-input-label>
         <x-text-input
             :name="'driver_account_name'"
-            :placeholder="{{__('credentials.driver_account_name_hint')}}"
-            :value="{{old('driver_account_name')}}"
+            :placeholder="__('credentials.driver_account_name_hint')"
+            :value="old('driver_account_name')"
             :required="true"
         />
-        <x-input-error :messages="$errors->get('driver_account_name')">
+        <x-input-error :messages="$errors->get('driver_account_name')"/>
+
+        <br>
 
         <x-input-label>{{__('string.company')}}</x-input-label>
         <x-text-input
             :name="'company'"
-            :placeholder="{{__('string.company')}}"
-            :value="{{old('company')}}"
+            :placeholder="__('string.company')"
+            :value="old('company')"
         />
-        <x-input-error :messages="$errors->get('string.company')">
+        <x-input-error :messages="$errors->get('string.company')"/>
+
+        <br>
 
         <x-input-label>{{__('credentials.driver_type')}}</x-input-label>
-        <select name="driver_type" required></select>
-        @foreach ($driver_type as $value)
-            <option value="{{$value}}" @selected({{old('driver_type') == $value}})>{{__('credentials.$value')}}</option>
-        @endforeach
+        <select name="driver_type" required>
+            @foreach ($driver_type as $value)
+                <option value="{{$value}}" @selected(old('driver_type') == $value)>{{__('credentials.'.$value)}}</option>
+            @endforeach
+        </select>
+        
+        <br>
 
         <strong>Notice:</strong>
         <p>Please verify your driver account enrolling into driving program. Without verification,
@@ -40,9 +47,7 @@
         
         <button type="submit">{{__('string.submit')}}</button><br>
     </form>
-    @isset($errors)
+    {{-- @isset($errors)
         <p>{{$errors}}</p>
-    @endisset
-
-    @include('pages.user.edit-password')
+    @endisset --}}
 @endsection

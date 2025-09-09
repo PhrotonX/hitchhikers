@@ -17,7 +17,8 @@
             </div>
         @endif
 
-        <a href="/user/{{Auth::user()->id}}/delete">Delete</a>
+        <a href="/user/{{Auth::user()->id}}/delete">Delete</a><br>
+        <a href="/driver/enroll">Enroll to Driving Program</a>
     @endauth
     
 @endsection

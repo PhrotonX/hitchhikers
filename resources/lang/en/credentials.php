@@ -36,7 +36,7 @@ return [
     'log_out' => 'Log Out',
     'driver_account_name' => 'Driver Account Name',
     'driver_account_name_hint' => 'Enter driver account name here...',
-    'driver_type' => 'Driver type...',
+    'driver_type' => 'Driver type',
     'driver_type_hint' => 'Enter driver type here...',
     'ordinary_driver' => 'Ordinary Driver',
     'company_driver' => 'Company Driver',
