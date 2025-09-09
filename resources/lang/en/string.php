@@ -16,4 +16,6 @@ return [
     'cancel' => 'Cancel',
     'back' => 'Back',
     'enroll_to_driving_program' => 'Enroll to Driving Program',
+    'company' => 'Company',
+    
 ];
