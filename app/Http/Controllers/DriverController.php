@@ -12,9 +12,7 @@ class DriverController extends Controller
      */
     public function index()
     {
-        return response()->json([
-            'redirect' => 'pages.driver.enroll_account',
-        ]);
+        //
     }
 
     /**
@@ -22,7 +20,9 @@ class DriverController extends Controller
      */
     public function create()
     {
-        //
+        return response()->json([
+            'redirect' => 'pages.driver.enroll_account',
+        ]);
     }
 
     /**

@@ -12,6 +12,8 @@ class Driver extends Model
 
     protected $fillable = [
         'account_status',
+        'company',
+        'driver_type',
         'user_id',
     ];
 

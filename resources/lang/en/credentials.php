@@ -34,6 +34,8 @@ return [
     'email_hint' => 'Enter your email...',
     'log_in' => 'Log In',
     'log_out' => 'Log Out',
+    'driver_account_name' => 'Driver Account Name',
+    'driver_account_name_hint' => 'Enter driver account name here...',
     'update_profile_information' => 'Update Profile Information',
     'update_profile_information_msg' => 'Update your account\'s profile information and email address.',
     'email_password_reset_link' => 'Email Password Reset Link',
