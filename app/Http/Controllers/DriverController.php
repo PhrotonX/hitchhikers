@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreDriverRequest;
 use App\Http\Requests\UpdateDriverRequest;
 use App\Models\Driver;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DriverController extends Controller
 {
@@ -28,24 +32,34 @@ class DriverController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreDriverRequest $request): JsonResponse
+    public function store(StoreDriverRequest $request): RedirectResponse
     {
-        $validated = $request;
+        $this->onStore($request);
 
-        $driver = Driver::create([
-            'user_id' => Auth::user()->id,
-            'driver_account_name' => $validated->driver_account_name,
-            'driver_type' => $validated->driver_type,
-            'account_status' => $validated->account_status,
-            'company' => $validated->company,
+        Log::debug('Data saved');
+        return route('home', [
+            'status' => __('string.driving_program_enrollment_success'),
         ]);
+    }
 
-        $driver->save();
+    public function storeAPI(StoreDriverRequest $request): JsonResponse
+    {
+        $this->onStore($request);
 
         return response()->json([
             'redirect' => 'home',
             'status' => __('string.driving_program_enrollment_success'),
         ]);
+    }
+
+    protected function onStore(StoreDriverRequrest $request){
+        $validated = $request->validated();
+
+        $driver = new Driver();
+        $driver->fill($validated);
+        $driver->user_id = Auth::user()->id;
+        
+        $driver->save();
     }
 
     /**

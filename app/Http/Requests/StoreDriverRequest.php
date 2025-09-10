@@ -6,13 +6,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreDriverRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return $this->user()->can('create');
-    }
+    // /**
+    //  * Determine if the user is authorized to make this request.
+    //  */
+    // public function authorize(): bool
+    // {
+    //     return $this->user()->can('create');
+    // }
 
     /**
      * Get the validation rules that apply to the request.
@@ -22,7 +22,10 @@ class StoreDriverRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'account_status',
+            'account_status' => ['string', 'nullable', 'max:255'],
+            'driver_type' => ['required', 'string', 'max:255'],
+            'company' => ['nullable', 'string', 'max:255'],
+            'user_id' => ['required'],
         ];
     }
 }
