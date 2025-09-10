@@ -29,7 +29,8 @@ class DriverPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        //@TODO: Must be able to only create driver accounts once.
+        return Auth::user()->id == $user->id;
     }
 
     /**

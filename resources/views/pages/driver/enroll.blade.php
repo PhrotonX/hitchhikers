@@ -9,7 +9,7 @@
 @extends('layouts.app')
 @section('content')
     <h1>{{__('string.enroll_to_driving_program')}}</h1>
-    <form action="#" method="POST">
+    <form action="/driver/enroll/submit" method="POST">
         @csrf
         <x-input-label>{{__('credentials.driver_account_name')}}</x-input-label>
         <x-text-input

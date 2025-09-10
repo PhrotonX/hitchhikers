@@ -4,6 +4,7 @@
  */
 
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DriverController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -24,9 +25,13 @@ Route::patch('user/{user}/update', [UserController::class, 'update'])->middlewar
 Route::get('user/{user}/delete', [UserController::class, 'delete'])->middleware(['auth', 'verified']);
 Route::delete('user/{user}/destroy', [UserController::class, 'destroy'])->middleware(['auth', 'verified'])->name('user.destroy');
 
-Route::get('driver/enroll', function(){
-    return view('pages.driver.enroll');
-})->middleware(['auth', 'verified']);
+Route::middleware(['auth', 'verified'])->group(function(){
+    Route::get('driver/enroll', function(){
+        return view('pages.driver.enroll');
+    });
+    Route::post('driver/enroll/submit', [DriverController::class, 'store']);
+});
+
 
 Route::get('settings', function(){
     return view('pages.user.settings');
