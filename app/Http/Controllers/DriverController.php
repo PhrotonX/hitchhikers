@@ -34,6 +34,7 @@ class DriverController extends Controller
      */
     public function store(StoreDriverRequest $request): RedirectResponse
     {
+        Log::debug('DriverController::onStore()');
         $this->onStore($request);
 
         Log::debug('Data saved');
@@ -53,7 +54,10 @@ class DriverController extends Controller
     }
 
     protected function onStore(StoreDriverRequrest $request){
+        Log::debug('DriverController::onStore()');
         $validated = $request->validated();
+
+        Log::debug('DriverController::onStore()');
 
         $driver = new Driver();
         $driver->fill($validated);
