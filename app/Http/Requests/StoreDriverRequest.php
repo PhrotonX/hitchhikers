@@ -26,7 +26,6 @@ class StoreDriverRequest extends FormRequest
             'account_status' => ['string', 'nullable', 'max:255'],
             'driver_type' => ['required', 'string', 'max:255'],
             'company' => ['nullable', 'string', 'max:255'],
-            'user_id' => ['required'],
         ];
     }
 }

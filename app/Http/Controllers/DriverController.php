@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreDriverRequest;
 use App\Http\Requests\UpdateDriverRequest;
 use App\Models\Driver;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
@@ -38,7 +39,7 @@ class DriverController extends Controller
         $this->onStore($request);
 
         Log::debug('Data saved');
-        return route('home', [
+        return redirect()->route('home', [
             'status' => __('string.driving_program_enrollment_success'),
         ]);
     }
@@ -53,7 +54,7 @@ class DriverController extends Controller
         ]);
     }
 
-    protected function onStore(StoreDriverRequrest $request){
+    protected function onStore(StoreDriverRequest $request){
         Log::debug('DriverController::onStore()');
         $validated = $request->validated();
 
