@@ -1,13 +1,20 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Http\Requests\StoreDriverRequest;
 use App\Http\Requests\UpdateDriverRequest;
 use App\Models\Driver;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DriverController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
@@ -21,15 +28,52 @@ class DriverController extends Controller
      */
     public function create()
     {
-        //
+        // $this->authorize('create', Auth::user());
+        if(Auth::user()->getDriverAccount() != null){
+            abort(403);
+        }
+
+        // return response()->json([
+        //     'redirect' => 'pages.driver.enroll',
+        // ]);
+        return view('pages.driver.enroll');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreDriverRequest $request)
+    public function store(StoreDriverRequest $request): RedirectResponse
     {
-        //
+        Log::debug('DriverController::onStore()');
+        $this->onStore($request);
+
+        Log::debug('Data saved');
+        return redirect()->route('home', [
+            'status' => __('string.driving_program_enrollment_success'),
+        ]);
+    }
+
+    public function storeAPI(StoreDriverRequest $request): JsonResponse
+    {
+        $this->onStore($request);
+
+        return response()->json([
+            'redirect' => 'home',
+            'status' => __('string.driving_program_enrollment_success'),
+        ]);
+    }
+
+    protected function onStore(StoreDriverRequest $request){
+        Log::debug('DriverController::onStore()');
+        $validated = $request->validated();
+
+        Log::debug('DriverController::onStore()');
+
+        $driver = new Driver();
+        $driver->fill($validated);
+        $driver->user_id = Auth::user()->id;
+        
+        $driver->save();
     }
 
     /**
@@ -45,15 +89,54 @@ class DriverController extends Controller
      */
     public function edit(Driver $driver)
     {
-        //
+        $this->onEdit($driver);
+
+        return view('pages.driver.edit', [
+            'driverAccount' => $driver,
+        ]);
+    }
+
+    public function editAPI(Driver $driver)
+    {
+        $this->onEdit($driver);
+
+        return response()->json([
+            'driverAccount' => $driver,
+            'redirect' => 'pages.driver.edit',
+        ]);
+    }
+
+    protected function onEdit(Driver $driver){
+        $this->authorize('update', $driver);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateDriverRequest $request, Driver $driver)
+    public function update(UpdateDriverRequest $request, Driver $driver): RedirectResponse
     {
-        //
+        $this->onUpdate($request, $driver);
+
+        return redirect()->route('settings', [
+            'status' => 'string.driver_edit_success',
+        ]);
+    }
+
+    public function updateAPI(UpdateDriverRequest $request, Driver $driver): JsonResponse
+    {
+        $this->onUpdate($request, $driver);
+
+        return response()->json([
+            'status' => 'string.driver_edit_success',
+        ]);
+    }
+
+    protected function onUpdate(UpdateDriverRequest $request, Driver $driver){
+        $validated = $request->validated();
+
+        $driver->fill($validated);
+        
+        $driver->save();
     }
 
     /**
@@ -61,6 +144,14 @@ class DriverController extends Controller
      */
     public function destroy(Driver $driver)
     {
-        //
+        $this->authorize('delete', $driver);
+
+        $this->onDestroy($driver);
+
+        return back()->with('status', 'account-deleted');
+    }
+
+    protected function onDestroy(Driver $driver){
+        $driver->delete();
     }
 }

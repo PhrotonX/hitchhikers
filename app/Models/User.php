@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Driver;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,6 +30,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'phone',
+        'account_status',
+    ];
+
+    protected $guarded = [
+        'id',
     ];
 
     /**
@@ -69,6 +75,10 @@ class User extends Authenticatable implements MustVerifyEmail
         }else{
             return null;
         }
+    }
+
+    public function getDriverAccount(){
+        return Driver::where('user_id', $this->id)->first()?->get()[0] ?? null;
     }
 
     public function isPrivileged(string $atLeast = null) : bool{

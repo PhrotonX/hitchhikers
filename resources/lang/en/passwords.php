@@ -24,6 +24,8 @@ return [
     'password_confirmation_hint' => 'Enter your password...',
     'secure_area_of_app' => 'This is a secure area of the application. Please confirm your password before continuing.',
     'confirm_password' => 'Confirm Password',
+    'current_password' => 'Current Password',
+    'new_password' => 'New Password',
     'update_password' => 'Update Password',
     'update_password_msg' => 'Ensure your account is using a long, random password to stay secure.',
 ];

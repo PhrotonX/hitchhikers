@@ -17,7 +17,10 @@ class DriverFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'driver_account_name' => fake()->name(),
+            'company' => 'Sample Company Name',
+            'driver_type' => 'ordinary_driver',
+            'user_id' => 1,
         ];
     }
 }

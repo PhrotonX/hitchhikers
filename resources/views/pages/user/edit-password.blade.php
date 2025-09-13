@@ -9,7 +9,7 @@
 @section('content') --}}
 <header>
     <h2>
-        {{ __('credentials.update_password') }}
+        {{ __('passwords.update_password') }}
     </h2>
 
     <p>
@@ -22,13 +22,13 @@
     @method('PUT')
     
     <div>
-        <x-input-label for="update_password_current_password" :value="__('credentials.current_password')" />
+        <x-input-label for="update_password_current_password" :value="__('passwords.current_password')" />
         <x-text-input id="update_password_current_password" name="current_password" type="password"  autocomplete="current-password" />
         <x-input-error :messages="$errors->get('current_password')"/>
     </div>
 
     <div>
-        <x-input-label for="update_password_password" :value="__('credentials.new_password')" />
+        <x-input-label for="update_password_password" :value="__('passwords.new_password')" />
         <x-text-input id="update_password_password" name="password" type="password" autocomplete="new-password" />
         <x-input-error :messages="$errors->get('password')"/>
     </div>
