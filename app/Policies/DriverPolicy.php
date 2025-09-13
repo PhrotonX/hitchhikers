@@ -46,7 +46,7 @@ class DriverPolicy
      */
     public function delete(User $user, Driver $driver): bool
     {
-        return false;
+        return $user->id === $driver->user_id;
     }
 
     /**

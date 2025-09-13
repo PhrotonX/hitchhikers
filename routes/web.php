@@ -30,6 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
         return view('pages.driver.enroll');
     });
     Route::post('driver/enroll/submit', [DriverController::class, 'store']);
+    Route::delete('driver/{driver}/leave', [DriverController::class, 'destroy']);
 });
 
 

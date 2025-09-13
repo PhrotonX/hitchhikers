@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreDriverRequest;
 use App\Http\Requests\UpdateDriverRequest;
 use App\Models\Driver;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
@@ -12,6 +13,8 @@ use Illuminate\Http\Request;
 
 class DriverController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
@@ -96,6 +99,14 @@ class DriverController extends Controller
      */
     public function destroy(Driver $driver)
     {
-        //
+        $this->authorize('delete', $driver);
+
+        $this->onDestroy($driver);
+
+        return back()->with('status', 'account-deleted');
+    }
+
+    protected function onDestroy(Driver $driver){
+        $driver->delete();
     }
 }

@@ -18,7 +18,16 @@
         @endif
 
         <a href="/user/{{Auth::user()->id}}/delete">Delete</a><br>
-        <a href="/driver/enroll">Enroll to Driving Program</a>
+        @if (Auth::user()->getDriverAccount() == null)
+            <a href="/driver/enroll">Enroll to Driving Program</a>
+        @else
+            <form action="/driver/{{Auth::user()->id}}/leave" method="POST">
+                @csrf
+                @method('DELETE')
+                <button type="submit">Leave Driving Program</button>
+            </form>
+        @endif
+        
     @endauth
     
 @endsection
