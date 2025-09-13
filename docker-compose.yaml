@@ -11,6 +11,7 @@ services:
     volumes:
       - ./app:/var/www/app
       - ./routes:/var/www/routes
+      - ./tests:/var/www/tests
       - ./resources:/var/www/resources
       - ./.env:/var/www/.env
       - ./public/build:/var/www/public/build
