@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateDriverRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateDriverRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('update', $this->route('driver'));
     }
 
     /**
@@ -22,7 +23,10 @@ class UpdateDriverRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'driver_account_name' => ['string', 'required', 'max:255'],
+            'account_status' => ['string', 'nullable', 'max:255'],
+            'driver_type' => ['required', 'string', 'max:255'],
+            'company' => ['max:255', Rule::requiredIf($this->input('driver_type') != 'ordinary_driver')],
         ];
     }
 }

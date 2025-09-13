@@ -47,7 +47,7 @@
         
         <button type="submit">{{__('string.submit')}}</button><br>
     </form>
-    {{-- @isset($errors)
+    @isset($errors)
         <p>{{$errors}}</p>
-    @endisset --}}
+    @endisset
 @endsection

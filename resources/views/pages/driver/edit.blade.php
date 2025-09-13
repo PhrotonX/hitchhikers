@@ -9,7 +9,7 @@
 @extends('layouts.app')
 @section('content')
     <h1>{{__('string.edit_driver_account')}}</h1>
-    <form action="/driver/{{$driverAccount->id}}/edit" method="POST">
+    <form action="/driver/{{$driverAccount->id}}/update" method="POST">
         @csrf
         @method('PATCH')
         <x-input-label>{{__('credentials.driver_account_name')}}</x-input-label>
@@ -42,13 +42,9 @@
         
         <br>
 
-        <strong>Notice:</strong>
-        <p>Please verify your driver account enrolling into driving program. Without verification,
-            the ability to make rides will be only available within 1 hour.</p>
-        
         <button type="submit">{{__('string.submit')}}</button><br>
     </form>
-    {{-- @isset($errors)
+    @isset($errors)
         <p>{{$errors}}</p>
-    @endisset --}}
+    @endisset
 @endsection

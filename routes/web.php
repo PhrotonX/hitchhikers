@@ -30,6 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::post('driver/enroll/submit', [DriverController::class, 'store']);
     Route::delete('driver/{driver}/leave', [DriverController::class, 'destroy']);
     Route::get('driver/{driver}/edit', [DriverController::class, 'edit']);
+    Route::patch('driver/{driver}/update', [DriverController::class, 'update']);
 });
 
 
@@ -37,7 +38,7 @@ Route::get('settings', function(){
     return view('pages.user.settings', [
         'driverAccount' => Auth::user()->getDriverAccount(),
     ]);
-})->middleware(['auth']);
+})->middleware(['auth'])->name('settings');
 
 
 
