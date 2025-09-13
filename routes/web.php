@@ -26,16 +26,16 @@ Route::get('user/{user}/delete', [UserController::class, 'delete'])->middleware(
 Route::delete('user/{user}/destroy', [UserController::class, 'destroy'])->middleware(['auth', 'verified'])->name('user.destroy');
 
 Route::middleware(['auth', 'verified'])->group(function(){
-    Route::get('driver/enroll', function(){
-        return view('pages.driver.enroll');
-    });
+    Route::get('driver/enroll', [DriverController::class, 'create']);
     Route::post('driver/enroll/submit', [DriverController::class, 'store']);
     Route::delete('driver/{driver}/leave', [DriverController::class, 'destroy']);
 });
 
 
 Route::get('settings', function(){
-    return view('pages.user.settings');
+    return view('pages.user.settings', [
+        'driverAccount' => Auth::user()->getDriverAccount(),
+    ]);
 })->middleware(['auth']);
 
 

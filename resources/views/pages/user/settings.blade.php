@@ -21,7 +21,7 @@
         @if (Auth::user()->getDriverAccount() == null)
             <a href="/driver/enroll">Enroll to Driving Program</a>
         @else
-            <form action="/driver/{{Auth::user()->id}}/leave" method="POST">
+            <form action="/driver/{{$driverAccount->id}}/leave" method="POST">
                 @csrf
                 @method('DELETE')
                 <button type="submit">Leave Driving Program</button>

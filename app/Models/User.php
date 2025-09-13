@@ -78,7 +78,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function getDriverAccount(){
-        return Driver::where('user_id', $this->id)->first()?->get() ?? null;
+        return Driver::where('user_id', $this->id)->first()?->get()[0] ?? null;
     }
 
     public function isPrivileged(string $atLeast = null) : bool{

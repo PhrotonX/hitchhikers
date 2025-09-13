@@ -26,11 +26,12 @@ class DriverPolicy
 
     /**
      * Determine whether the user can create models.
+     * 
+     * Must be invoked before saving driver data.
      */
     public function create(User $user): bool
     {
-        //@TODO: Must be able to only create driver accounts once.
-        return Auth::user()->id == $user->id;
+        return $user->getDriverAccount() == null;
     }
 
     /**

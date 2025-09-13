@@ -28,9 +28,15 @@ class DriverController extends Controller
      */
     public function create()
     {
-        return response()->json([
-            'redirect' => 'pages.driver.enroll_account',
-        ]);
+        // $this->authorize('create', Auth::user());
+        if(Auth::user()->getDriverAccount() != null){
+            abort(403);
+        }
+
+        // return response()->json([
+        //     'redirect' => 'pages.driver.enroll',
+        // ]);
+        return view('pages.driver.enroll');
     }
 
     /**

@@ -21,6 +21,7 @@ class UserController extends Controller
     public function show(User $user){
         return view('pages.user.view', [
             'user' => $user,
+            'driverAccount' => $user->getDriverAccount(),
         ]);
     }
 
