@@ -39,7 +39,7 @@ class DriverPolicy
      */
     public function update(User $user, Driver $driver): bool
     {
-        return false;
+        return $user->id === $driver->user_id && $user->getDriverAccount() != null;
     }
 
     /**

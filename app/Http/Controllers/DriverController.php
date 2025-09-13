@@ -89,15 +89,54 @@ class DriverController extends Controller
      */
     public function edit(Driver $driver)
     {
-        //
+        $this->onEdit($driver);
+
+        return view('pages.driver.edit', [
+            'driverAccount' => $driver,
+        ]);
+    }
+
+    public function editAPI(Driver $driver)
+    {
+        $this->onEdit($driver);
+
+        return response()->json([
+            'driverAccount' => $driver,
+            'redirect' => 'pages.driver.edit',
+        ]);
+    }
+
+    protected function onEdit(Driver $driver){
+        $this->authorize('update', $driver);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateDriverRequest $request, Driver $driver)
+    public function update(UpdateDriverRequest $request, Driver $driver): RedirectResponse
     {
-        //
+        $this->onUpdate($request, $driver);
+
+        return redirect()->route('settings', [
+            'status' => 'string.driver_edit_success',
+        ]);
+    }
+
+    public function updateAPI(UpdateDriverRequest $request, Driver $driver): JsonResponse
+    {
+        $this->onUpdate($request, $driver);
+
+        return response()->json([
+            'status' => 'string.driver_edit_success',
+        ]);
+    }
+
+    protected function onUpdate(UpdateDriverRequest $request, Driver $driver){
+        $validated = $request->validated();
+
+        $driver->fill($validated);
+        
+        $driver->save();
     }
 
     /**

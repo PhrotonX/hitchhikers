@@ -29,6 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('driver/enroll', [DriverController::class, 'create']);
     Route::post('driver/enroll/submit', [DriverController::class, 'store']);
     Route::delete('driver/{driver}/leave', [DriverController::class, 'destroy']);
+    Route::get('driver/{driver}/edit', [DriverController::class, 'edit']);
 });
 
 

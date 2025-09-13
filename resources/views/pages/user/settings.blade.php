@@ -30,6 +30,7 @@
         @if ($driverAccount == null)
             <a href="/driver/enroll">Enroll to Driving Program</a>
         @else
+            <a href="/driver/{{$driverAccount->id}}/edit">Edit Driver Account</a>
             <form action="/driver/{{$driverAccount->id}}/leave" method="POST">
                 @csrf
                 @method('DELETE')
