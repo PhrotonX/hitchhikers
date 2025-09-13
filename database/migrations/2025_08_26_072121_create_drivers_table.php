@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-// The migration sequence between drivers and rides table had been accidentally switched.
 return new class extends Migration
 {
     /**
@@ -14,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('drivers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->unique();
             $table->string('account_status')->nullable();
             $table->string('driver_type');
             $table->string('company')->nullable();

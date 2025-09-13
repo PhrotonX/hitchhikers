@@ -4,7 +4,6 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-// The migration sequence between drivers and rides table had been accidentally switched.
 return new class extends Migration
 {
     /**
