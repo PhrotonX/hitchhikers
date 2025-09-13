@@ -16,9 +16,18 @@
                 </button>
             </div>
         @endif
+    @endauth
+    
+    @if ($driverAccount != null)
+        <p><strong>Driver Account Name: </strong>{{$driverAccount->driver_account_name}}</p>
+        <p><strong>Driver Type: </strong>{{$driverAccount->driver_account_name}}</p>
+        <p><strong>Company: </strong>{{$driverAccount->company}}</p>
+    @endif
+    
 
+    @auth
         <a href="/user/{{Auth::user()->id}}/delete">Delete</a><br>
-        @if (Auth::user()->getDriverAccount() == null)
+        @if ($driverAccount == null)
             <a href="/driver/enroll">Enroll to Driving Program</a>
         @else
             <form action="/driver/{{$driverAccount->id}}/leave" method="POST">
@@ -27,7 +36,6 @@
                 <button type="submit">Leave Driving Program</button>
             </form>
         @endif
-        
     @endauth
     
 @endsection
