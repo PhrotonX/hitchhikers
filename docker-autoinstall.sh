@@ -25,7 +25,7 @@ wait $PID
 docker exec -it hitchhikers_app php artisan key:generate
 docker exec -it hitchhikers_app php artisan config:clear
 docker exec -it hitchhikers_app php artisan cache:clear
-docker exec -it hitchhikers_app php artisan config:cache
+# docker exec -it hitchhikers_app php artisan config:cache
 docker compose down -v
 docker compose up -d
 
@@ -33,7 +33,13 @@ PID=$!
 wait $PID
 
 echo "Please wait..."
-sleep 15
 
-# Migrate
+# Wait for 15-20 seconds then migrate. Oftentimes, it needs
+# re-running to fully migrate the database.
+sleep 45
+
 docker exec -it hitchhikers_app php artisan migrate
+
+# Run npm
+docker exec -it hitchhikers_node npm run build
+# docker exec -it hitchhikers_node npm run dev

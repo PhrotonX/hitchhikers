@@ -13,7 +13,7 @@ class DriverPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,15 +21,17 @@ class DriverPolicy
      */
     public function view(User $user, Driver $driver): bool
     {
-        return false;
+        return true;
     }
 
     /**
      * Determine whether the user can create models.
+     * 
+     * Must be invoked before saving driver data.
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->getDriverAccount() == null;
     }
 
     /**
@@ -37,7 +39,7 @@ class DriverPolicy
      */
     public function update(User $user, Driver $driver): bool
     {
-        return false;
+        return $user->id === $driver->user_id && $user->getDriverAccount() != null;
     }
 
     /**
@@ -45,7 +47,7 @@ class DriverPolicy
      */
     public function delete(User $user, Driver $driver): bool
     {
-        return false;
+        return $user->id === $driver->user_id;
     }
 
     /**

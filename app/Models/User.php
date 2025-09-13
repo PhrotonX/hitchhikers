@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Driver;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -18,9 +20,21 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'ext_name',
+        'gender',
+        'birthdate',
+        'user_type',
         'email',
         'password',
+        'phone',
+        'account_status',
+    ];
+
+    protected $guarded = [
+        'id',
     ];
 
     /**
@@ -45,4 +59,56 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function getFullName(): string{
+        $name = $this->first_name;
+        $name .= " " . $this->getMiddleInitial() ?? " ";
+        $name .= " $this->last_name";
+        $name .= " $this->ext_name" ?? "";
+
+        return $name;
+    }
+
+    public function getMiddleInitial(): ?string{
+        if(isset($this->middle_name)){
+            return $this->middle_name[0] . '.';
+        }else{
+            return null;
+        }
+    }
+
+    public function getDriverAccount(){
+        return Driver::where('user_id', $this->id)->first()?->get()[0] ?? null;
+    }
+
+    public function isPrivileged(string $atLeast = null) : bool{
+        // There's probably a better way to deal with this.
+        switch($this->user_type){
+            case "member":
+                if($atLeast == "member"){
+                    return true;
+                }
+                return false;
+            case "moderator":
+                if($atLeast == "moderator" || $atLeast == "member"){
+                    return true;
+                }
+                return false;
+            case "staff":
+                if($atLeast == "staff" || $atLeast == "moderator" || $atLeast == "member"){
+                    return true;
+                }
+                return false;
+            case "owner":
+                if($atLeast == "owner" || $atLeast == "staff" || $atLeast == "moderator" || $atLeast == "member"){
+                    return true;
+                }
+                return false;
+            default:
+                return false;
+                break;
+        }
+    }
+
+    
 }

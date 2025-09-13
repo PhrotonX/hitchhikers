@@ -29,7 +29,7 @@ REM Batch 3 (Key generation)
 docker exec -it hitchhikers_app php artisan key:generate
 docker exec -it hitchhikers_app php artisan config:clear
 docker exec -it hitchhikers_app php artisan cache:clear
-docker exec -it hitchhikers_app php artisan config:cache
+@REM docker exec -it hitchhikers_app php artisan config:cache
 
 docker compose down -v
 docker compose up -d
@@ -39,3 +39,7 @@ timeout /t 15 >nul
 
 REM Migrate
 docker exec -it hitchhikers_app php artisan migrate
+
+REM Run NPM
+docker exec -it hitchhikers_node npm run build
+docker exec -it hitchhikers_node npm run dev
