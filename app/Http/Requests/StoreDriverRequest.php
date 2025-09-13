@@ -23,6 +23,7 @@ class StoreDriverRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'driver_account_name' => ['string', 'required', 'max:255'],
             'account_status' => ['string', 'nullable', 'max:255'],
             'driver_type' => ['required', 'string', 'max:255'],
             'company' => ['nullable', 'string', 'max:255'],

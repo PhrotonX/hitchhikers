@@ -11,6 +11,7 @@ class Driver extends Model
     use HasFactory;
 
     protected $fillable = [
+        'driver_account_name',
         'account_status',
         'company',
         'driver_type',

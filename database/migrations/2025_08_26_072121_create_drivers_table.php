@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('drivers', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->unique();
+            $table->string('driver_account_name');
             $table->string('account_status')->nullable();
             $table->string('driver_type');
             $table->string('company')->nullable();
