@@ -1,10 +1,12 @@
 @extends('layouts.app')
 @section('content')
-    <h1>{{Auth::user()->getFullName()}}</h1>
-    <p><strong>Date joined: </strong>{{Auth::user()->created_at}}</p>
+    <h1>{{$user->getFullName()}}</h1>
+    <p><strong>Date joined: </strong>{{$user->created_at}}</p>
 
     @auth
-        <a href="/settings">Settings</a>
+        @if ($user->id == Auth::user()->id)
+            <a href="/settings">Settings</a>
+        @endif
     @endauth
     
 @endsection
