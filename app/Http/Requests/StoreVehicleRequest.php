@@ -11,7 +11,7 @@ class StoreVehicleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('create', $this->route('vehicle'));
     }
 
     /**
@@ -22,7 +22,14 @@ class StoreVehicleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'plate_number' => ['required', 'string', 'max:255', 'unique'],
+            'vehicle_model' => ['required', 'string', 'max:255'],
+            'vehicle_brand' => ['required', 'string', 'max:255'],
+            'capacity' => ['numeric'],
+            'coordinates' => ['nullable'],
+            'color' => ['required', 'string'],
+            'type' => ['required', 'string', 'max:255'],
+
         ];
     }
 }
