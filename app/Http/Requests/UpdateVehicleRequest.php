@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateVehicleRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class UpdateVehicleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()->can('update', $this->route('vehicle'));
     }
 
     /**
@@ -22,7 +23,14 @@ class UpdateVehicleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'plate_number' => ['required', 'string', 'max:255', Rule::unique(User::class)->ignore($this->route('vehicle')->id)],
+            'vehicle_model' => ['required', 'string', 'max:255'],
+            'vehicle_brand' => ['required', 'string', 'max:255'],
+            'capacity' => ['numeric'],
+            'coordinates' => ['nullable'],
+            'color' => ['required', 'string'],
+            'type' => ['required', 'string', 'max:255'],
+
         ];
     }
 }
