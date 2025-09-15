@@ -8,5 +8,8 @@
             <a href="/settings">Settings</a>
         @endif
     @endauth
+
+    <h2>Your Vehicles</h2>
+    <a href="/vehicle/create">Create a vehicle</a>
     
 @endsection
