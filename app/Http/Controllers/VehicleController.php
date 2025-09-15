@@ -23,7 +23,7 @@ class VehicleController extends Controller
      */
     public function create()
     {
-        return redirect()->route('pages.vehicle.create');
+        return view('pages.vehicle.create');
     }
 
     /**
@@ -35,7 +35,7 @@ class VehicleController extends Controller
     {
         $this->onStore($request);
 
-        return redirect()->route('pages.vehicle.create');
+        return redirect()->route('vehicle.create');
     }
 
     /**
@@ -46,7 +46,7 @@ class VehicleController extends Controller
         $this->onStore($request);
 
         return response()->json([
-            'redirect' => 'pages.vehicle.create',
+            'redirect' => 'vehicle.create',
         ]);
     }
 
@@ -78,11 +78,43 @@ class VehicleController extends Controller
     }
 
     /**
+     * Update the specified resource in storage and returns a page.
+     * 
+     * @param Vehicle The vehicle object
+     * @return RedirectReponse ```vehicle```
+     */
+    public function update(UpdateVehicleRequest $request, Vehicle $vehicle): RedirectResponse
+    {
+        $this->onUpdate($request, $vehicle);
+
+        return redirect()->route('vehicle.view', [
+            'vehicle' => $vehicle,
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage and returns a page.
+     * 
+     * @param Vehicle The vehicle object
+     * @return JsonResponse ```redirect``` and ```vehicle```
+     */
+    public function updateAPI(UpdateVehicleRequest $request, Vehicle $vehicle): JsonResponse
+    {
+        $this->onUpdate($request, $vehicle);
+
+        return response()->json([
+            'redirect' => 'vehicle.view',
+            'vehicle' => $vehicle,
+        ]);
+    }
+
+    /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateVehicleRequest $request, Vehicle $vehicle)
-    {
-        //
+    protected function onUpdate(UpdateVehicleRequest $request, Vehicle $vehicle){
+        $vehicle->fill($request->validated());
+
+        $vehicle->save();
     }
 
     /**
