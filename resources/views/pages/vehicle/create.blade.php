@@ -9,7 +9,7 @@
             :placeholder="__('string.vehicle_name_placeholder')"
             :value="old('vehicle_name')"
         />
-        <x-input-error :messages="$error->get('vehicle_name')"/>
+        <x-input-error :messages="$errors->get('vehicle_name')"/>
 
         <button type="submit">Submit</button>
     </form>
