@@ -15,31 +15,31 @@ use Illuminate\Support\Facades\Route;
 // API-only
 Route::post('api/register', [RegisteredUserController::class, 'storeAPI'])
     ->middleware('guest')
-    ->name('register');
+    ->name('api.register');
 
 Route::post('api/login', [AuthenticatedSessionController::class, 'storeAPI'])
     ->middleware('guest')
-    ->name('login');
+    ->name('api.login');
 
 Route::post('api/forgot-password', [PasswordResetLinkController::class, 'storeAPI'])
     ->middleware('guest')
-    ->name('password.email');
+    ->name('api.password.email');
 
 Route::post('api/reset-password', [NewPasswordController::class, 'storeAPI'])
     ->middleware('guest')
-    ->name('password.store');
+    ->name('api.password.store');
 
 Route::get('api/verify-email/{id}/{hash}', VerifyEmailControllerAPI::class)
     ->middleware(['auth', 'signed', 'throttle:6,1'])
-    ->name('verification.verify');
+    ->name('api.verification.verify');
 
 Route::post('api/email/verification-notification', [EmailVerificationNotificationController::class, 'storeAPI'])
     ->middleware(['auth', 'throttle:6,1'])
-    ->name('verification.send');
+    ->name('api.verification.send');
 
 Route::post('api/logout', [AuthenticatedSessionController::class, 'destroyAPI'])
     ->middleware('auth')
-    ->name('logout');
+    ->name('api.logout');
 
 // Web API Authentication (works with Laravel Blade)
 // Route::post('register', [RegisteredUserController::class, 'store'])
