@@ -12,6 +12,7 @@ class Vehicle extends Model
 
     protected $fillable = [
         'plate_number',
+        'vehicle_name',
         'vehicle_model',
         'vehicle_brand',
         'capacity',

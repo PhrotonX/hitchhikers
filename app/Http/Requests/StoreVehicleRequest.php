@@ -23,6 +23,7 @@ class StoreVehicleRequest extends FormRequest
     {
         return [
             'plate_number' => ['required', 'string', 'max:255', 'unique'],
+            'vehicle_name' => ['required', 'string', 'mmax:255'],
             'vehicle_model' => ['required', 'string', 'max:255'],
             'vehicle_brand' => ['required', 'string', 'max:255'],
             'capacity' => ['numeric'],
