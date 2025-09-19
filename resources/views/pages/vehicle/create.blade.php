@@ -11,6 +11,14 @@
         />
         <x-input-error :messages="$errors->get('vehicle_name')"/>
 
+        <x-input-label>{{__('string.vehicle_brand')}}</x-input-label>
+        <x-text-input
+            :name="'vehicle_brand'"
+            :placeholder="__('string.vehicle_brand_placeholder')"
+            :value="old('vehicle_brand')"
+        />
+        <x-input-error :messages="$errors->get('vehicle_brand')"/>
+
         <button type="submit">Submit</button>
     </form>
 @endsection
