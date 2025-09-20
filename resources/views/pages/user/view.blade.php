@@ -11,7 +11,9 @@
 
     
     <h2>Your Vehicles</h2>
-    
+    @foreach ($vehicleDrivers ?? null as $vehicleDriver)
+        <p>{{$vehicleDriver->vehicle->vehicle_name}}</p>
+    @endforeach
     @auth
         @if ($user->id == Auth::user()->id)
             @if($user->isDriver())

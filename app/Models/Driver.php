@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Vehicle;
+use App\Models\VehicleDriver;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,11 +22,4 @@ class Driver extends Model
     protected $guarded = [
         'id',
     ];
-
-    /**
-     * @return array Returns an array of vehicles associated with the account.
-     */
-    public function getVehicles(){
-        return Vehicle::where('driver_id', $this->id)->get();
-    }
 }

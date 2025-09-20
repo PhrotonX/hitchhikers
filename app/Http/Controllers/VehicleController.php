@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
+use App\Models\VehicleDriver;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class VehicleController extends Controller
 {
@@ -64,6 +66,13 @@ class VehicleController extends Controller
         $vehicle->fill($request->validated());
 
         $vehicle->save();
+
+        // On save to associative tables
+        $vehicleDriver = new VehicleDriver;
+        $vehicleDriver->vehicle_id = $vehicle->id;
+        $vehicleDriver->driver_id = Auth::user()->getDriverAccount()->id;
+
+        $vehicleDriver->save();
     }
 
     /**
