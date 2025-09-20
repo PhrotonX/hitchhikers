@@ -60,9 +60,18 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function getFullName(): string{
+    /**
+     * Returns the full name of the user.
+     * 
+     * @param useMiddleInitial True if the string should consist of a middle initial, false for middle name.
+     * @return string The full name of the user.
+     */
+    public function getFullName($useMiddleInitial = false): string{
         $name = $this->first_name;
-        $name .= " " . $this->getMiddleInitial() ?? " ";
+        if($useMiddleInitial == true)
+            $name .= " " . $this->getMiddleInitial() ?? " ";
+        else
+            $name .= " " . $this->middle_name ?? " ";
         $name .= " $this->last_name";
         $name .= " $this->ext_name" ?? "";
 
@@ -77,10 +86,21 @@ class User extends Authenticatable implements MustVerifyEmail
         }
     }
 
+    /**
+     * Obtains the Driver account object.
+     * 
+     * @return Driver? A nullable Driver object.
+     */
     public function getDriverAccount(){
         return Driver::where('user_id', $this->id)->first()?->get()[0] ?? null;
     }
 
+    /**
+     * Checks if the user consists of a role or a privilege such as member, moderator, staff, and owner (in ascending order).
+     * 
+     * @param atLeast Checks whether the user account consist of the specified privelege until the highest privelege.
+     * @return bool Returns true if the specified or higher privilege exists. Else, false otherwise.
+     */
     public function isPrivileged(string $atLeast = null) : bool{
         // There's probably a better way to deal with this.
         switch($this->user_type){
@@ -108,6 +128,15 @@ class User extends Authenticatable implements MustVerifyEmail
                 return false;
                 break;
         }
+    }
+
+    /**
+     * Checks whether the user account is a driver or not.
+     * 
+     * @return bool Returns true if the user's driver account object is not null. Else, false.
+     */
+    public function isDriver(): bool{
+        return $this->getDriverAccount() != null;
     }
 
     

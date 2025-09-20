@@ -5,6 +5,7 @@
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,6 +32,9 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::delete('driver/{driver}/leave', [DriverController::class, 'destroy']);
     Route::get('driver/{driver}/edit', [DriverController::class, 'edit']);
     Route::patch('driver/{driver}/update', [DriverController::class, 'update']);
+
+    Route::get('vehicle/create', [VehicleController::class, 'create'])->name('vehicle.create');
+    Route::post('vehicle/create/submit', [VehicleController::class, 'store'])->name('vehicle.submit');
 });
 
 

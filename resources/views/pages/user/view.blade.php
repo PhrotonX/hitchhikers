@@ -8,5 +8,15 @@
             <a href="/settings">Settings</a>
         @endif
     @endauth
+
+    
+    <h2>Your Vehicles</h2>
+    @auth
+        @if ($user->id == Auth::user()->id)
+            @if($user->isDriver())
+                <a href="/vehicle/create">Create a vehicle</a>
+            @endif
+        @endif
+    @endauth
     
 @endsection

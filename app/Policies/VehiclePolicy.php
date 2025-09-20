@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Facades\Support\Log;
 
 class VehiclePolicy
 {
@@ -29,7 +30,7 @@ class VehiclePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isDriver();
     }
 
     /**

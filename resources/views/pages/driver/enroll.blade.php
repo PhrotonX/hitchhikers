@@ -28,7 +28,7 @@
             :placeholder="__('string.company')"
             :value="old('company')"
         />
-        <x-input-error :messages="$errors->get('string.company')"/>
+        <x-input-error :messages="$errors->get('company')"/>
 
         <br>
 
