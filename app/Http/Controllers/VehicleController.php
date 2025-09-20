@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 
 class VehicleController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
@@ -54,6 +57,8 @@ class VehicleController extends Controller
      * Store a newly created resource in storage.
      */
     protected function onStore(StoreVehicleRequest $request){
+        // $this->authorize('create');
+
         $vehicle = new Vehicle();
 
         $vehicle->fill($request->validated());

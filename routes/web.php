@@ -34,6 +34,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::patch('driver/{driver}/update', [DriverController::class, 'update']);
 
     Route::get('vehicle/create', [VehicleController::class, 'create'])->name('vehicle.create');
+    Route::post('vehicle/create/submit', [VehicleController::class, 'store'])->name('vehicle.submit');
 });
 
 
