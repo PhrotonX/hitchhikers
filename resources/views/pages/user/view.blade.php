@@ -9,7 +9,14 @@
         @endif
     @endauth
 
+    
     <h2>Your Vehicles</h2>
-    <a href="/vehicle/create">Create a vehicle</a>
+    @auth
+        @if ($user->id == Auth::user()->id)
+            @if($user->isDriver())
+                <a href="/vehicle/create">Create a vehicle</a>
+            @endif
+        @endif
+    @endauth
     
 @endsection
