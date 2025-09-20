@@ -35,8 +35,9 @@ Route::middleware(['auth', 'verified'])->group(function(){
 
     Route::get('vehicle/create', [VehicleController::class, 'create'])->name('vehicle.create');
     Route::post('vehicle/create/submit', [VehicleController::class, 'store'])->name('vehicle.submit');
-    Route::get('vehicle/{vehicle}/edit/edit', [VehicleController::class, 'edit'])->name('vehicle.edit');
+    Route::get('vehicle/{vehicle}/edit', [VehicleController::class, 'edit'])->name('vehicle.edit');
     Route::patch('vehicle/{vehicle}/edit/update', [VehicleController::class, 'update'])->name('vehicle.update');
+    Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
 });
 
 

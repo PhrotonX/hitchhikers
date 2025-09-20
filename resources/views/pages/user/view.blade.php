@@ -11,11 +11,13 @@
 
     
     <h2>Your Vehicles</h2>
+    
     @auth
         @if ($user->id == Auth::user()->id)
             @if($user->isDriver())
                 <a href="/vehicle/create">Create a vehicle</a>
             @endif
+            <a href="/user/vehicle/">Show all vehicles</a>
         @endif
     @endauth
     
