@@ -12,7 +12,7 @@
     
     <h2>Your Vehicles</h2>
     @foreach ($vehicleDrivers ?? null as $vehicleDriver)
-        <p>{{$vehicleDriver->vehicle->vehicle_name}} <a href="/vehicle/{{$vehicleDriver->vehicle->id}}/edit">{{__('string.edit')}}</a></p>
+        <p><a href="/vehicle/{{$vehicleDriver->vehicle->id}}">{{$vehicleDriver->vehicle->vehicle_name}}</a> <a href="/vehicle/{{$vehicleDriver->vehicle->id}}/edit">{{__('string.edit')}}</a></p>
     @endforeach
     @auth
         @if ($user->id == Auth::user()->id)

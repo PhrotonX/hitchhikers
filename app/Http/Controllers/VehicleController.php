@@ -80,7 +80,9 @@ class VehicleController extends Controller
      */
     public function show(Vehicle $vehicle)
     {
-        //
+        return view('pages.vehicle.view', [
+            'vehicle' => $vehicle,
+        ]);
     }
 
     /**

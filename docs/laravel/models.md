@@ -15,3 +15,4 @@ Example in a blade file, enclosed in a ddouble curly braces {{ }}
 ```
 
 - All database fields can be found within migration files at [migrations folder at /database/migration](../../database/migrations/) or [models at /app/Models/](../../app/Models/).
+- Fields such as **created_at** and **updated_at** if **timestamps** are present in a migration file. The field  **deleted_at** is only present if **softDeletes** is present in a migration file.
