@@ -138,10 +138,36 @@ class VehicleController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage with a RedirectResponse.
+     * 
+     * @param vehicle The resource to be deleted.
+     * @return RedirectResponse Returns back page.
      */
     public function destroy(Vehicle $vehicle)
     {
-        //
+        $results = $this->onDestroy($vehicle);
+
+        return back()->with([
+            'status' => $results['status'],
+        ]);
+    }
+
+    protected function onDestroy(Vehicle $vehicle): array{
+        $this->authorize('delete', $vehicle);
+
+        // Delete the data from associative tables.
+        VehicleDriver::where('vehicle_id', $vehicle->id)
+                    //  ->where('driver_id', Auth::user()->getDriverAccount()?->id ?? 0)
+                     ->delete();
+
+        // @TODO: Delete the foriegn keys from other tables such as the rides table.
+
+        // Delete the actual vehicle data.
+
+        $vehicle->delete();
+
+        return [
+            'status' => "Vehicle $vehicle->vehicle_name deleted",
+        ];
     }
 }

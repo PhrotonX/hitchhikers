@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\VehicleDriver;
 use Illuminate\Auth\Access\Response;
-use Illuminate\Facades\Support\Log;
+use Illuminate\Support\Facades\Log;
 
 class VehiclePolicy
 {
@@ -39,9 +39,7 @@ class VehiclePolicy
      */
     public function update(User $user, Vehicle $vehicle): bool
     {
-        //VehicleDriver IDs are unique.
-        $vehicleDriver = VehicleDriver::where('vehicle_id', $vehicle->id)->first()->get();
-        return $user->getDriverAccount()?->id ?? 0 == $vehicleDriver->driver->id; 
+        return $this->checkIfDriverOwnsVehicle($user, $vehicle);
     }
 
     /**
@@ -49,7 +47,7 @@ class VehiclePolicy
      */
     public function delete(User $user, Vehicle $vehicle): bool
     {
-        return false;
+        return $this->checkIfDriverOwnsVehicle($user, $vehicle);
     }
 
     /**
@@ -66,5 +64,17 @@ class VehiclePolicy
     public function forceDelete(User $user, Vehicle $vehicle): bool
     {
         return false;
+    }
+
+    protected function checkIfDriverOwnsVehicle(User $user, Vehicle $vehicle){
+        // Check if the user owns the vehicle.
+        // VehicleDriver IDs are unique.
+
+        // Get the associative VehicleDriver object from the Vehicle object to obtain access to
+        // driver ID.
+        $vehicleDriver = VehicleDriver::where('vehicle_id', $vehicle->id)->first()->get();
+
+        // Compare the driver ID of the vehicle to the current user's driver ID.
+        return $user->getDriverAccount()?->id ?? 0 == $vehicleDriver->driver->id; 
     }
 }
