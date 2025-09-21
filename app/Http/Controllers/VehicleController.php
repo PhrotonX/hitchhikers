@@ -38,9 +38,9 @@ class VehicleController extends Controller
      */
     public function store(StoreVehicleRequest $request): RedirectResponse
     {
-        $this->onStore($request);
+        $results = $this->onStore($request);
 
-        return redirect()->route('vehicle.create');
+        return redirect()->route('vehicle.show', $results);
     }
 
     /**
@@ -58,7 +58,7 @@ class VehicleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    protected function onStore(StoreVehicleRequest $request){
+    protected function onStore(StoreVehicleRequest $request): array{
         // $this->authorize('create');
 
         $vehicle = new Vehicle();
@@ -73,6 +73,10 @@ class VehicleController extends Controller
         $vehicleDriver->driver_id = Auth::user()->getDriverAccount()->id;
 
         $vehicleDriver->save();
+
+        return [
+            'vehicle' => $vehicle,
+        ];
     }
 
     /**
@@ -147,9 +151,7 @@ class VehicleController extends Controller
     {
         $results = $this->onDestroy($vehicle);
 
-        return back()->with([
-            'status' => $results['status'],
-        ]);
+        return back()->with($results);
     }
 
     protected function onDestroy(Vehicle $vehicle): array{

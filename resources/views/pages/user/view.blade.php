@@ -28,5 +28,10 @@
             {{-- <a href="/user/vehicle/">Show all vehicles</a> --}}
         @endif
     @endauth
+
+    @if (isset($status))
+        <x-status>{{$status}}</x-status>
+        <p>{{$status}}</p> 
+    @endif
     
 @endsection
