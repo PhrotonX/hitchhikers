@@ -13,3 +13,5 @@ Example in a blade file, enclosed in a ddouble curly braces {{ }}
 ```html
 <p><strong>Vehicle Name: </strong>{{$vehicle->vehicle_name}}</p>
 ```
+
+- All database fields can be found within migration files at [migrations folder at /database/migration](../../database/migrations/) or [models at /app/Models/](../../app/Models/).
