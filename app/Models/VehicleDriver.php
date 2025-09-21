@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Model\Driver;
-use App\Model\Vehicle;
+use App\Models\Driver;
+use App\Models\Vehicle;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,6 +19,6 @@ class VehicleDriver extends Model
     }
 
     public function vehicle(){
-        return $this->velongsTo(Vehicle::class);
+        return $this->belongsTo(Vehicle::class);
     }
 }
