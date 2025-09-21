@@ -5,6 +5,7 @@
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\RideController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +41,9 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
     Route::delete('vehicle/{vehicle}/delete', [VehicleController::class, 'destroy'])->name('vehicle.delete');
     // Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
+
+    Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');
+    Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');
 });
 
 

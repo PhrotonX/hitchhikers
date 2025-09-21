@@ -9,10 +9,10 @@ class StoreRideRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
-    {
-        return false;
-    }
+    // public function authorize(): bool
+    // {
+    //     return this
+    // }
 
     /**
      * Get the validation rules that apply to the request.
@@ -22,7 +22,11 @@ class StoreRideRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'ride_name' => ['required', 'string', 'max:255'],
+            'status' => ['nullable'],
+            'fare_rate' => ['required', 'decimal:2,4'],
+            'vehicle_id' => ['required', 'numeric'],
+            'rating' => ['nullable'],
         ];
     }
 }
