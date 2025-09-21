@@ -13,6 +13,10 @@ return [
 
     'submit' => 'Submit',
     'ok' => 'OK',
+    'edit' => 'Edit',
+    'update' => 'Update',
+    'delete' => 'Delete',
+    'view' => 'View',
     'cancel' => 'Cancel',
     'back' => 'Back',
     'enroll_to_driving_program' => 'Enroll to Driving Program',

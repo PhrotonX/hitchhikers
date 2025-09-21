@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Vehicle;
+use App\Models\VehicleDriver;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Facades\Support\Log;
 
@@ -38,7 +39,9 @@ class VehiclePolicy
      */
     public function update(User $user, Vehicle $vehicle): bool
     {
-        return false;
+        //VehicleDriver IDs are unique.
+        $vehicleDriver = VehicleDriver::where('vehicle_id', $vehicle->id)->first()->get();
+        return $user->getDriverAccount()?->id ?? 0 == $vehicleDriver->driver->id; 
     }
 
     /**

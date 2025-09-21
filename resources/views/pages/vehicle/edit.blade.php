@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('content')
     <h1>{{__('string.edit_vehicle')}}</h1>
-    <form action="/vehicle/{{$vehicle->id}}/edit/update" method="POST">
+    <form action="/vehicle/{{$vehicle->id}}/update" method="POST">
         @method('PATCH')
         @csrf
         <x-input-label>{{__('string.plate_number')}}</x-input-label>

@@ -103,7 +103,7 @@ class VehicleController extends Controller
     {
         $this->onUpdate($request, $vehicle);
 
-        return redirect()->route('vehicle.view', [
+        return redirect()->route('vehicle.show', [
             'vehicle' => $vehicle,
         ]);
     }
@@ -128,6 +128,8 @@ class VehicleController extends Controller
      * Update the specified resource in storage.
      */
     protected function onUpdate(UpdateVehicleRequest $request, Vehicle $vehicle){
+        // $this->authorize('update', $vehicle);
+
         $vehicle->fill($request->validated());
 
         $vehicle->save();

@@ -23,7 +23,7 @@ class UserController extends Controller
         return view('pages.user.view', [
             'user' => $user,
             'driverAccount' => $user->getDriverAccount(),
-            'vehicleDrivers' => VehicleDriver::where('driver_id', $user->id)->get(),
+            'vehicleDrivers' => $user->getVehicleDriver(),
         ]);
     }
 
