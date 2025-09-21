@@ -13,6 +13,7 @@ services:
       - ./routes:/var/www/routes
       - ./tests:/var/www/tests
       - ./resources:/var/www/resources
+      - ./database:/var/www/database # Unmount on production
       - ./.env:/var/www/.env
       - ./public/build:/var/www/public/build
       - vendor_dir:/var/www/vendor

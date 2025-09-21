@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
+use App\Models\VehicleDriver;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class VehicleController extends Controller
 {
@@ -36,9 +38,9 @@ class VehicleController extends Controller
      */
     public function store(StoreVehicleRequest $request): RedirectResponse
     {
-        $this->onStore($request);
+        $results = $this->onStore($request);
 
-        return redirect()->route('vehicle.create');
+        return redirect()->route('vehicle.show', $results);
     }
 
     /**
@@ -56,7 +58,7 @@ class VehicleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    protected function onStore(StoreVehicleRequest $request){
+    protected function onStore(StoreVehicleRequest $request): array{
         // $this->authorize('create');
 
         $vehicle = new Vehicle();
@@ -64,6 +66,17 @@ class VehicleController extends Controller
         $vehicle->fill($request->validated());
 
         $vehicle->save();
+
+        // On save to associative tables
+        $vehicleDriver = new VehicleDriver;
+        $vehicleDriver->vehicle_id = $vehicle->id;
+        $vehicleDriver->driver_id = Auth::user()->getDriverAccount()->id;
+
+        $vehicleDriver->save();
+
+        return [
+            'vehicle' => $vehicle,
+        ];
     }
 
     /**
@@ -71,7 +84,9 @@ class VehicleController extends Controller
      */
     public function show(Vehicle $vehicle)
     {
-        //
+        return view('pages.vehicle.view', [
+            'vehicle' => $vehicle,
+        ]);
     }
 
     /**
@@ -79,7 +94,9 @@ class VehicleController extends Controller
      */
     public function edit(Vehicle $vehicle)
     {
-        //
+        return view('pages.vehicle.edit', [
+            'vehicle' => $vehicle,
+        ]);
     }
 
     /**
@@ -92,7 +109,7 @@ class VehicleController extends Controller
     {
         $this->onUpdate($request, $vehicle);
 
-        return redirect()->route('vehicle.view', [
+        return redirect()->route('vehicle.show', [
             'vehicle' => $vehicle,
         ]);
     }
@@ -117,16 +134,42 @@ class VehicleController extends Controller
      * Update the specified resource in storage.
      */
     protected function onUpdate(UpdateVehicleRequest $request, Vehicle $vehicle){
+        // $this->authorize('update', $vehicle);
+
         $vehicle->fill($request->validated());
 
         $vehicle->save();
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage with a RedirectResponse.
+     * 
+     * @param vehicle The resource to be deleted.
+     * @return RedirectResponse Returns back page.
      */
     public function destroy(Vehicle $vehicle)
     {
-        //
+        $results = $this->onDestroy($vehicle);
+
+        return back()->with($results);
+    }
+
+    protected function onDestroy(Vehicle $vehicle): array{
+        $this->authorize('delete', $vehicle);
+
+        // Delete the data from associative tables.
+        VehicleDriver::where('vehicle_id', $vehicle->id)
+                    //  ->where('driver_id', Auth::user()->getDriverAccount()?->id ?? 0)
+                     ->delete();
+
+        // @TODO: Delete the foriegn keys from other tables such as the rides table.
+
+        // Delete the actual vehicle data.
+
+        $vehicle->delete();
+
+        return [
+            'status' => "Vehicle $vehicle->vehicle_name deleted",
+        ];
     }
 }

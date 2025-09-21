@@ -13,6 +13,10 @@ return [
 
     'submit' => 'Submit',
     'ok' => 'OK',
+    'edit' => 'Edit',
+    'update' => 'Update',
+    'delete' => 'Delete',
+    'view' => 'View',
     'cancel' => 'Cancel',
     'back' => 'Back',
     'enroll_to_driving_program' => 'Enroll to Driving Program',
@@ -21,6 +25,7 @@ return [
     'driver_edit_success' => 'Successfully edited driver account information!',
     'edit_driver_account' => 'Edit Driver Account',
     'create_vehicle' => 'Create Vehicle',
+    'edit_vehicle' => 'Edit Vehicle',
     'plate_number' => 'Plate Number',
     'plate_number_placeholder' => 'Enter your plate number here...',
     'vehicle_name' => 'Vehicle Name',

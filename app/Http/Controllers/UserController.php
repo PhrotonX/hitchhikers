@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\VehicleDriver;
 use App\Http\Requests\DeleteUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -22,6 +23,7 @@ class UserController extends Controller
         return view('pages.user.view', [
             'user' => $user,
             'driverAccount' => $user->getDriverAccount(),
+            'vehicleDrivers' => $user->getVehicleDriver(),
         ]);
     }
 

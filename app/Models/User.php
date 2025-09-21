@@ -95,6 +95,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return Driver::where('user_id', $this->id)->first()?->get()[0] ?? null;
     }
 
+    public function getVehicleDriver(){
+        return VehicleDriver::where('driver_id', $this->id)->get();
+    }
+
     /**
      * Checks if the user consists of a role or a privilege such as member, moderator, staff, and owner (in ascending order).
      * 
