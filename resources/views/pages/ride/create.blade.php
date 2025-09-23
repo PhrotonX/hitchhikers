@@ -38,11 +38,24 @@
 
         <script>
             var map = L.map('map', {doubleClickZoom: false}).locate({setView: true, maxZoom: 16});
-            
+
+            //Define the marker icon.
+            var markerIcon = L.icon({
+                iconUrl: '{{asset("img/red_pin.png")}}',
+                shadowUrl: '{{asset("img/shadow_identifier.png")}}',
+                
+                iconSize:     [38, 95],
+                shadowSize:   [50, 64],
+                iconAnchor:   [22, 94],
+                shadowAnchor: [4, 62], 
+                popupAnchor:  [-3, -76]
+            });
+
             map.on('click', function(e){
                 console.log('Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng);
 
-                //@TODO: Add markers here...
+                //Add markers
+                L.marker([e.latlng.lat, e.latlng.lng], {icon: markerIcon}).addTo(map);
             })
 
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
