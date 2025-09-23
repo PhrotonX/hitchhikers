@@ -8,7 +8,7 @@
         :placeholder="__('string.ride_name_placeholder')"
         :value="old('ride_name')"
         :required="true"
-    />
+    /><br>
     <x-input-error :messages="$errors->get('ride_name')"/>
 
     <x-input-label>{{__('string.fare_rate')}}</x-input-label>
@@ -17,16 +17,15 @@
         :placeholder="__('string.fare_rate_placeholder')"
         :value="old('fare_rate')"
         :required="true"
-    />
+    /><br>
     <x-input-error :messages="$errors->get('fare_rate')"/>
 
     <x-input-label>{{__('string.vehicle')}}</x-input-label>
-    <x-text-input
-        :name="'vehicle_id'"
-        :placeholder="__('string.vehicle_placeholder')"
-        :value="old('vehicle_id')"
-        :required="true"
-    />
+    <select name="vehicle_id" title="{{__('string.vehicle')}}">
+        @foreach ($driverVehicles as $key => $value)
+            <option value="{{$value->vehicle->id}}">{{$value->vehicle->vehicle_name}}</option>
+        @endforeach
+    </select>
     <x-input-error :messages="$errors->get('vehicle_id')"/>
 
     <h2>{{__('string.destinations')}}</h2>

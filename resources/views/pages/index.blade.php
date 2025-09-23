@@ -22,4 +22,6 @@
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
     </script>
+
+    <a href="/ride/create">Create a ride</a>
 @endsection
