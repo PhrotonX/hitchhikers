@@ -1,4 +1,7 @@
 @extends('layouts.app')
+
+<x-map-head/>
+
 @section('content')
     <h1>{{__('string.create_ride')}}</h1>
     
@@ -29,6 +32,26 @@
     <x-input-error :messages="$errors->get('vehicle_id')"/>
 
     <h2>{{__('string.destinations')}}</h2>
+
+    <div class="destination-selector">
+        <div id="map"></div>
+
+        <script>
+            var map = L.map('map', {doubleClickZoom: false}).locate({setView: true, maxZoom: 16});
+            
+            map.on('click', function(e){
+                console.log('Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng);
+
+                //@TODO: Add markers here...
+            })
+
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+        </script>
+    </div>
+    
 
     {{-- Must be able to add or remove an address. --}}
     {{-- Must be draggable. Each drag should change the destination value based on their positions. --}}
