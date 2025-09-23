@@ -6,6 +6,7 @@ use App\Http\Requests\StoreRideRequest;
 use App\Http\Requests\UpdateRideRequest;
 use App\Models\Ride;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
 
 class RideController extends Controller
 {
@@ -24,9 +25,11 @@ class RideController extends Controller
      */
     public function create()
     {
-        $this->authorize('create');
+        $this->authorize('create', Ride::class);
 
-        return view('pages.rides.create');
+        return view('pages.ride.create', [
+            'driverVehicles' => Auth::user()->getVehicleDriver(),
+        ]);
     }
 
     /**
@@ -42,6 +45,7 @@ class RideController extends Controller
     }
 
     protected function onStore(StoreRideRequest $request){
+        //@TODO: Must verify that the user is a driver and owns the selected vehicle.
         $this->authorize('create');
 
         $ride = new Ride();
@@ -78,7 +82,7 @@ class RideController extends Controller
      */
     public function update(UpdateRideRequest $request, Ride $ride)
     {
-        //
+        
     }
 
     /**

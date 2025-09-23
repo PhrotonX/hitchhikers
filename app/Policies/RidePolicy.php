@@ -25,11 +25,13 @@ class RidePolicy
     }
 
     /**
-     * Determine whether the user can create models.
+     * Determine whether the user can create rides.
+     * 
+     * A user can only create a ride if the user is a driver and has at least one vehicle.
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isDriver();
     }
 
     /**
