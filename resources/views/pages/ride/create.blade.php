@@ -77,7 +77,7 @@
                             console.log(data);
 
                             //Add markers
-                            L.marker([e.latlng.lat, e.latlng.lng], {icon: markerIcon}).addTo(map);
+                            var marker = L.marker([e.latlng.lat, e.latlng.lng], {icon: markerIcon}).addTo(map);
 
                             //Add to destination list.
                             var destinationList = document.getElementById('destination-list');
@@ -89,6 +89,16 @@
                                     destinationName.innerHTML = "<strong>"+data['display_name'];+"</strong>";
                                     // console.log('Display Name: ' + data['display_name']);
                                     destinationItem.appendChild(destinationName);
+                                    
+                                    var removeButton = document.createElement('button');
+                                    removeButton.setAttribute('type', 'button');
+                                    removeButton.innerHTML = "Remove";
+                                    removeButton.addEventListener('click', function(){
+                                        map.removeLayer(marker);
+                                        destinationList.removeChild(destinationItem);
+                                    });
+
+                                    destinationItem.appendChild(removeButton);
 
                                     var destinationCoordinates = document.createElement('p');
                                     destinationCoordinates.innerHTML = 'Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng;
