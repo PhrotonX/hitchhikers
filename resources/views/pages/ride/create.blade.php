@@ -55,48 +55,61 @@
                     popupAnchor:  [-3, -76]
                 });
 
-                // Insert Leaftlet Control Geocoder Plugin.
-                // new L.Control.Geocoder().addTo(map);
-
                 // Handle map markers
                 map.on('click', function(e){
                     console.log('Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng);
-                    // var results = L.Control.geocoders.geocoder.reverse(e.latlng, map.getZoom());
-                    // console.log('Results: ' + results);
 
-                    //Add markers
-                    L.marker([e.latlng.lat, e.latlng.lng], {icon: markerIcon}).addTo(map);
+                    fetch("{{env('NOMINATIM_URL', '')}}/reverse?lat=" + e.latlng.lat + "&lon=" + e.latlng.lng + '&format=json&zoom=18&addressdetails=1')
+                        .then(response => {
+                            if(!response.ok){
+                                throw new Error("Error: " + response);
+                            }
+                            console.log(response);
 
-                    //Add to destination list.
-                    var destinationList = document.getElemenById('destination-list');
+                            return response.json();
+                        })
+                        .then(data => {
+                            // const parser = new DOMParser();
+                            // const xmlDoc = parser.parseFromString(data, 'text/xml');
 
-                        var destinationItem = document.createElement('div');
-                        
-                            var destinationName = document.createElement('p');
-                            // @TODO: Obtain destination name here using Leaflet.
-                            // destinationName.innerHTML = 
+                            // console.log(xmlDoc);
 
-                            var destinationCoordinates = document.createElement('p');
-                            destinationCoordinates.innerHTML = 'Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng;
-                            destinationItem.appendChild(destinationItem);
+                            console.log(data);
+
+                            //Add markers
+                            L.marker([e.latlng.lat, e.latlng.lng], {icon: markerIcon}).addTo(map);
+
+                            //Add to destination list.
+                            var destinationList = document.getElementById('destination-list');
+                            console.log(destinationList);
+
+                                var destinationItem = document.createElement('div');
+                                
+                                    var destinationName = document.createElement('p');
+                                    destinationName.innerHTML = data['display_name'];
+                                    // console.log('Display Name: ' + data['display_name']);
+                                    destinationItem.appendChild(destinationName);
+
+                                    var destinationCoordinates = document.createElement('p');
+                                    destinationCoordinates.innerHTML = 'Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng;
+                                    destinationItem.appendChild(destinationCoordinates);
+
+                                destinationList.appendChild(destinationItem);
+                        })
+                        .catch(error => {
+                            console.log("Error: " + error);
+                        });
                 });
 
                 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     maxZoom: 19,
                     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 }).addTo(map);
-
-                // Configure geocoder
-                // var geocoder = L.Control.geocoder({
-                //     defaultMarkGeocode: false
-                // }).on('markgeocode', function(e){
-                    
-                // })
                 
             </script>
         </div>
 
-        <div class="destination-list">
+        <div id="destination-list">
             <h3>{{__('string.from')}}</h3>
             <h3>{{__('string.to')}}</h3>
             
