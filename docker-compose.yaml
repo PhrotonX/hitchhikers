@@ -103,6 +103,16 @@ services:
     networks:
       - laravel
 
+  nominatim:
+    image: mediagis/nominatim:5.1
+    container_name: hitchhikers_nominatim
+    ports:
+      - 8080:8080
+    environment:
+      - PBF_URL=https://download.geofabrik.de/europe/monaco-latest.osm.pbf
+    volumes:
+      - nominatim_data:/var/lib/postgresql/14/main
+
 networks:
   laravel:
 
@@ -111,3 +121,4 @@ volumes:
   app_storage:
   app_cache:
   vendor_dir:
+  nominatim_data:
