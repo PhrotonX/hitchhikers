@@ -5,7 +5,7 @@
 @section('content')
     <h1>{{__('string.create_ride')}}</h1>
 
-    <form action="/ride/create/submit" method="POST">
+    <form action="/ride/create/submit" method="POST" class="rider-create-form">
         @csrf
 
         <x-input-label>{{__('string.ride_name')}}</x-input-label>
@@ -103,6 +103,14 @@
                                     var destinationCoordinates = document.createElement('p');
                                     destinationCoordinates.innerHTML = 'Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng;
                                     destinationItem.appendChild(destinationCoordinates);
+
+                                    // Add additional form data to be able to submit these data into the HTTP request.
+
+                                    const formData = new FormData(document.getElementById("rider-create-form"));
+                                    formData.append("latitude", e.latlng.lat);
+                                    formData.append("longitude", e.latlng.lng);
+
+                                    
 
                                 destinationList.appendChild(destinationItem);
                         })
