@@ -86,7 +86,7 @@
                                 var destinationItem = document.createElement('div');
                                 
                                     var destinationName = document.createElement('p');
-                                    destinationName.innerHTML = data['display_name'];
+                                    destinationName.innerHTML = "<strong>"+data['display_name'];+"</strong>";
                                     // console.log('Display Name: ' + data['display_name']);
                                     destinationItem.appendChild(destinationName);
 
