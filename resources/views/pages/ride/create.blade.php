@@ -41,8 +41,8 @@
 
             //Define the marker icon.
             var markerIcon = L.icon({
-                iconUrl: '{{asset("img/red_pin.png")}}',
-                shadowUrl: '{{asset("img/shadow_identifier.png")}}',
+                iconUrl: '{{Vite::asset("resources/img/red_pin.png")}}',
+                shadowUrl: '{{Vite::asset("resources/img/shadow_pin.png")}}',
                 
                 iconSize:     [38, 95],
                 shadowSize:   [50, 64],
@@ -56,7 +56,7 @@
 
                 //Add markers
                 L.marker([e.latlng.lat, e.latlng.lng], {icon: markerIcon}).addTo(map);
-            })
+            });
 
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
