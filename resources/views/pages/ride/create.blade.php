@@ -131,6 +131,10 @@
             <h3>{{__('string.to')}}</h3>
             
         </div>
+
+        <button type="submit">
+            <p>{{__('string.submit')}}</p>
+        </button>
     </form>
     
     
