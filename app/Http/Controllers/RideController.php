@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRideRequest;
 use App\Http\Requests\UpdateRideRequest;
 use App\Models\Ride;
+use App\Models\RideDestination;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 
@@ -49,11 +50,16 @@ class RideController extends Controller
         $this->authorize('create');
 
         $ride = new Ride();
-        $ride = $request->validated();
+        $validated = $request->validated();
+        $ride->ride_name = $validated['ride_name'];
+        $ride->fare_rate = $validated['fare_rate'];
+        $ride->vehicle_id = $validated['vehicle_id'];
         $ride->rating = 0;
         $ride->status = "";
 
         $ride->save();
+
+        //$destinations = new RideDestination();
 
         return [
             'ride' => $ride,
