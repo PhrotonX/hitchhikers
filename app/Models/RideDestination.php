@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Destination extends Model
+class RideDestination extends Model
 {
     /** @use HasFactory<\Database\Factories\DestinationFactory> */
     use HasFactory;
@@ -16,5 +16,6 @@ class Destination extends Model
         'longitude',
         'latitude',
         'order',
+        'ride_id',
     ];
 }

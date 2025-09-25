@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('destinations', function (Blueprint $table) {
+        Schema::create('ride_destinations', function (Blueprint $table) {
             $table->id();
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
             $table->integer('order')->nullable();
+            $table->foreign('ride_id')->references('id')->on('rides');
         });
     }
 
