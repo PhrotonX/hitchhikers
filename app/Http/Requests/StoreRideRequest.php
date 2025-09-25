@@ -24,7 +24,7 @@ class StoreRideRequest extends FormRequest
         return [
             'ride_name' => ['required', 'string', 'max:255'],
             'status' => ['nullable'],
-            'fare_rate' => ['required', 'decimal:2,4'],
+            'fare_rate' => ['required', 'decimal:0,4'],
             'vehicle_id' => ['required', 'numeric'],
             'rating' => ['nullable'],
             'longitude[]' => ['required', 'numeric'],
