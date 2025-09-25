@@ -107,10 +107,9 @@
                                     // Add additional form data to be able to submit these data into the HTTP request.
 
                                     var formData = new FormData(document.getElementById("rider-create-form"));
-                                    formData.append("latitude", e.latlng.lat);
-                                    formData.append("longitude", e.latlng.lng);
-
-                                    
+                                    formData.append("order[]", formData.entries("order[]").length);
+                                    formData.append("latitude[]", e.latlng.lat);
+                                    formData.append("longitude[]", e.latlng.lng);
 
                                 destinationList.appendChild(destinationItem);
                         })
