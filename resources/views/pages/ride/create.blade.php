@@ -2,6 +2,10 @@
 
 <x-map-head/>
 
+{{-- @push('head')
+    @vite('resources/js/Map.js');
+@endpush --}}
+
 @section('content')
     <h1>{{__('string.create_ride')}}</h1>
 
@@ -40,103 +44,91 @@
             <div id="map"></div>
 
             {{-- TODO: Make this code reusable by encapsulating it, making it OOP and move it into Map.js --}}
-            <script>
-                var map = L.map('map', {doubleClickZoom: false}).locate({setView: true, maxZoom: 16});
+            <script type="module">
+                import MainMap from '{{ Vite::asset("resources/js/MainMap.js") }}';
 
-                //Define the marker icon.
-                var markerIcon = L.icon({
-                    iconUrl: '{{Vite::asset("resources/img/red_pin.png")}}',
-                    shadowUrl: '{{Vite::asset("resources/img/shadow_pin.png")}}',
-                    
-                    iconSize:     [38, 95],
-                    shadowSize:   [50, 64],
-                    iconAnchor:   [22, 94],
-                    shadowAnchor: [4, 62], 
-                    popupAnchor:  [-3, -76]
-                });
+                var map = new MainMap('map', '{{env("NOMINATIM_URL", "")}}');
+                map.setMarkerIcon('{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+                map.onMapClick(function(marker, e, data){
+                    // const parser = new DOMParser();
+                    // const xmlDoc = parser.parseFromString(data, 'text/xml');
+
+                    // console.log(xmlDoc);
+
+                    // console.log(data);
+
+                    //Add to destination list.
+                    var destinationList = document.getElementById('destination-list');
+                    console.log(destinationList);
+
+                        var destinationItem = document.createElement('div');
+                        destinationItem.setAttribute('class', 'destination-item');
+                        
+                            var destinationName = document.createElement('p');
+                            destinationName.innerHTML = "<strong>"+data['display_name'];+"</strong>";
+                            // console.log('Display Name: ' + data['display_name']);
+                            destinationItem.appendChild(destinationName);
+                            
+                            var removeButton = document.createElement('button');
+                            removeButton.setAttribute('type', 'button');
+                            removeButton.innerHTML = "Remove";
+                            removeButton.addEventListener('click', function(){
+                                map.getMap().removeLayer(marker);
+                                destinationList.removeChild(destinationItem);
+                            });
+
+                            destinationItem.appendChild(removeButton);
+
+                            var destinationCoordinates = document.createElement('p');
+                            destinationCoordinates.innerHTML = 'Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng;
+                            destinationItem.appendChild(destinationCoordinates);
+
+                            var orderField = document.createElement('input');
+                            orderField.setAttribute('type', 'number');
+                            orderField.setAttribute('name', 'order[]');
+                            orderField.setAttribute('value', document.getElementsByClassName('destination-item').length);
+                            orderField.setAttribute('hidden', true);
+                            destinationItem.appendChild(orderField);
+
+                            var latitudeField = document.createElement('input');
+                            latitudeField.setAttribute('type', 'number');
+                            latitudeField.setAttribute('name', 'latitude[]');
+                            latitudeField.setAttribute('value', e.latlng.lat);
+                            latitudeField.setAttribute('hidden', true);
+                            destinationItem.appendChild(latitudeField);
+
+                            var longitudeField = document.createElement('input');
+                            longitudeField.setAttribute('type', 'number');
+                            longitudeField.setAttribute('name', 'longitude[]');
+                            longitudeField.setAttribute('value', e.latlng.lng);
+                            longitudeField.setAttribute('hidden', true);
+                            destinationItem.appendChild(longitudeField);
+
+                        destinationList.appendChild(destinationItem);
+                })
 
                 // Handle map markers
-                map.on('click', function(e){
-                    console.log('Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng);
+                // map.on('click', function(e){
+                //     console.log('Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng);
 
-                    fetch("{{env('NOMINATIM_URL', '')}}/reverse?lat=" + e.latlng.lat + "&lon=" + e.latlng.lng + '&format=json&zoom=18&addressdetails=1')
-                        .then(response => {
-                            if(!response.ok){
-                                throw new Error("Error: " + response);
-                            }
-                            console.log(response);
+                //     fetch("{{env('NOMINATIM_URL', '')}}/reverse?lat=" + e.latlng.lat + "&lon=" + e.latlng.lng + '&format=json&zoom=18&addressdetails=1')
+                //         .then(response => {
+                //             if(!response.ok){
+                //                 throw new Error("Error: " + response);
+                //             }
+                //             console.log(response);
 
-                            return response.json();
-                        })
-                        .then(data => {
-                            // const parser = new DOMParser();
-                            // const xmlDoc = parser.parseFromString(data, 'text/xml');
+                //             return response.json();
+                //         })
+                //         .then(data => {
+                            
+                //         })
+                //         .catch(error => {
+                //             console.log("Error: " + error);
+                //         });
+                // });
 
-                            // console.log(xmlDoc);
-
-                            console.log(data);
-
-                            //Add markers
-                            var marker = L.marker([e.latlng.lat, e.latlng.lng], {icon: markerIcon}).addTo(map);
-
-                            //Add to destination list.
-                            var destinationList = document.getElementById('destination-list');
-                            console.log(destinationList);
-
-                                var destinationItem = document.createElement('div');
-                                destinationItem.setAttribute('class', 'destination-item');
-                                
-                                    var destinationName = document.createElement('p');
-                                    destinationName.innerHTML = "<strong>"+data['display_name'];+"</strong>";
-                                    // console.log('Display Name: ' + data['display_name']);
-                                    destinationItem.appendChild(destinationName);
-                                    
-                                    var removeButton = document.createElement('button');
-                                    removeButton.setAttribute('type', 'button');
-                                    removeButton.innerHTML = "Remove";
-                                    removeButton.addEventListener('click', function(){
-                                        map.removeLayer(marker);
-                                        destinationList.removeChild(destinationItem);
-                                    });
-
-                                    destinationItem.appendChild(removeButton);
-
-                                    var destinationCoordinates = document.createElement('p');
-                                    destinationCoordinates.innerHTML = 'Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng;
-                                    destinationItem.appendChild(destinationCoordinates);
-
-                                    var orderField = document.createElement('input');
-                                    orderField.setAttribute('type', 'number');
-                                    orderField.setAttribute('name', 'order[]');
-                                    orderField.setAttribute('value', document.getElementsByClassName('destination-item').length);
-                                    orderField.setAttribute('hidden', true);
-                                    destinationItem.appendChild(orderField);
-
-                                    var latitudeField = document.createElement('input');
-                                    latitudeField.setAttribute('type', 'number');
-                                    latitudeField.setAttribute('name', 'latitude[]');
-                                    latitudeField.setAttribute('value', e.latlng.lat);
-                                    latitudeField.setAttribute('hidden', true);
-                                    destinationItem.appendChild(latitudeField);
-
-                                    var longitudeField = document.createElement('input');
-                                    longitudeField.setAttribute('type', 'number');
-                                    longitudeField.setAttribute('name', 'longitude[]');
-                                    longitudeField.setAttribute('value', e.latlng.lng);
-                                    longitudeField.setAttribute('hidden', true);
-                                    destinationItem.appendChild(longitudeField);
-
-                                destinationList.appendChild(destinationItem);
-                        })
-                        .catch(error => {
-                            console.log("Error: " + error);
-                        });
-                });
-
-                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                }).addTo(map);
+                
                 
             </script>
         </div>

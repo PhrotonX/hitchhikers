@@ -1,0 +1,68 @@
+export default class MainMap{
+    /**
+     * Creates MainMap object, initializes the map, and loads the tile layer.
+     * @param {string} mapId The ID of the HTML element where map should be displayed.
+     * @param {string} nominatimUrl The URL of Nominatim server.
+     */
+    constructor(mapId, nominatimUrl){
+        this.map = L.map(mapId, {doubleClickZoom: false}).locate({setView: true, maxZoom: 16});
+        this.markerIcon = null;
+        this.mapClickCallback = null;
+        this.nominatimUrl = nominatimUrl;
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(this.map);
+
+        // Handle map markers
+        this.map.on('click', (e) => {
+            console.log('Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng);
+
+            fetch(this.nominatimUrl + "/reverse?lat=" + e.latlng.lat + "&lon=" + e.latlng.lng + '&format=json&zoom=18&addressdetails=1')
+                .then(response => {
+                    if(!response.ok){
+                        throw new Error("Error: " + response);
+                    }
+                    console.log(response);
+
+                    return response.json();
+                })
+                .then(data => {
+                    //Add markers
+                    var marker = L.marker([e.latlng.lat, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
+
+                    this.mapClickCallback(marker, e, data);
+                })
+                .catch(error => {
+                    console.log("Error: " + error);
+                });
+        });
+    }
+
+    getMap(){
+        return this.map;
+    }
+
+    onMapClick(callback){
+        this.mapClickCallback = callback;
+    }
+
+    /**
+     * Define the default marker icon.
+     * @param {*} markerIconParam The main marker icon.
+     * @param {*} markerShadowIcon The shadow icon for main marker icon.
+     */
+    setMarkerIcon(markerIconParam, markerShadowIcon){
+        this.markerIcon = L.icon({
+            iconUrl: markerIconParam,
+            shadowUrl: markerShadowIcon,
+            
+            iconSize:     [38, 95],
+            shadowSize:   [50, 64],
+            iconAnchor:   [22, 94],
+            shadowAnchor: [4, 62], 
+            popupAnchor:  [-3, -76]
+        });
+    }
+}
