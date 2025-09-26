@@ -41,23 +41,16 @@ class RideController extends Controller
      */    
     public function store(StoreRideRequest $request)
     {
-        Log::debug("RideController.oncreate(): Request called");
         $result = $this->onStore($request);
 
         return view('pages.rides.view', $result);
     }
 
     protected function onStore(StoreRideRequest $request){
-        Log::debug("RideController.oncreate(): Authorizing...");
-
         //@TODO: Must verify that the user is a driver and owns the selected vehicle.
         $this->authorize('create', Ride::class);
 
-        Log::debug("RideController.oncreate(): Authorized...");
-
         $ride = new Ride();
-
-        Log::debug("RideController.oncreate(): Validating...");
 
         $validated = $request->validated();
         $ride->ride_name = $validated['ride_name'];
@@ -66,12 +59,11 @@ class RideController extends Controller
         $ride->rating = 0;
         $ride->status = "";
 
-        Log::debug("RideController.oncreate(): Saving...");
-
         $ride->save();
 
-        Log::debug("RideController.oncreate(): Saved...");
-
+        // Log::debug('validated order: ');
+        // Log::debug($validated['order']);
+        //for($i = 0; $i < $validated)
         //$destinations = new RideDestination();
 
         return [

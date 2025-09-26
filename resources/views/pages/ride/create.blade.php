@@ -107,9 +107,12 @@
                                     // Add additional form data to be able to submit these data into the HTTP request.
 
                                     var formData = new FormData(document.getElementById("rider-create-form"));
-                                    formData.append("order[]", formData.entries("order[]").length);
+                                    formData.append("order[]", formData.entries("order[]").length - 1); // Temporary. Actual values must come from actual ordering of these items.
                                     formData.append("latitude[]", e.latlng.lat);
                                     formData.append("longitude[]", e.latlng.lng);
+                                    console.log(formData.entries('order[]'));
+                                    console.log(formData.entries('latitude[]'));
+                                    console.log(formData.entries('longitude[]'));
 
                                 destinationList.appendChild(destinationItem);
                         })
