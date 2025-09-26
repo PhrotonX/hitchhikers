@@ -27,9 +27,9 @@ class StoreRideRequest extends FormRequest
             'fare_rate' => ['required', 'decimal:0,4'],
             'vehicle_id' => ['required', 'numeric'],
             'rating' => ['nullable'],
-            'longitude[]' => ['required', 'numeric'],
-            'latitude[]' => ['required', 'numeric'],
-            'order[]' => ['required', 'numeric'],
+            'longitude.*' => ['required', 'numeric'],
+            'latitude.*' => ['required', 'numeric'],
+            'order.*' => ['required', 'numeric'],
         ];
     }
 }

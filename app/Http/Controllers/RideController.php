@@ -8,6 +8,7 @@ use App\Models\Ride;
 use App\Models\RideDestination;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class RideController extends Controller
 {
@@ -40,16 +41,24 @@ class RideController extends Controller
      */    
     public function store(StoreRideRequest $request)
     {
+        Log::debug("RideController.oncreate(): Request called");
         $result = $this->onStore($request);
 
         return view('pages.rides.view', $result);
     }
 
     protected function onStore(StoreRideRequest $request){
+        Log::debug("RideController.oncreate(): Authorizing...");
+
         //@TODO: Must verify that the user is a driver and owns the selected vehicle.
-        $this->authorize('create');
+        $this->authorize('create', Ride::class);
+
+        Log::debug("RideController.oncreate(): Authorized...");
 
         $ride = new Ride();
+
+        Log::debug("RideController.oncreate(): Validating...");
+
         $validated = $request->validated();
         $ride->ride_name = $validated['ride_name'];
         $ride->fare_rate = $validated['fare_rate'];
@@ -57,7 +66,11 @@ class RideController extends Controller
         $ride->rating = 0;
         $ride->status = "";
 
+        Log::debug("RideController.oncreate(): Saving...");
+
         $ride->save();
+
+        Log::debug("RideController.oncreate(): Saved...");
 
         //$destinations = new RideDestination();
 
