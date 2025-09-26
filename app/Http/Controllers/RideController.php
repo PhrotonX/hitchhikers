@@ -72,7 +72,14 @@ class RideController extends Controller
 
         Log::debug("RideController.oncreate(): Saved...");
 
-        //$destinations = new RideDestination();
+        for($i = 0; $i < count($validated['order']); $i++){
+            $destinations = new RideDestination();
+            $destinations->ride_id = $ride->id;
+            $destinations->latitude = $validated['latitude'][$i];
+            $destinations->longitude = $validated['longitude'][$i];
+            $destinations->order = $validated['order'][$i];
+            $destinations->save();
+        }
 
         return [
             'ride' => $ride,
