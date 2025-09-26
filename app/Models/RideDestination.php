@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class RideDestination extends Model
+{
+    /** @use HasFactory<\Database\Factories\DestinationFactory> */
+    use HasFactory;
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'longitude',
+        'latitude',
+        'order',
+        'ride_id',
+    ];
+}

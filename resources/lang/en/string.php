@@ -10,19 +10,20 @@ return [
     | The following language lines are common strings found within the entire website.
     |
     */
-
+    'create_ride' => 'Create Ride',
+    'delete' => 'Delete',
+    'destinations' => 'Destinations',
+    'driving_program_enrollment_success' => 'You have sucessfully enrolled into the driving program!',
+    'driver_edit_success' => 'Successfully edited driver account information!',
     'submit' => 'Submit',
     'ok' => 'OK',
     'edit' => 'Edit',
     'update' => 'Update',
-    'delete' => 'Delete',
     'view' => 'View',
     'cancel' => 'Cancel',
     'back' => 'Back',
     'enroll_to_driving_program' => 'Enroll to Driving Program',
     'company' => 'Company',
-    'driving_program_enrollment_success' => 'You have sucessfully enrolled into the driving program!',
-    'driver_edit_success' => 'Successfully edited driver account information!',
     'edit_driver_account' => 'Edit Driver Account',
     'create_vehicle' => 'Create Vehicle',
     'edit_vehicle' => 'Edit Vehicle',
@@ -40,4 +41,10 @@ return [
     'color_placeholder' => 'Enter color placeholder here...',
     'vehicle_type' => 'Vehicle Type',
     'vehicle_type_placeholder' => 'Enter vehicle type here...',
+    'ride_name' => 'Ride Name',
+    'ride_name_placeholder' => 'Enter ride name here...',
+    'fare_rate' => 'Fare Rate',
+    'fare_rate_placeholder' => 'Enter fare rate here...',
+    'vehicle' => 'Vehicle',
+    'vehicle_placeholder' => 'Enter vehicle here...',
 ];

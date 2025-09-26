@@ -96,7 +96,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function getVehicleDriver(){
-        return VehicleDriver::where('driver_id', $this->id)->get();
+        return VehicleDriver::where('driver_id', $this->getDriverAccount()?->id ?? 0)->get();
     }
 
     /**

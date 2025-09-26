@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Ride;
+use App\Models\Destination;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class RidePolicy
+class DestinationPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -19,25 +19,23 @@ class RidePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Ride $ride): bool
+    public function view(User $user, Destination $destination): bool
     {
         return false;
     }
 
     /**
-     * Determine whether the user can create rides.
-     * 
-     * A user can only create a ride if the user is a driver and has at least one vehicle.
+     * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
-        return $user->isDriver();
+        return false;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Ride $ride): bool
+    public function update(User $user, Destination $destination): bool
     {
         return false;
     }
@@ -45,7 +43,7 @@ class RidePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Ride $ride): bool
+    public function delete(User $user, Destination $destination): bool
     {
         return false;
     }
@@ -53,7 +51,7 @@ class RidePolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Ride $ride): bool
+    public function restore(User $user, Destination $destination): bool
     {
         return false;
     }
@@ -61,7 +59,7 @@ class RidePolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Ride $ride): bool
+    public function forceDelete(User $user, Destination $destination): bool
     {
         return false;
     }
