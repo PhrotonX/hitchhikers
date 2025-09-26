@@ -84,6 +84,7 @@
                             console.log(destinationList);
 
                                 var destinationItem = document.createElement('div');
+                                destinationItem.setAttribute('class', 'destination-item');
                                 
                                     var destinationName = document.createElement('p');
                                     destinationName.innerHTML = "<strong>"+data['display_name'];+"</strong>";
@@ -104,15 +105,26 @@
                                     destinationCoordinates.innerHTML = 'Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng;
                                     destinationItem.appendChild(destinationCoordinates);
 
-                                    // Add additional form data to be able to submit these data into the HTTP request.
+                                    var orderField = document.createElement('input');
+                                    orderField.setAttribute('type', 'number');
+                                    orderField.setAttribute('name', 'order[]');
+                                    orderField.setAttribute('value', document.getElementsByClassName('destination-item').length);
+                                    orderField.setAttribute('hidden', true);
+                                    destinationItem.appendChild(orderField);
 
-                                    var formData = new FormData(document.getElementById("rider-create-form"));
-                                    formData.append("order[]", formData.entries("order[]").length - 1); // Temporary. Actual values must come from actual ordering of these items.
-                                    formData.append("latitude[]", e.latlng.lat);
-                                    formData.append("longitude[]", e.latlng.lng);
-                                    console.log(formData.entries('order[]'));
-                                    console.log(formData.entries('latitude[]'));
-                                    console.log(formData.entries('longitude[]'));
+                                    var latitudeField = document.createElement('input');
+                                    latitudeField.setAttribute('type', 'number');
+                                    latitudeField.setAttribute('name', 'latitude[]');
+                                    latitudeField.setAttribute('value', e.latlng.lat);
+                                    latitudeField.setAttribute('hidden', true);
+                                    destinationItem.appendChild(latitudeField);
+
+                                    var longitudeField = document.createElement('input');
+                                    longitudeField.setAttribute('type', 'number');
+                                    longitudeField.setAttribute('name', 'longitude[]');
+                                    longitudeField.setAttribute('value', e.latlng.lng);
+                                    longitudeField.setAttribute('hidden', true);
+                                    destinationItem.appendChild(longitudeField);
 
                                 destinationList.appendChild(destinationItem);
                         })
@@ -135,11 +147,14 @@
             
         </div>
 
+        @if ($errors)
+            <p>{{$errors}}</p>
+        @endif
+
         <button type="submit">
             <p>{{__('string.submit')}}</p>
         </button>
     </form>
-    
     
 @endsection
 

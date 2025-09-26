@@ -34,9 +34,9 @@ class StoreRideRequest extends FormRequest
             'longitude' => ['required', 'array', 'min:1'],
             'latitude' => ['required', 'array', 'min:1'],
             'order' => ['required', 'array', 'min:1'],
-            'longitude.*' => ['required', 'numeric', 'min:1'],
-            'latitude.*' => ['required', 'numeric', 'min:1'],
-            'order.*' => ['required', 'numeric', 'min:1'],
+            'longitude.*' => ['required', 'numeric'],
+            'latitude.*' => ['required', 'numeric'],
+            'order.*' => ['required', 'numeric'],
         ];
     }
 }
