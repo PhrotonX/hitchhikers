@@ -50,6 +50,7 @@ export default class MainMap{
 
     /**
      * Define the default marker icon.
+     * Must be invoked after calling the constructor.
      * @param {*} markerIconParam The main marker icon.
      * @param {*} markerShadowIcon The shadow icon for main marker icon.
      */
