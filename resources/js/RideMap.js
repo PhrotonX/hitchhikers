@@ -7,7 +7,20 @@ export default class RideMap extends MainMap{
     }
 
     getRideDestinations(){
-        // fetch(this.webUrl + '/api/rides/latitude')
+        const bounds = this.map.getBounds();
+        const northWest = bounds.getNorthEast();
+        const southEast = bounds.getSouthEast();
+
+        fetch(this.webUrl + '/api/ride/all/destinations?' +
+            'lat-north=' + northWest.latlng.lat + '&lng-west=' + northWest.latlng.lng +
+            '&lat-south=' + southEast.latlng.lat + '&lng-east=' + southEast.latlng.lng
+        ).then((response) => {
+            return response.json();
+        }).then((data) => {
+            
+        }).catch((error) => {
+            throw new Error("Failed retrieving ride destinations: " + error);
+        });
     }
 
     /**
@@ -16,5 +29,5 @@ export default class RideMap extends MainMap{
      */
     // setRideDestinationUrl(url){
         
-    // }
+    //}
 }

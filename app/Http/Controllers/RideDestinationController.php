@@ -11,6 +11,8 @@ class RideDestinationController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * 
+     * Expects parameters lat-north, lat-south, lng-east, and lng-west.
      */
     public function index(Request $request)
     {
@@ -24,7 +26,7 @@ class RideDestinationController extends Controller
         $results = RideDestination::query('latitude', 'BETWEEN', $north, 'AND', $south, 'AND',
             'longitude', 'BETWEEN', $east, 'AND', $west);
 
-        
+        return $results;
     }
 
     /**
