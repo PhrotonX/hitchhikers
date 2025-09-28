@@ -4,6 +4,12 @@ export default class RideMap extends MainMap{
     constructor(mapId, nominatimUrl, webUrl){
         this.webUrl = webUrl;
         super(mapId, nominatimUrl);
+
+        //@TODO: Use proper event listener values and parameters.
+        this.map.on('', () => {
+            //@TODO: Remove markers.
+            var data = this.getRideDestinations();
+        });
     }
 
     getRideDestinations(){
@@ -17,7 +23,9 @@ export default class RideMap extends MainMap{
         ).then((response) => {
             return response.json();
         }).then((data) => {
-            
+            console.log(data);
+
+            return data;
         }).catch((error) => {
             throw new Error("Failed retrieving ride destinations: " + error);
         });
