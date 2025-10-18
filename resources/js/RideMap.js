@@ -1,15 +1,17 @@
-import MainMap from 'MainMap.js';
+import MainMap from '../js/MainMap.js';
 
 export default class RideMap extends MainMap{
-    constructor(mapId, nominatimUrl, webUrl){
-        this.webUrl = webUrl;
+    constructor(mapId, nominatimUrl, webUrl, rideUrl = '/api/ride/all/destinations?'){
         super(mapId, nominatimUrl);
-
+        this.webUrl = webUrl;
+        this.rideUrl = rideUrl;
+        
         //@TODO: Use proper event listener values and parameters.
-        this.map.on('', () => {
+        // this.map.on('', () => {
             //@TODO: Remove markers.
             var data = this.getRideDestinations();
-        });
+        // });
+        
     }
 
     getRideDestinations(){
@@ -17,17 +19,22 @@ export default class RideMap extends MainMap{
         const northWest = bounds.getNorthEast();
         const southEast = bounds.getSouthEast();
 
-        fetch(this.webUrl + '/api/ride/all/destinations?' +
-            'lat-north=' + northWest.latlng.lat + '&lng-west=' + northWest.latlng.lng +
-            '&lat-south=' + southEast.latlng.lat + '&lng-east=' + southEast.latlng.lng
+        var url = this.webUrl + this.rideUrl +
+            'lat-north=' + northWest.lat + '&lng-west=' + northWest.lng +
+            '&lat-south=' + southEast.lat + '&lng-east=' + southEast.lng;
+
+        console.log("Url: " + url);
+
+        fetch(url
         ).then((response) => {
-            return response.json();
+            // return response.json();
+            return response;
         }).then((data) => {
             console.log(data);
 
             return data;
         }).catch((error) => {
-            throw new Error("Failed retrieving ride destinations: " + error);
+            throw new Error(error);
         });
     }
 
@@ -35,7 +42,7 @@ export default class RideMap extends MainMap{
      * Sets the URL or the route where the marker data is retrieved.
      * @param {*} url The JSON data based on RideDestination[] model.
      */
-    // setRideDestinationUrl(url){
-        
-    //}
+    setRideDestinationUrl(url){
+        this.rideUrl = url;
+    }
 }
