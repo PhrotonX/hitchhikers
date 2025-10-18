@@ -21,7 +21,7 @@ class RideController extends Controller
     {
         return view('pages.ride.show');
     }
-
+    
     /**
      * Show the form for creating a new resource.
      */

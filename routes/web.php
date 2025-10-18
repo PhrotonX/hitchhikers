@@ -3,6 +3,7 @@
  * Front-end API for the Web.
  */
 
+use App\Http\Controllers\RideDestinationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\RideController;
@@ -54,5 +55,6 @@ Route::get('settings', function(){
 })->middleware(['auth'])->name('settings');
 
 
+Route::get('api/ride/all/destinations', [RideDestinationController::class, 'index']);
 
 require __DIR__.'/auth.php';

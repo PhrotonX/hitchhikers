@@ -24,9 +24,11 @@ class RideDestinationController extends Controller
 
         // Get rides based on a range of coordinates that forms a bounding box.
         $results = RideDestination::query('latitude', 'BETWEEN', $north, 'AND', $south, 'AND',
-            'longitude', 'BETWEEN', $east, 'AND', $west);
+            'longitude', 'BETWEEN', $east, 'AND', $west)->get();
 
-        return $results;
+        return response()->json([
+            "results" => $results,
+        ]);
     }
 
     /**
