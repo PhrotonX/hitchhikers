@@ -5,6 +5,14 @@
     <div id="map"></div>
 
     <a href="/ride/create">Create a ride</a>
+
+    <div id="driving-mode">
+        <button type="submit">Start driving mode</button>
+        {{-- @TODO: Insert a dropdown menu here to be able to choose a vehicle to begin with. --}}
+        {{-- Use JavaScript to perform the driving mode. --}}
+    </div>
+    
+    
 @endsection
 
 @push('scripts')
