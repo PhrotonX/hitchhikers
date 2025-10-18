@@ -13,8 +13,6 @@
 
         var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
         map.setMarkerIcon('{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
-        // map.getMap().center = [15.038880837376297, 120.6808276221496];
-        // map.getMap().zoom = 13;
         // map.onMapClick(function(marker, e, data){
         //     // const parser = new DOMParser();
         //     // const xmlDoc = parser.parseFromString(data, 'text/xml');

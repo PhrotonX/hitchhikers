@@ -5,7 +5,7 @@ export default class MainMap{
      * @param {string} nominatimUrl The URL of Nominatim server.
      */
     constructor(mapId, nominatimUrl){
-        this.map = L.map(mapId, {doubleClickZoom: false, center: [15.038880837376297, 120.6808276221496], zoom: 13,}).locate({setView: true, maxZoom: 16});
+        this.map = L.map(mapId, {doubleClickZoom: false, center: [15.038880837376297, 120.6808276221496], zoom: 13,}).locate({setView: true, maxZoom: 20});
         this.markerIcon = null;
         this.mapClickCallback = null;
         this.nominatimUrl = nominatimUrl;

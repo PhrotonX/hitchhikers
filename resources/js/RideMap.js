@@ -9,12 +9,20 @@ export default class RideMap extends MainMap{
         //@TODO: Use proper event listener values and parameters.
         // this.map.on('', () => {
             //@TODO: Remove markers.
-            var data = this.getRideDestinations();
+            //var data = this.getRideDestinations();
         // });
-        
+        // console.log("data: " + data);
+
+        // var data = this.loadRideDestinations();
+
+        // data.results.forEach(element => {
+        //     console.log(element);
+        // });
+
+        // this.loadRideDestinations();
     }
 
-    getRideDestinations(){
+    loadRideDestinations(){
         const bounds = this.map.getBounds();
         const northWest = bounds.getNorthEast();
         const southEast = bounds.getSouthEast();
@@ -27,12 +35,16 @@ export default class RideMap extends MainMap{
 
         fetch(url
         ).then((response) => {
-            // return response.json();
-            return response;
+            return response.json();
         }).then((data) => {
-            console.log(data);
+            // console.log("RideDestinations: " + data.results[0].latitude);
+            //var marker = L.marker([data.results, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
 
-            return data;
+            // data.results.forEach(result => {
+            //     L.marker([result.latitude, result.longitude], {icon: this.markerIcon}).addTo(this.map);
+            // });
+
+            L.marker([data.results[0].latitude, data.results[0].longitude], {icon: this.markerIcon}).addTo(this.map);
         }).catch((error) => {
             throw new Error(error);
         });
