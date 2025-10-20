@@ -4,13 +4,24 @@
 @section('content')
     <div id="map"></div>
 
-    <a href="/ride/create">Create a ride</a>
+    @auth
+        {{-- Show driving mode form if the user account has a driver account --}}
+        @if (Auth::user()->isDriver())
+            <a href="/ride/create">Create a ride</a>
+            <div id="driving-mode">
+                <button type="submit">Start driving mode</button>
+                {{-- @TODO: Insert a dropdown menu here to be able to choose a ride to begin with. --}}
+                {{-- Use JavaScript to perform the driving mode. --}}
 
-    <div id="driving-mode">
-        <button type="submit">Start driving mode</button>
-        {{-- @TODO: Insert a dropdown menu here to be able to choose a vehicle to begin with. --}}
-        {{-- Use JavaScript to perform the driving mode. --}}
-    </div>
+                <select name="driving-mode-option">
+                    @foreach (Auth::user()->getRides() as $key => $ride)
+                        <option value="{{$key}}">{{$ride->ride_name}}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
+    @endauth
+    
     
     
 @endsection
