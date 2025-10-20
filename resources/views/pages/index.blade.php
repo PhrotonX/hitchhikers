@@ -9,7 +9,7 @@
         @if (Auth::user()->isDriver())
             <a href="/ride/create">Create a ride</a>
             <div id="driving-mode">
-                <button type="submit">Start driving mode</button>
+                <button type="button" id="btn-driving-mode" data-state="off">Start driving mode</button>
                 {{-- @TODO: Insert a dropdown menu here to be able to choose a ride to begin with. --}}
                 {{-- Use JavaScript to perform the driving mode. --}}
 
@@ -40,5 +40,38 @@
 
         //     // console.log(data);
         // })
+
+        
+        var btnDrivingMode = document.getElementById('btn-driving-mode');
+
+        btnDrivingMode.addEventListener('click', function(){
+
+            var drivingMode = "inactive";
+        
+            if(btnDrivingMode.getAttribute('data-state') == "off"){
+                drivingMode = "active";
+                btnDrivingMode.setAttribute('data-state', 'on');
+            }else if(btnDrivingMode.getAttribute('data-state') == "on"){
+                drivingMode = "inactive";
+                btnDrivingMode.setAttribute('data-state', 'off');
+            }
+
+            fetch('{{env("APP_URL", "")}}' + '/ride/{{}}/update-status', {
+                method: "PATCH",
+                body: JSON.stringify({
+                    status: drivingMode,
+                }),
+                headers: {
+                    "Content-type": "application/json",
+                },
+            })
+            .then((response) => {
+                return response.json();
+            }).then((data) => {
+                console.log(data);
+            }).catch((error) => {
+                throw new Error(error);
+            });
+        });
     </script>
 @endpush
