@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRideRequest;
 use App\Http\Requests\UpdateRideRequest;
 use App\Http\Requests\UpdateRideStatus;
+use App\Models\User;
 use App\Models\Ride;
 use App\Models\RideDestination;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -115,11 +116,13 @@ class RideController extends Controller
 
     public function updateStatus(UpdateRideStatus $request, Ride $ride)
     {
-        $this->authorize("update", Ride::class);
+        // $this->authorize("update", Ride::class);
 
-        $ride->status = $request["status"];
+        // $ride->status = $request["status"];
 
-        $ride->save();
+        // $ride->save();
+
+        $ride->update($request->all());
 
         return response()->json([
             "ride" => $ride

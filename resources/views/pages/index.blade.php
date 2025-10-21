@@ -1,6 +1,10 @@
 @extends('layouts.app')
 <x-map-head/>
 
+@push('head')
+    <meta name="csrf-token" content={{csrf_token()}}
+@endpush
+
 @section('content')
     <div id="map"></div>
 
@@ -52,7 +56,7 @@
             if(btnDrivingMode.getAttribute('data-state') == "off"){
                 drivingMode = "active";
                 btnDrivingMode.setAttribute('data-state', 'on');
-            }else if(btnDrivingMode.getAttribute('data-state') == "on"){x
+            }else if(btnDrivingMode.getAttribute('data-state') == "on"){
                 drivingMode = "inactive";
                 btnDrivingMode.setAttribute('data-state', 'off');
             }
@@ -64,6 +68,8 @@
                 }),
                 headers: {
                     "Content-type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
                 },
             })
             .then((response) => {
@@ -74,5 +80,9 @@
                 throw new Error(error);
             });
         });
+
+        function toggleDrivingMode(){
+            
+        }
     </script>
 @endpush
