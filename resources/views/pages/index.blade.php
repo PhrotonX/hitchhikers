@@ -13,9 +13,9 @@
                 {{-- @TODO: Insert a dropdown menu here to be able to choose a ride to begin with. --}}
                 {{-- Use JavaScript to perform the driving mode. --}}
 
-                <select name="driving-mode-option">
-                    @foreach (Auth::user()->getRides() as $key => $ride)
-                        <option value="{{$key}}">{{$ride->ride_name}}</option>
+                <select name="driving-mode-option" id="select-driving-vehicle">
+                    @foreach (Auth::user()->getRides() as $ride)
+                        <option value="{{$ride->id}}">{{$ride->ride_name}}</option>
                     @endforeach
                 </select>
             </div>
@@ -43,6 +43,7 @@
 
         
         var btnDrivingMode = document.getElementById('btn-driving-mode');
+        var drivingModeOption = document.getElementById('select-driving-vehicle');
 
         btnDrivingMode.addEventListener('click', function(){
 
@@ -51,12 +52,12 @@
             if(btnDrivingMode.getAttribute('data-state') == "off"){
                 drivingMode = "active";
                 btnDrivingMode.setAttribute('data-state', 'on');
-            }else if(btnDrivingMode.getAttribute('data-state') == "on"){
+            }else if(btnDrivingMode.getAttribute('data-state') == "on"){x
                 drivingMode = "inactive";
                 btnDrivingMode.setAttribute('data-state', 'off');
             }
 
-            fetch('{{env("APP_URL", "")}}' + '/ride/{{}}/update-status', {
+            fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value+'/update-status', {
                 method: "PATCH",
                 body: JSON.stringify({
                     status: drivingMode,
