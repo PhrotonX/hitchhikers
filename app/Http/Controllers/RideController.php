@@ -116,11 +116,7 @@ class RideController extends Controller
 
     public function updateStatus(UpdateRideStatus $request, Ride $ride)
     {
-        // $this->authorize("update", Ride::class);
-
-        // $ride->status = $request["status"];
-
-        // $ride->save();
+        $this->authorize("update", $ride);
 
         $ride->update($request->all());
 
