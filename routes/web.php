@@ -42,6 +42,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
     Route::delete('vehicle/{vehicle}/delete', [VehicleController::class, 'destroy'])->name('vehicle.delete');
     // Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
+    Route::patch('vehicle/{vehicle}/update-location', [VehicleController::class, 'updateLocation']);
 
     Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');
     Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');

@@ -6,6 +6,7 @@ use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
 use App\Models\VehicleDriver;
+use App\Http\Requests\UpdateVehicleLocationRequest;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
@@ -139,6 +140,16 @@ class VehicleController extends Controller
         $vehicle->fill($request->validated());
 
         $vehicle->save();
+    }
+
+    public function updateLocation(UpdateVehicleLocationRequest $request, Vehicle $vehicle){
+        $this->authorize("update", $vehicle);
+
+        $vehicle->update($request->all());
+
+        return response()->json([
+            "vehicle" => $vehicle
+        ], 200);
     }
 
     /**

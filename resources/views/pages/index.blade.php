@@ -34,7 +34,9 @@
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
 
-        var id;
+        var trackingId = null;
+        var vehicleId = null;
+
         var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
         map.setMarkerIcon('{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
 
@@ -50,14 +52,11 @@
                 drivingMode = "active";
                 btnDrivingMode.setAttribute('data-state', 'on');
                 btnDrivingMode.innerHTML = "Stop driving mode";
-                startLiveTracking(null);
-                console.log("Tracking ID: " + id);
+                
             }else if(btnDrivingMode.getAttribute('data-state') == "on"){
                 drivingMode = "inactive";
                 btnDrivingMode.setAttribute('data-state', 'off');
                 btnDrivingMode.innerHTML = "Start driving mode";
-                console.log("Tracking ID Stopped: " + id);
-                stopLiveTracking(id);
             }
 
             fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value+'/update-status', {
@@ -76,27 +75,62 @@
             }).then((data) => {
                 console.log(data);
 
-                //Update vehicle location here and display it live on map.
-                
+                vehicleId = data.ride.vehicle_id;
+
+                console.log("Vehicle ID: " + vehicleId);
+
+                if(drivingMode == "active"){
+                    startLiveTracking(null, vehicleId);
+                    console.log("Tracking ID: " + trackingId);
+                }else{
+                    stopLiveTracking(trackingId);
+                    console.log("Tracking ID Stopped: " + trackingId);
+                }
+
+                //@TODO: Update vehicle location here and display it live on map.
             }).catch((error) => {
                 throw new Error(error);
             });
         });
 
-        function startLiveTracking(onMarkerClick){
+        function startLiveTracking(onMarkerClick, vehicle_id){
             //Get current location
             if(navigator.geolocation){
-                id = navigator.geolocation.watchPosition((position) => {
+                trackingId = navigator.geolocation.watchPosition((position) => {
                     var latitude = position.coords.latitude;
                     var longitude = position.coords.longitude;
 
                     console.log("Live Marker: Latitude: " + latitude);
                     console.log("Live Marker: Longitude: " + longitude);
 
+                    //Position the map where the current location is pointing to.
                     map.getMap().setView([latitude, longitude], 16);
+
+                    //Save the position data into the database.
+                    //=========================================
+                    fetch('{{env("APP_URL", "")}}' + '/vehicle/'+vehicle_id+'/update-location', {
+                        method: "PATCH",
+                        body: JSON.stringify({
+                            latitude: latitude,
+                            longitude: longitude,
+                        }),
+                        headers: {
+                            "Content-type": "application/json",
+                            "Accept": "application/json",
+                            "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
+                        },
+                    }).then((response) => {
+                        return response.json();
+                    }).then((data) => {
+                        console.log(data);
+                    }).catch((error) => {
+                        throw new Error(error);
+                    });
+                    //=========================================
+
                 }, (error) => {
-                    console.log("Error: " + error);
-                });
+                console.log("Error: " + error);
+            });
             }else{
                 alert("Geolocation is turned off or not supported by this device");
             }
@@ -105,7 +139,7 @@
         }
 
         function stopLiveTracking(tag){
-            navigator.geolocation.clearWatch(id);
+            navigator.geolocation.clearWatch(trackingId);
         }
     </script>
 @endpush
