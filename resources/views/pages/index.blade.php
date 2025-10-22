@@ -34,33 +34,30 @@
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
 
+        var id;
         var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
         map.setMarkerIcon('{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
-        // map.onMapClick(function(marker, e, data){
-        //     // const parser = new DOMParser();
-        //     // const xmlDoc = parser.parseFromString(data, 'text/xml');
-        
-        //     // console.log(xmlDoc);
 
-        //     // console.log(data);
-        // })
-
-        
         var btnDrivingMode = document.getElementById('btn-driving-mode');
         var drivingModeOption = document.getElementById('select-driving-vehicle');
 
         btnDrivingMode.addEventListener('click', function(){
 
             var drivingMode = "inactive";
+            
         
             if(btnDrivingMode.getAttribute('data-state') == "off"){
                 drivingMode = "active";
                 btnDrivingMode.setAttribute('data-state', 'on');
                 btnDrivingMode.innerHTML = "Stop driving mode";
+                startLiveTracking(null);
+                console.log("Tracking ID: " + id);
             }else if(btnDrivingMode.getAttribute('data-state') == "on"){
                 drivingMode = "inactive";
                 btnDrivingMode.setAttribute('data-state', 'off');
                 btnDrivingMode.innerHTML = "Start driving mode";
+                console.log("Tracking ID Stopped: " + id);
+                stopLiveTracking(id);
             }
 
             fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value+'/update-status', {
@@ -80,13 +77,35 @@
                 console.log(data);
 
                 //Update vehicle location here and display it live on map.
+                
             }).catch((error) => {
                 throw new Error(error);
             });
         });
 
-        function toggleDrivingMode(){
-            
+        function startLiveTracking(onMarkerClick){
+            //Get current location
+            if(navigator.geolocation){
+                id = navigator.geolocation.watchPosition((position) => {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+
+                    console.log("Live Marker: Latitude: " + latitude);
+                    console.log("Live Marker: Longitude: " + longitude);
+
+                    map.getMap().setView([latitude, longitude], 16);
+                }, (error) => {
+                    console.log("Error: " + error);
+                });
+            }else{
+                alert("Geolocation is turned off or not supported by this device");
+            }
+
+            //var marker = L.marker([e.latlng.lat, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
+        }
+
+        function stopLiveTracking(tag){
+            navigator.geolocation.clearWatch();
         }
     </script>
 @endpush

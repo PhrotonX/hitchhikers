@@ -40,19 +40,7 @@ export default class MainMap{
         });
     }
 
-    addLiveMarker(onClick){
-        //Get current location
-        navigator.geolocation.getCurrentPosition((pos) => {
-            var latitude = pos.coords.latitude;
-            var longitude = pos.coords.longitude;
-
-            console.log("Latitude: " + latitude);
-        }, (error) => {
-
-        });
-
-        //var marker = L.marker([e.latlng.lat, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
-    }
+    
 
     getMap(){
         return this.map;
