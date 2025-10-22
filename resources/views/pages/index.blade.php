@@ -56,9 +56,11 @@
             if(btnDrivingMode.getAttribute('data-state') == "off"){
                 drivingMode = "active";
                 btnDrivingMode.setAttribute('data-state', 'on');
+                btnDrivingMode.innerHTML = "Stop driving mode";
             }else if(btnDrivingMode.getAttribute('data-state') == "on"){
                 drivingMode = "inactive";
                 btnDrivingMode.setAttribute('data-state', 'off');
+                btnDrivingMode.innerHTML = "Start driving mode";
             }
 
             fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value+'/update-status', {
@@ -76,6 +78,8 @@
                 return response.json();
             }).then((data) => {
                 console.log(data);
+
+                //Update vehicle location here and display it live on map.
             }).catch((error) => {
                 throw new Error(error);
             });
