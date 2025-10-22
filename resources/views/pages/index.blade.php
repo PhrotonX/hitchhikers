@@ -105,7 +105,7 @@
         }
 
         function stopLiveTracking(tag){
-            navigator.geolocation.clearWatch();
+            navigator.geolocation.clearWatch(id);
         }
     </script>
 @endpush
