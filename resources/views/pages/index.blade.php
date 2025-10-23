@@ -36,9 +36,14 @@
 
         var trackingId = null;
         var vehicleId = null;
+        var vehicleMarker = null;
 
         var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
         map.setMarkerIcon('{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        
+        navigator.geolocation.getCurrentPosition((pos) => {
+            vehicleMarker = L.marker([pos.coords.latitude, pos.coords.longitude], {icon: map.markerIcon}).addTo(map.getMap());
+        })
 
         var btnDrivingMode = document.getElementById('btn-driving-mode');
         var drivingModeOption = document.getElementById('select-driving-vehicle');
@@ -103,8 +108,13 @@
                     console.log("Live Marker: Latitude: " + latitude);
                     console.log("Live Marker: Longitude: " + longitude);
 
+                    //@TODO: Change the map marker color from gray to blue.
+
                     //Position the map where the current location is pointing to.
                     map.getMap().setView([latitude, longitude], 16);
+
+                    //Update the position of the marker indicating the vehicle's position.
+                    vehicleMarker.setLatLng([latitude, longitude]);
 
                     //Save the position data into the database.
                     //=========================================
@@ -134,12 +144,12 @@
             }else{
                 alert("Geolocation is turned off or not supported by this device");
             }
-
-            //var marker = L.marker([e.latlng.lat, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
         }
 
         function stopLiveTracking(tag){
             navigator.geolocation.clearWatch(trackingId);
+
+            //@TODO: Change the marker color from blue to gray.
         }
     </script>
 @endpush
