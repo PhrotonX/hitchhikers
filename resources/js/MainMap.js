@@ -6,7 +6,9 @@ export default class MainMap{
      */
     constructor(mapId, nominatimUrl){
         this.map = L.map(mapId, {doubleClickZoom: false, center: [15.038880837376297, 120.6808276221496], zoom: 13,}).locate({setView: true, maxZoom: 20});
-        this.markerIcon = null;
+        this.markers = {};
+        this.markerIcon = null; //Deprecated
+        this.markerIcons = {};
         this.mapClickCallback = null;
         this.nominatimUrl = nominatimUrl;
 
@@ -40,7 +42,18 @@ export default class MainMap{
         });
     }
 
-    
+    addMarker(tag, latitude, longitude){
+        this.markers[tag] = L.marker([latitude, longitude], {icon: this.markerIcon}).addTo(this.map);
+    }
+
+    /**
+     * 
+     * @param {*} tag The key or name of the marker.
+     * @param {*} object Expects L.marker() object.
+     */
+    addMarkerObject(tag, object){
+        this.markers[tag] = object.addTo(this.map);
+    }
 
     getMap(){
         return this.map;
