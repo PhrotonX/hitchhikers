@@ -2,8 +2,7 @@ import MainMap from '../js/MainMap.js';
 
 export default class RideMap extends MainMap{
     constructor(mapId, nominatimUrl, webUrl, rideUrl = '/api/ride/all/destinations?'){
-        super(mapId, nominatimUrl);
-        this.webUrl = webUrl;
+        super(mapId, nominatimUrl, webUrl);
         this.rideUrl = rideUrl;
 
         this.trackingId = null;
@@ -79,7 +78,7 @@ export default class RideMap extends MainMap{
                 this.map.setView([latitude, longitude], 16);
 
                 //Update the position of the marker indicating the vehicle's position.
-                this.vehicleMarker.setLatLng([latitude, longitude]);
+                this.markers.currentPos.setLatLng([latitude, longitude]);
 
                 //Save the position data into the database.
                 //=========================================

@@ -47,7 +47,7 @@
             <script type="module">
                 import MainMap from '{{ Vite::asset("resources/js/MainMap.js") }}';
 
-                var map = new MainMap('map', '{{env("NOMINATIM_URL", "")}}');
+                var map = new MainMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
                 map.setMarkerIcon('{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
                 map.onMapClick(function(marker, e, data){
                     // const parser = new DOMParser();

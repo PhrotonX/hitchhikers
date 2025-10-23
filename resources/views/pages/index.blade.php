@@ -34,15 +34,10 @@
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
 
-        
-
         var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
-        map.setMarkerIcon('{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.setMarkerIcon('currentPos', '{{Vite::asset("resources/img/current_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.detectLocation();
         
-        navigator.geolocation.getCurrentPosition((pos) => {
-            map.vehicleMarker = L.marker([pos.coords.latitude, pos.coords.longitude], {icon: map.markerIcon}).addTo(map.getMap());
-        });
-
         var btnDrivingMode = document.getElementById('btn-driving-mode');
         var drivingModeOption = document.getElementById('select-driving-vehicle');
 
