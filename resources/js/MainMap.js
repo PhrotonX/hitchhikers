@@ -43,6 +43,10 @@ export default class MainMap{
                     console.log("Error: " + error);
                 });
         });
+
+        this.map.on('moveend', () => {
+            console.log("Map panned!");
+        });
     }
 
     addMarker(tag, latitude, longitude, iconTag){
