@@ -19,5 +19,7 @@ class Vehicle extends Model
         'coordinates',
         'color',
         'type',
+        'latitude',
+        'longitude',
     ];
 }
