@@ -18,35 +18,7 @@ export default class MainMap{
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(this.map);
 
-        this.setMarkerIcon("default", this.webUrl + "")
-
-        // Handle map markers
-        this.map.on('click', (e) => {
-            console.log('Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng);
-
-            fetch(this.nominatimUrl + "/reverse?lat=" + e.latlng.lat + "&lon=" + e.latlng.lng + '&format=json&zoom=18&addressdetails=1')
-                .then(response => {
-                    if(!response.ok){
-                        throw new Error("Error: " + response);
-                    }
-                    console.log(response);
-
-                    return response.json();
-                })
-                .then(data => {
-                    //Add markers
-                    var marker = L.marker([e.latlng.lat, e.latlng.lng], {icon: this.markerIcons["default"]}).addTo(this.map);
-
-                    this.mapClickCallback(marker, e, data);
-                })
-                .catch(error => {
-                    console.log("Error: " + error);
-                });
-        });
-
-        this.map.on('moveend', () => {
-            console.log("Map panned!");
-        });
+        // this.setMarkerIcon("default", this.webUrl + "");
     }
 
     addMarker(tag, latitude, longitude, iconTag){
@@ -76,6 +48,35 @@ export default class MainMap{
         this.mapClickCallback = callback;
     }
 
+    retrieveMarkerData(){
+        this.map.on('moveend', () => {
+            // console.log("Map panned!");
+
+
+        });
+    }
+
+    reverseEngineer(e, lat, lng){
+        fetch(this.nominatimUrl + "/reverse?lat=" + lat + "&lon=" + lng + '&format=json&zoom=18&addressdetails=1')
+            .then(response => {
+                if(!response.ok){
+                    throw new Error("Error: " + response);
+                }
+                console.log(response);
+
+                return response.json();
+            })
+            .then(data => {
+                //Add markers
+                var marker = L.marker([lat, lng], {icon: this.markerIcons["default"]}).addTo(this.map);
+
+                this.mapClickCallback(marker, e, data);
+            })
+            .catch(error => {
+                console.log("Error: " + error);
+            });
+    }
+
     /**
      * Define the default marker icon.
      * Must be invoked after calling the constructor.
@@ -92,6 +93,13 @@ export default class MainMap{
             iconAnchor:   [22, 94],
             shadowAnchor: [4, 62], 
             popupAnchor:  [-3, -76]
+        });
+    }
+
+    enableClickToAddMultipleMarkers(){
+        this.map.on('click', (e) => {
+            // console.log('Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng);
+            this.reverseEngineer(e, e.latlng.lat, e.latlng.lng);
         });
     }
 }
