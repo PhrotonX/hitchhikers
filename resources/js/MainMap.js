@@ -26,7 +26,7 @@ export default class MainMap{
     }
 
     /**
-     * 
+     * Adds a marker object created with L.marker();
      * @param {*} tag The key or name of the marker.
      * @param {*} object Expects L.marker() object.
      */
@@ -34,6 +34,9 @@ export default class MainMap{
         this.markers[tag] = object.addTo(this.map);
     }
 
+    /**
+     * Detects the current device location.
+     */
     detectLocation(){
         navigator.geolocation.getCurrentPosition((pos) => {
             this.addMarkerObject("currentPos", L.marker([pos.coords.latitude, pos.coords.longitude], {icon: this.markerIcons.currentPos}));
@@ -56,7 +59,10 @@ export default class MainMap{
         });
     }
 
-    reverseEngineer(e, lat, lng){
+    /**
+     * Retrieves latitude and longitude data.
+     */
+    reverseEngineer(e, lat, lng, pinToMap = true){
         fetch(this.nominatimUrl + "/reverse?lat=" + lat + "&lon=" + lng + '&format=json&zoom=18&addressdetails=1')
             .then(response => {
                 if(!response.ok){
@@ -67,10 +73,12 @@ export default class MainMap{
                 return response.json();
             })
             .then(data => {
-                //Add markers
-                var marker = L.marker([lat, lng], {icon: this.markerIcons["default"]}).addTo(this.map);
+                if(pinToMap){
+                    //Add markers
+                    var marker = L.marker([lat, lng], {icon: this.markerIcons["default"]}).addTo(this.map);
 
-                this.mapClickCallback(marker, e, data);
+                    this.mapClickCallback(marker, e, data);
+                }
             })
             .catch(error => {
                 console.log("Error: " + error);
@@ -96,6 +104,9 @@ export default class MainMap{
         });
     }
 
+    /**
+     * Must be called before setting the map onClick event.
+     */
     enableClickToAddMultipleMarkers(){
         this.map.on('click', (e) => {
             // console.log('Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng);
