@@ -3,6 +3,7 @@
  * Front-end API for the Web.
  */
 
+use App\Http\Controllers\RideDestinationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\RideController;
@@ -41,9 +42,11 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
     Route::delete('vehicle/{vehicle}/delete', [VehicleController::class, 'destroy'])->name('vehicle.delete');
     // Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
+    Route::patch('vehicle/{vehicle}/update-location', [VehicleController::class, 'updateLocation']);
 
     Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');
     Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');
+    Route::patch('ride/{ride}/update-status', [RideController::class, 'updateStatus']);
 });
 
 
@@ -54,5 +57,6 @@ Route::get('settings', function(){
 })->middleware(['auth'])->name('settings');
 
 
+Route::get('api/ride/all/destinations', [RideDestinationController::class, 'index']);
 
 require __DIR__.'/auth.php';
