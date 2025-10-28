@@ -10,6 +10,7 @@ export default class RideMap extends MainMap{
         this.vehicleId = null;
         this.vehicleMarker = null;
         this.vehicleUrl = '/vehicle?';
+        this.onVehicleMarkerClick = null;
         
         this.rideMarkers = L.markerClusterGroup();
         this.vehicleMarkers = L.markerClusterGroup();
@@ -27,6 +28,9 @@ export default class RideMap extends MainMap{
         // });
 
         // this.loadRideDestinations();
+
+        this.map.addLayer(this.rideMarkers);
+        this.map.addLayer(this.vehicleMarkers);
     }
 
     /**
@@ -36,41 +40,18 @@ export default class RideMap extends MainMap{
         this.map.on('moveend', this.retrieveVehicleMarkers());
     }
 
-    // loadRideDestinations(){
-    //     const bounds = this.map.getBounds();
-    //     const northWest = bounds.getNorthEast();
-    //     const southEast = bounds.getSouthEast();
-
-    //     var url = this.webUrl + this.rideUrl +
-    //         'lat-north=' + northWest.lat + '&lng-west=' + northWest.lng +
-    //         '&lat-south=' + southEast.lat + '&lng-east=' + southEast.lng;
-
-    //     console.log("Url: " + url);
-
-    //     fetch(url
-    //     ).then((response) => {
-    //         return response.json();
-    //     }).then((data) => {
-    //         // console.log("RideDestinations: " + data.results[0].latitude);
-    //         //var marker = L.marker([data.results, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
-
-    //         // data.results.forEach(result => {
-    //         //     L.marker([result.latitude, result.longitude], {icon: this.markerIcon}).addTo(this.map);
-    //         // });
-
-    //         L.marker([data.results[0].latitude, data.results[0].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
-    //     }).catch((error) => {
-    //         throw new Error(error);
-    //     });
-    // }
+    setOnVehicleMarkerClick(callback){
+        this.onVehicleMarkerClick = callback;
+    }
 
     /**
-     * Retrieves map markers within a map boundary.
+     * Retrieves map markers within a map boundary (outdated code)
      */
     retrieveRideMarkers(){
         return () => {
             // console.log("Map panned!");
 
+            //Obtain map bounds to specify the area of map where markers must be obtained.
             const bounds = this.map.getBounds();
             const northWest = bounds.getNorthEast();
             const southEast = bounds.getSouthEast();
@@ -85,28 +66,21 @@ export default class RideMap extends MainMap{
             ).then((response) => {
                 return response.json();
             }).then((data) => {
-                // console.log("RideDestinations: " + JSON.stringify(data));
-                // var marker = L.marker([data.results, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
 
-                // data.results.forEach(result => {
-                //     L.marker([result.latitude, result.longitude], {icon: this.markerIcon}).addTo(this.map);
-                // });
-
+                //Populate the map with markers
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
-                    // if(this.markers["ride-" + data.results[i].id] == null){
-                    //     this.markers["ride-" + data.results[i].id] = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
-                    // }
 
+                    //Check if the marker already exists to avoid marker duplication.
                     if(!this.rideMarkers.hasLayer(this.markerIds["ride-" + data.results[i].id])){
-                        this.markerIds["ride-" + data.results[i].id] = this.rideMarkers.addLayer(L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map)).getLayerId();
+                        var marker = this.rideMarkers.addLayer(L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map));
+
+                        this.markerIds["ride-" + data.results[i].id] = marker.getLayerId();
                     }
 
                 }
 
-                console.log("Count: " + Object.keys(this.markerIds).length);
-
-                // L.marker([data.results[0].latitude, data.results[0].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
+                // console.log("Count: " + Object.keys(this.markerIds).length);
             }).catch((error) => {
                 throw new Error(error);
             });
@@ -115,7 +89,7 @@ export default class RideMap extends MainMap{
 
     retrieveVehicleMarkers(){
         return () => {
-            console.log("Map panned!");
+            // console.log("Map panned!");
 
             const bounds = this.map.getBounds();
             const northWest = bounds.getNorthEast();
@@ -125,33 +99,31 @@ export default class RideMap extends MainMap{
                 'lat-north=' + northWest.lat + '&lng-west=' + northWest.lng +
                 '&lat-south=' + southEast.lat + '&lng-east=' + southEast.lng;
 
-            console.log("Url: " + url);
+            // console.log("Url: " + url);
 
             fetch(url
             ).then((response) => {
                 return response.json();
             }).then((data) => {
-                // console.log("VehicleDestinations: " + JSON.stringify(data));
-                // var marker = L.marker([data.results, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
-
-                // data.results.forEach(result => {
-                //     L.marker([result.latitude, result.longitude], {icon: this.markerIcon}).addTo(this.map);
-                // });
 
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
-                    // if(this.markers["ride-" + data.results[i].id] == null){
-                    //     this.markers["ride-" + data.results[i].id] = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
-                    // }
 
-                    if(!this.vehicleMarkers.hasLayer(this.markerIds["ride-" + data.results[i].id])){
-                        this.markerIds["ride-" + data.results[i].id] = this.vehicleMarkers.addLayer(L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map));
+                    if(!this.vehicleMarkers.hasLayer(this.markers["vehicle-" + data.results[i].id])){
+                        var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]});
+                        marker.on('click', (e) => {
+                            if(this.onVehicleMarkerClick){
+                                this.onVehicleMarkerClick(e, data.results[i]);
+                            }
+                        });
+                        this.markers["vehicle-" + data.results[i].id] = marker;
+
+                        this.vehicleMarkers.addLayer(marker);
                     }
                 }
 
-                console.log("Count: " + Object.keys(this.markerIds).length);
+                // console.log("Count: " + Object.keys(this.markers).length);
 
-                // L.marker([data.results[0].latitude, data.results[0].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
             }).catch((error) => {
                 throw new Error(error);
             });

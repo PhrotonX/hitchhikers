@@ -38,7 +38,12 @@
         map.setMarkerIcon('default', '{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.setMarkerIcon('currentPos', '{{Vite::asset("resources/img/current_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.detectLocation();
+        map.setOnVehicleMarkerClick((e, data) => {
+            console.log("Marker clicked! e: " + e);
+            console.log("Marker clicked! data: " + data);
+        });
         map.enablePanToRetrieveMarkers();
+        
         
         var btnDrivingMode = document.getElementById('btn-driving-mode');
         var drivingModeOption = document.getElementById('select-driving-vehicle');
