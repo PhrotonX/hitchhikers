@@ -91,6 +91,7 @@ export default class RideMap extends MainMap{
         return () => {
             // console.log("Map panned!");
 
+            //Obtain map bounds to specify the area of map where markers must be obtained.
             const bounds = this.map.getBounds();
             const northWest = bounds.getNorthEast();
             const southEast = bounds.getSouthEast();
@@ -106,18 +107,25 @@ export default class RideMap extends MainMap{
                 return response.json();
             }).then((data) => {
 
+                //Populate the map with markers
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
 
+                    //Check if the marker already exists to avoid marker duplication.
                     if(!this.vehicleMarkers.hasLayer(this.markers["vehicle-" + data.results[i].id])){
                         var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]});
+
+                        //Setup marker click listener.
                         marker.on('click', (e) => {
                             if(this.onVehicleMarkerClick){
                                 this.onVehicleMarkerClick(e, data.results[i]);
                             }
                         });
+
+                        //Obtain marker ID for duplication detection.
                         this.markers["vehicle-" + data.results[i].id] = marker;
 
+                        // Add the marker into the map.
                         this.vehicleMarkers.addLayer(marker);
                     }
                 }
