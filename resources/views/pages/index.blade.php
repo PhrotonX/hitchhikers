@@ -42,7 +42,8 @@
             console.log("Marker clicked! e: " + e);
             console.log("Marker clicked! data: " + data);
         });
-        map.enablePanToRetrieveMarkers();
+        map.enablePanToRetrieveRideMarkers();
+        map.enablePanToRetrieveVehicleMarkers();
         
         
         var btnDrivingMode = document.getElementById('btn-driving-mode');

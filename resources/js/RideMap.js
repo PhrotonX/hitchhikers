@@ -11,6 +11,7 @@ export default class RideMap extends MainMap{
         this.vehicleMarker = null;
         this.vehicleUrl = '/vehicle?';
         this.onVehicleMarkerClick = null;
+        this.onRideMarkerClick = null;
         
         this.rideMarkers = L.markerClusterGroup();
         this.vehicleMarkers = L.markerClusterGroup();
@@ -33,11 +34,19 @@ export default class RideMap extends MainMap{
         this.map.addLayer(this.vehicleMarkers);
     }
 
+    enablePanToRetrieveRideMarkers(){
+        this.map.on('moveend', this.retrieveRideMarkers());
+    }
+
     /**
      * Replaces existing map pan event into an event that retrieves all map markers within the bounding box of the map view.
      */
-    enablePanToRetrieveMarkers(){
+    enablePanToRetrieveVehicleMarkers(){
         this.map.on('moveend', this.retrieveVehicleMarkers());
+    }
+
+    setOnRideMarkerClick(callback){
+        this.onRideMarkerClick = callback;
     }
 
     setOnVehicleMarkerClick(callback){
@@ -60,7 +69,7 @@ export default class RideMap extends MainMap{
                 'lat-north=' + northWest.lat + '&lng-west=' + northWest.lng +
                 '&lat-south=' + southEast.lat + '&lng-east=' + southEast.lng;
 
-            console.log("Url: " + url);
+            // console.log("Url: " + url);
 
             fetch(url
             ).then((response) => {
@@ -72,15 +81,26 @@ export default class RideMap extends MainMap{
                 for(let i = 0; i < count; i++){
 
                     //Check if the marker already exists to avoid marker duplication.
-                    if(!this.rideMarkers.hasLayer(this.markerIds["ride-" + data.results[i].id])){
-                        var marker = this.rideMarkers.addLayer(L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map));
+                    if(!this.rideMarkers.hasLayer(this.markers["ride-" + data.results[i].id])){
+                        var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]});
 
-                        this.markerIds["ride-" + data.results[i].id] = marker.getLayerId();
+                        //Setup marker click listener.
+                        marker.on('click', (e) => {
+                            if(this.onRideMarkerClick){
+                                this.onRideMarkerClick(e, data.results[i]);
+                            }
+                        });
+
+                        //Obtain marker ID for duplication detection.
+                        this.markers["ride-" + data.results[i].id] = marker;
+
+                        // Add the marker into the map.
+                        this.rideMarkers.addLayer(marker);
                     }
-
                 }
 
-                // console.log("Count: " + Object.keys(this.markerIds).length);
+                // console.log("Count: " + Object.keys(this.markers).length);
+
             }).catch((error) => {
                 throw new Error(error);
             });
