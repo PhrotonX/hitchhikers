@@ -44,7 +44,7 @@
             console.log("Marker clicked! e: " + e);
             console.log("Marker clicked! data: " + data);
         });
-        map.enablePanToRetrieveRideMarkers();
+        // map.enablePanToRetrieveAllRideMarkers();
         map.enablePanToRetrieveVehicleMarkers();
         
         
@@ -143,10 +143,15 @@
                 }else{
                     btnDrivingMode.innerHTML = "Start driving mode";
                 }
+
+                // console.log(drivingModeOption.value);
+                getRides(drivingModeOption.value);
             }
         @endauth
         
-
+        function getRides(rideId){
+            map.retrieveRideMarkers(rideId)();
+        }
         
     </script>
 @endpush

@@ -57,7 +57,8 @@ Route::get('settings', function(){
 })->middleware(['auth'])->name('settings');
 
 
-Route::get('api/ride/all/destinations', [RideDestinationController::class, 'index']);
+Route::get('ride', [RideDestinationController::class, 'index']);
+Route::get('ride/{ride}', [RideDestinationController::class, 'get']);
 Route::get('vehicle', [VehicleController::class, 'index'])->name('vehicle.index');
 Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
 
