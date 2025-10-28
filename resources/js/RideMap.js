@@ -17,6 +17,7 @@ export default class RideMap extends MainMap{
         this.onVehicleMarkerClick = null;
         this.onRideMarkerClick = null;
         
+        this.cachedMarkers = L.markerClusterGroup();
         this.rideMarkers = L.markerClusterGroup();
         this.vehicleMarkers = L.markerClusterGroup();
         //@TODO: Use proper event listener values and parameters.
@@ -34,6 +35,7 @@ export default class RideMap extends MainMap{
 
         // this.loadRideDestinations();
 
+        this.map.addLayer(this.cachedMarkers);
         this.map.addLayer(this.rideMarkers);
         this.map.addLayer(this.vehicleMarkers);
     }
@@ -114,7 +116,8 @@ export default class RideMap extends MainMap{
     }
 
     /**
-     * Retrieves map markers of a ride destination for a specific ride.
+     * Retrieves map markers of a ride destination for a specific ride and stores the markers. This function
+     * also removes the ride-specific map markers before populating the map with markers.
      * Returns a callback function.
      * @param {*} rideId 
      * @returns 
@@ -130,19 +133,21 @@ export default class RideMap extends MainMap{
 
             var url = this.webUrl + this.rideUrl + "/" + rideId;
 
-            // console.log("Url: " + url);
+            console.log("Url: " + url);
 
             fetch(url
             ).then((response) => {
                 return response.json();
             }).then((data) => {
+                //Clear the cached ride map markers.
+                this.cachedMarkers.clearLayers();
 
                 //Populate the map with markers
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
 
                     //Check if the marker already exists to avoid marker duplication.
-                    if(!this.rideMarkers.hasLayer(this.markers["ride-" + data.results[i].id])){
+                    if(!this.cachedMarkers.hasLayer(this.markers["ride-" + data.results[i].id])){
                         var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]});
 
                         //Setup marker click listener.
@@ -156,7 +161,7 @@ export default class RideMap extends MainMap{
                         this.markers["ride-" + data.results[i].id] = marker;
 
                         // Add the marker into the map.
-                        this.rideMarkers.addLayer(marker);
+                        this.cachedMarkers.addLayer(marker);
                     }
                 }
 
