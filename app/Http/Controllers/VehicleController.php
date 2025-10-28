@@ -105,6 +105,12 @@ class VehicleController extends Controller
         ]);
     }
 
+    public function get(Vehicle $vehicle){
+        return response()->json([
+            'vehicle' => $vehicle,
+        ]);
+    }
+
     public function getRides(Vehicle $vehicle){
         $results = Ride::where('vehicle_id', $vehicle->id)->get();
         return response()->json([

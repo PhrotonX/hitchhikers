@@ -12,7 +12,7 @@ export default class MainMap{
         this.mapClickCallback = null;
         this.mapPanCallback = null;
         this.nominatimUrl = nominatimUrl;
-        this.rideUrl = '/api/ride/all/destinations?';
+        this.rideDestinationUrl = '/api/ride/all/destinations?';
         this.webUrl = webUrl;
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -20,7 +20,7 @@ export default class MainMap{
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(this.map);
 
-        // this.setMarkerIcon("default", this.webUrl + "");
+        // this.configureMarkerIcon("default", this.webUrl + "");
     }
 
     addMarker(tag, latitude, longitude, iconTag){
@@ -64,9 +64,35 @@ export default class MainMap{
     }
 
     /**
-     * Retrieves latitude and longitude data.
+     * Obtains a human-readable address based on latitude and longitude data.
+     * @param {*} lat 
+     * @param {*} lng 
+     * @param {*} callback 
+     * @returns 
      */
-    reverseEngineer(e, lat, lng, pinToMap = true){
+    reverseGeocode(lat, lng, callback = null){
+        return fetch(this.nominatimUrl + "/reverse?lat=" + lat + "&lon=" + lng + '&format=json&zoom=18&addressdetails=1')
+            .then(response => {
+                return response.json();
+            })
+            .then((data) => {
+                // console.log(data);
+                if(callback){
+                    callback(data);
+                }
+                return data;
+            })
+            .catch(error => {
+                throw new Error(error);
+            });
+    }
+
+    /**
+     * Reverse geocodes and then pins the location to the map.
+     * 
+     * @TODO: Refactor to make it more general and accept click events.
+     */
+    reverseGeocodeAndPin(e, lat, lng, pinToMap = true){
         fetch(this.nominatimUrl + "/reverse?lat=" + lat + "&lon=" + lng + '&format=json&zoom=18&addressdetails=1')
             .then(response => {
                 if(!response.ok){
@@ -85,17 +111,28 @@ export default class MainMap{
                 }
             })
             .catch(error => {
-                console.log("Error: " + error);
+                throw new Error(error);
             });
     }
 
     /**
-     * Define the default marker icon.
+     * Sets the icon of a marker.
+     * @param {*} markerTag 
+     * @param {*} iconTag 
+     */
+    setMarkerIcon(markerTag, iconTag){
+        if(this.markers[markerTag]){
+            this.markers[markerTag].setIcon(this.markerIcons[iconTag]);
+        }
+    }
+
+    /**
+     * Defines a marker icon.
      * Must be invoked after calling the constructor.
      * @param {*} markerIconParam The main marker icon.
      * @param {*} markerShadowIcon The shadow icon for main marker icon.
      */
-    setMarkerIcon(tag, markerIconParam, markerShadowIcon){
+    configureMarkerIcon(tag, markerIconParam, markerShadowIcon){
         this.markerIcons[tag] = L.icon({
             iconUrl: markerIconParam,
             shadowUrl: markerShadowIcon,
@@ -114,7 +151,7 @@ export default class MainMap{
     enableClickToAddMultipleMarkers(){
         this.map.on('click', (e) => {
             // console.log('Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng);
-            this.reverseEngineer(e, e.latlng.lat, e.latlng.lng);
+            this.reverseGeocodeAndPin(e, e.latlng.lat, e.latlng.lng);
         });
     }
 

@@ -57,9 +57,11 @@ Route::get('settings', function(){
 })->middleware(['auth'])->name('settings');
 
 
-Route::get('ride', [RideDestinationController::class, 'index']);
-Route::get('ride/{ride}', [RideDestinationController::class, 'get']);
+Route::get('ride/destinations', [RideDestinationController::class, 'index']);
+Route::get('ride/destinations/{ride}', [RideDestinationController::class, 'get']);
+Route::get('ride/{ride}', [RideController::class, 'get']);
 Route::get('vehicle', [VehicleController::class, 'index'])->name('vehicle.index');
+Route::get('api/vehicle/{vehicle}', [VehicleController::class, 'get'])->name('vehicle.get');
 Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
 Route::get('vehicle/{vehicle}/rides', [VehicleController::class, 'getRides'])->name('vehicle.rides');
 

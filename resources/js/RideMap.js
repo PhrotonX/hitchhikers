@@ -7,7 +7,7 @@ import MainMap from '../js/MainMap.js';
 export default class RideMap extends MainMap{
     constructor(mapId, nominatimUrl, webUrl){
         super(mapId, nominatimUrl, webUrl);
-        this.rideUrl = '/ride';
+        this.rideDestinationUrl = '/ride/destinations';
         this.rideMarkers = new Object();
         this.vehicleMarkers = new Object();
         this.trackingId = null;
@@ -73,7 +73,7 @@ export default class RideMap extends MainMap{
             const northWest = bounds.getNorthEast();
             const southEast = bounds.getSouthEast();
 
-            var url = this.webUrl + this.rideUrl + "?" +
+            var url = this.webUrl + this.rideDestinationUrl + "?" +
                 'lat-north=' + northWest.lat + '&lng-west=' + northWest.lng +
                 '&lat-south=' + southEast.lat + '&lng-east=' + southEast.lng;
 
@@ -124,7 +124,7 @@ export default class RideMap extends MainMap{
         return () => {
             var url = this.webUrl + this.vehicleUrl + "/" + vehicleId + "/rides";
 
-            console.log("Url: " + url);
+            // console.log("Url: " + url);
 
             return fetch(url
                 ).then((response) => {
@@ -153,9 +153,9 @@ export default class RideMap extends MainMap{
             const northWest = bounds.getNorthEast();
             const southEast = bounds.getSouthEast();
 
-            var url = this.webUrl + this.rideUrl + "/" + rideId;
+            var url = this.webUrl + this.rideDestinationUrl + "/" + rideId;
 
-            console.log("Url: " + url);
+            // console.log("Url: " + url);
 
             fetch(url
             ).then((response) => {
@@ -195,6 +195,10 @@ export default class RideMap extends MainMap{
         }
     }
 
+    /**
+     * Retrieves vehicle markers and displays it on a map.
+     * @returns A callback function.
+     */
     retrieveVehicleMarkers(){
         return () => {
             // console.log("Map panned!");
@@ -222,15 +226,19 @@ export default class RideMap extends MainMap{
                     //Check if the marker already exists to avoid marker duplication.
                     if(!this.vehicleMarkers.hasLayer(this.markers["vehicle-" + data.results[i].id])){
                         //Decide on the marker icon depending on the marker state [INCOMPLETE].
-                        var markerIcon = this.markerIcons["active_vehicle"];
-
+                        var markerIcon;
+                        if(data.results[i].status == "active"){
+                            markerIcon = this.markerIcons["active_vehicle"];
+                        }else{
+                            markerIcon = this.markerIcons["inactive_vehicle"];
+                        }
+                        
                         var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: markerIcon});
 
                         //Setup marker click listener.
                         marker.on('click', (e) => {
 
                             //Get vehicle rides.
-                            
 
                             if(this.onVehicleMarkerClick){
                                 this.onVehicleMarkerClick(e, data.results[i]);
@@ -258,10 +266,14 @@ export default class RideMap extends MainMap{
      * @param {*} url The JSON data based on RideDestination[] model.
      */
     setRideDestinationUrl(url){
-        this.rideUrl = url;
+        this.rideDestinationUrl = url;
     }
 
-    startLiveTracking(onMarkerClick, vehicle_id){
+    /**
+     * Tracks the 
+     * @param {*} vehicle_id 
+     */
+    startLiveTracking(vehicle_id){
         this.vehicleId = vehicle_id;
         //Get current location
         if(navigator.geolocation){
@@ -312,7 +324,5 @@ export default class RideMap extends MainMap{
 
     stopLiveTracking(tag){
         navigator.geolocation.clearWatch(this.trackingId);
-
-        //@TODO: Change the marker color from blue to gray.
     }
 }
