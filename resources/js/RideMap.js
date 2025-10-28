@@ -99,7 +99,7 @@ export default class RideMap extends MainMap{
                     // }
 
                     if(!this.rideMarkers.hasLayer(this.markerIds["ride-" + data.results[i].id])){
-                        this.markerIds["ride-" + data.results[i].id] = this.rideMarkers.addLayer(L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map));
+                        this.markerIds["ride-" + data.results[i].id] = this.rideMarkers.addLayer(L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map)).getLayerId();
                     }
 
                 }
