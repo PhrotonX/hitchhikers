@@ -7,7 +7,7 @@ import MainMap from '../js/MainMap.js';
 export default class RideMap extends MainMap{
     constructor(mapId, nominatimUrl, webUrl){
         super(mapId, nominatimUrl, webUrl);
-        this.rideUrl = '/ride';
+        this.rideDestinationUrl = '/ride/destinations';
         this.rideMarkers = new Object();
         this.vehicleMarkers = new Object();
         this.trackingId = null;
@@ -73,7 +73,7 @@ export default class RideMap extends MainMap{
             const northWest = bounds.getNorthEast();
             const southEast = bounds.getSouthEast();
 
-            var url = this.webUrl + this.rideUrl + "?" +
+            var url = this.webUrl + this.rideDestinationUrl + "?" +
                 'lat-north=' + northWest.lat + '&lng-west=' + northWest.lng +
                 '&lat-south=' + southEast.lat + '&lng-east=' + southEast.lng;
 
@@ -124,7 +124,7 @@ export default class RideMap extends MainMap{
         return () => {
             var url = this.webUrl + this.vehicleUrl + "/" + vehicleId + "/rides";
 
-            console.log("Url: " + url);
+            // console.log("Url: " + url);
 
             return fetch(url
                 ).then((response) => {
@@ -153,9 +153,9 @@ export default class RideMap extends MainMap{
             const northWest = bounds.getNorthEast();
             const southEast = bounds.getSouthEast();
 
-            var url = this.webUrl + this.rideUrl + "/" + rideId;
+            var url = this.webUrl + this.rideDestinationUrl + "/" + rideId;
 
-            console.log("Url: " + url);
+            // console.log("Url: " + url);
 
             fetch(url
             ).then((response) => {
@@ -235,7 +235,6 @@ export default class RideMap extends MainMap{
                         marker.on('click', (e) => {
 
                             //Get vehicle rides.
-                            
 
                             if(this.onVehicleMarkerClick){
                                 this.onVehicleMarkerClick(e, data.results[i]);
@@ -263,7 +262,7 @@ export default class RideMap extends MainMap{
      * @param {*} url The JSON data based on RideDestination[] model.
      */
     setRideDestinationUrl(url){
-        this.rideUrl = url;
+        this.rideDestinationUrl = url;
     }
 
     startLiveTracking(onMarkerClick, vehicle_id){

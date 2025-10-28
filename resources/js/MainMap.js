@@ -12,7 +12,7 @@ export default class MainMap{
         this.mapClickCallback = null;
         this.mapPanCallback = null;
         this.nominatimUrl = nominatimUrl;
-        this.rideUrl = '/api/ride/all/destinations?';
+        this.rideDestinationUrl = '/api/ride/all/destinations?';
         this.webUrl = webUrl;
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {

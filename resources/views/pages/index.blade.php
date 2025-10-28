@@ -185,10 +185,13 @@
                 });
             @endif
 
+            // Handle driving mode select list.
             function updateSelectedRideOption(){
+                //Retrieves data needed to be processed.
                 var selectedDrivingModeOption = document.getElementById("ride-option" + "-" + drivingModeOption.value);
                 status = selectedDrivingModeOption.getAttribute('data-status');
 
+                // Toggles button state.
                 if(status == "active"){
                     btnDrivingMode.innerHTML = "Stop driving mode";
                 }else{
@@ -196,12 +199,32 @@
                 }
                 
                 getRides(drivingModeOption.value);
+
+                // Zoom into the position of associated vehicle from a selected ride.
+                fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value)
+                .then((response) => {
+                    return response.json();
+                }).then((data) => {
+
+                    fetch('{{env("APP_URL", "")}}' + '/api/vehicle/'+data.ride.vehicle_id)
+                    .then((response) => {
+                        console.log("URL: " + '{{env("APP_URL", "")}}' + '/vehicle/'+data.ride.vehicle_id);
+                        return response.json();
+                    }).then((vehicleData) => {
+                        map.getMap().setView([vehicleData.vehicle.latitude, vehicleData.vehicle.longitude], 16);
+                    }).catch((error) => {
+                        throw new Error(error);
+                    });
+
+                }).catch((error) => {
+                    throw new Error(error);
+                });
             }
 
         @endauth
 
         
-        
+        // Retrieves ride destinations based on ride ID.
         function getRides(rideId){
             map.retrieveRideMarkers(rideId)();
         }

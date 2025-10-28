@@ -98,6 +98,12 @@ class RideController extends Controller
         //
     }
 
+    public function get(Ride $ride){
+        return response()->json([
+            "ride" => $ride,
+        ]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      */
