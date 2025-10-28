@@ -6,6 +6,7 @@ use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
 use App\Models\VehicleDriver;
+use App\Models\Ride;
 use App\Http\Requests\UpdateVehicleLocationRequest;
 use App\Http\Requests\UpdateVehicleStatus;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -101,6 +102,13 @@ class VehicleController extends Controller
     {
         return view('pages.vehicle.view', [
             'vehicle' => $vehicle,
+        ]);
+    }
+
+    public function getRides(Vehicle $vehicle){
+        $results = Ride::where('vehicle_id', $vehicle->id)->get();
+        return response()->json([
+            'rides' => $results,
         ]);
     }
 

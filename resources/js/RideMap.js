@@ -116,6 +116,28 @@ export default class RideMap extends MainMap{
     }
 
     /**
+     * Retrieves rides based on a vehicle ID.
+     * 
+     * Returns a callback function.
+     */
+    retrieveRides(vehicleId){
+        return () => {
+            var url = this.webUrl + this.vehicleUrl + "/" + vehicleId + "/rides";
+
+            console.log("Url: " + url);
+
+            return fetch(url
+                ).then((response) => {
+                    return response.json();
+                }).then((data) => {
+                    return data;
+                }).catch((error) => {
+                    throw new Error(error);
+                });
+        }
+    }
+
+    /**
      * Retrieves map markers of a ride destination for a specific ride and stores the markers. This function
      * also removes the ride-specific map markers before populating the map with markers.
      * Returns a callback function.
@@ -206,6 +228,10 @@ export default class RideMap extends MainMap{
 
                         //Setup marker click listener.
                         marker.on('click', (e) => {
+
+                            //Get vehicle rides.
+                            
+
                             if(this.onVehicleMarkerClick){
                                 this.onVehicleMarkerClick(e, data.results[i]);
                             }

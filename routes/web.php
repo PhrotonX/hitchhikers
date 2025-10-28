@@ -61,5 +61,6 @@ Route::get('ride', [RideDestinationController::class, 'index']);
 Route::get('ride/{ride}', [RideDestinationController::class, 'get']);
 Route::get('vehicle', [VehicleController::class, 'index'])->name('vehicle.index');
 Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
+Route::get('vehicle/{vehicle}/rides', [VehicleController::class, 'getRides'])->name('vehicle.rides');
 
 require __DIR__.'/auth.php';
