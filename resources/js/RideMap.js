@@ -25,6 +25,13 @@ export default class RideMap extends MainMap{
         // this.loadRideDestinations();
     }
 
+    /**
+     * Replaces existing map pan event into an event that retrieves all map markers within the bounding box of the map view.
+     */
+    enablePanToRetrieveMarkers(){
+        this.map.on('moveend', this.retrieveMarkers());
+    }
+
     loadRideDestinations(){
         const bounds = this.map.getBounds();
         const northWest = bounds.getNorthEast();
@@ -47,10 +54,52 @@ export default class RideMap extends MainMap{
             //     L.marker([result.latitude, result.longitude], {icon: this.markerIcon}).addTo(this.map);
             // });
 
-            L.marker([data.results[0].latitude, data.results[0].longitude], {icon: this.markerIcon}).addTo(this.map);
+            L.marker([data.results[0].latitude, data.results[0].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
         }).catch((error) => {
             throw new Error(error);
         });
+    }
+
+    /**
+     * Retrieves map markers within a map boundary.
+     */
+    retrieveMarkers(){
+        return () => {
+            console.log("Map panned!");
+
+            const bounds = this.map.getBounds();
+            const northWest = bounds.getNorthEast();
+            const southEast = bounds.getSouthEast();
+
+            var url = this.webUrl + this.rideUrl +
+                'lat-north=' + northWest.lat + '&lng-west=' + northWest.lng +
+                '&lat-south=' + southEast.lat + '&lng-east=' + southEast.lng;
+
+            console.log("Url: " + url);
+
+            fetch(url
+            ).then((response) => {
+                return response.json();
+            }).then((data) => {
+                console.log("RideDestinations: " + JSON.stringify(data));
+                // var marker = L.marker([data.results, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
+
+                // data.results.forEach(result => {
+                //     L.marker([result.latitude, result.longitude], {icon: this.markerIcon}).addTo(this.map);
+                // });
+
+                var count = Object.keys(data.results).length;
+                for(let i = 0; i < count; i++){
+                    if(this.markers["ride-" + data.results[i].id] == null){
+                        this.markers["ride-" + data.results[i].id] = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
+                    }
+                }
+
+                // L.marker([data.results[0].latitude, data.results[0].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
+            }).catch((error) => {
+                throw new Error(error);
+            });
+        }
     }
 
     /**

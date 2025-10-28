@@ -10,7 +10,9 @@ export default class MainMap{
         // this.markerIcon = null; //Deprecated
         this.markerIcons = new Object();
         this.mapClickCallback = null;
+        this.mapPanCallback = null;
         this.nominatimUrl = nominatimUrl;
+        this.rideUrl = '/api/ride/all/destinations?';
         this.webUrl = webUrl;
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -35,7 +37,7 @@ export default class MainMap{
     }
 
     /**
-     * Detects the current device location.
+     * Detects the current device location and adds a marker object on it.
      */
     detectLocation(){
         navigator.geolocation.getCurrentPosition((pos) => {
@@ -47,16 +49,18 @@ export default class MainMap{
         return this.map;
     }
 
+    /**
+     * Sets the functionality for map click event.
+     * 
+     * This returns an event parameter containing the latitude and longitude of a clicked area from the map.
+     * @param {*} callback 
+     */
     onMapClick(callback){
         this.mapClickCallback = callback;
     }
 
-    retrieveMarkerData(){
-        this.map.on('moveend', () => {
-            // console.log("Map panned!");
-
-
-        });
+    onMapPan(callback){
+        this.mapPanCallback = callback;
     }
 
     /**
@@ -105,7 +109,7 @@ export default class MainMap{
     }
 
     /**
-     * Must be called before setting the map onClick event.
+     * Replaces existing map click event into an event that retrieves a reverse-engineered data based on map click location.
      */
     enableClickToAddMultipleMarkers(){
         this.map.on('click', (e) => {
@@ -113,4 +117,6 @@ export default class MainMap{
             this.reverseEngineer(e, e.latlng.lat, e.latlng.lng);
         });
     }
+
+    
 }
