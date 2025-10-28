@@ -63,6 +63,13 @@ export default class MainMap{
         this.mapPanCallback = callback;
     }
 
+    /**
+     * Obtains a human-readable address based on latitude and longitude data.
+     * @param {*} lat 
+     * @param {*} lng 
+     * @param {*} callback 
+     * @returns 
+     */
     reverseGeocode(lat, lng, callback = null){
         return fetch(this.nominatimUrl + "/reverse?lat=" + lat + "&lon=" + lng + '&format=json&zoom=18&addressdetails=1')
             .then(response => {
@@ -108,6 +115,11 @@ export default class MainMap{
             });
     }
 
+    /**
+     * Sets the icon of a marker.
+     * @param {*} markerTag 
+     * @param {*} iconTag 
+     */
     setMarkerIcon(markerTag, iconTag){
         if(this.markers[markerTag]){
             this.markers[markerTag].setIcon(this.markerIcons[iconTag]);
@@ -115,7 +127,7 @@ export default class MainMap{
     }
 
     /**
-     * Define the default marker icon.
+     * Defines a marker icon.
      * Must be invoked after calling the constructor.
      * @param {*} markerIconParam The main marker icon.
      * @param {*} markerShadowIcon The shadow icon for main marker icon.

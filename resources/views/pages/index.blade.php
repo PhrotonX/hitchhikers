@@ -13,6 +13,7 @@
         @if (Auth::user()->isDriver())
             <a href="/ride/create">Create a ride</a>
             <div id="driving-mode">
+                {{-- Driving mode button --}}
                 <button type="button" id="btn-driving-mode">Start driving mode</button>
                 {{-- @TODO: Insert a dropdown menu here to be able to choose a ride to begin with. --}}
                 {{-- Use JavaScript to perform the driving mode. --}}
@@ -22,6 +23,7 @@
                         <option id="ride-option-{{$ride->id}}" value="{{$ride->id}}" data-status="{{$ride->status}}">{{$ride->ride_name}}</option>
                     @endforeach
                 </select>
+                <div id="driving-mode-infobox"></div>
             </div>
         @endif
     @endauth
@@ -68,16 +70,19 @@
                 }
             });
 
+            // Obtain the human-readable address of latitude and longitude data.
             map.reverseGeocode(data.latitude, data.longitude).then((location) => {
                 document.getElementById('ride-location').innerHTML = location.display_name;
             });
             
+            // If the user is not authenticated or not a driver, then add the ability 
             @if (Auth::user() == null || !(Auth::user()->isDriver()))
                 infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>' +
                 '<button type="button">See More</button>';
             
                 var rideList = document.getElementById('ride-list');
                 
+                // Gets all the associated rides of a vehicle and display a selection of it.
                 map.retrieveRides(data.id)().then((data) => {
                     var count = Object.keys(data.rides).length;
 
@@ -94,11 +99,11 @@
                             option.setAttribute("value", data.rides[i].id);
                             option.innerHTML = data.rides[i].ride_name;
                         }
-                        
 
                         rideList.appendChild(option);
                     }
 
+                    // Once the selection from ride list has changed, display all of its associated ride destinations.
                     rideList.addEventListener('change', () => {
                         getRides(rideList.value);
                     });
@@ -107,22 +112,28 @@
                 // getRides(rideList.value);
             @endif
         });
+
         // map.enablePanToRetrieveAllRideMarkers();
         map.enablePanToRetrieveVehicleMarkers();
         
         @auth
             @if (Auth::user()->isDriver())
 
+                // Make the driving mode button always update its toggle value after loading the page.
                 updateSelectedRideOption();
 
+                // Toggle the text of driving mode button once the user changes selection from the ride list.
                 drivingModeOption.addEventListener('change', function(){
                     updateSelectedRideOption();
                 });
 
+                // Handle driving mode.
                 btnDrivingMode.addEventListener('click', function(){
+                    // Initialize variables.
                     var drivingMode = "inactive";                    
                     selectedDrivingModeOption = document.getElementById("ride-option" + "-" + drivingModeOption.value);
 
+                    // Toggle the text of driving mode button after clicking on the button itself.
                     if(status == "active"){
                         drivingMode = "inactive";
                         selectedDrivingModeOption.setAttribute('data-status', 'inactive');
@@ -130,10 +141,9 @@
                         drivingMode = "active";
                         selectedDrivingModeOption.setAttribute('data-status', 'active');
                     }
-
                     updateSelectedRideOption();
 
-                    console.log("Mode: "+ drivingMode);
+                    // console.log("Mode: "+ drivingMode);
                     
                     // Update both ride and vehicle driving mode status and marker icon color.
                     // ========================================================================
@@ -173,18 +183,18 @@
 
                             // console.log("Vehicle ID: " + vehicleData.vehicle.id);
 
+                            // Toggle live tracking. This updates the current marker position (green) into the current ones.
                             if(drivingMode == "active"){
-                                map.startLiveTracking(null, vehicleData.vehicle.id);
-                                console.log("Tracking ID: " + map.trackingId);
+                                map.startLiveTracking(vehicleData.vehicle.id);
+                                // console.log("Tracking ID: " + map.trackingId);
                             }else{
                                 map.stopLiveTracking(map.trackingId);
-                                console.log("Tracking ID Stopped: " + map.trackingId);
+                                // console.log("Tracking ID Stopped: " + map.trackingId);
                             }
 
                             //CHange vehicle icon color
                             map.setMarkerIcon("vehicle-" + vehicleData.vehicle.id, status + "_vehicle");
 
-                            //@TODO: Update vehicle location here and display it live on map.
                         }).catch((error) => {
                             throw new Error(error);
                         });
@@ -200,6 +210,7 @@
             function updateSelectedRideOption(){
                 //Retrieves data needed to be processed.
                 var selectedDrivingModeOption = document.getElementById("ride-option" + "-" + drivingModeOption.value);
+                var infobox = document.getElementById("driving-mode-infobox");
                 status = selectedDrivingModeOption.getAttribute('data-status');
 
                 // Toggles button state.
@@ -222,6 +233,9 @@
                         console.log("URL: " + '{{env("APP_URL", "")}}' + '/vehicle/'+data.ride.vehicle_id);
                         return response.json();
                     }).then((vehicleData) => {
+                        // Displays information into driving-mode-infobox.
+                        infobox.innerHTML = "<p>"+vehicleData.vehicle.vehicle_name+"</p>"
+
                         map.getMap().setView([vehicleData.vehicle.latitude, vehicleData.vehicle.longitude], 16);
                     }).catch((error) => {
                         throw new Error(error);

@@ -195,6 +195,10 @@ export default class RideMap extends MainMap{
         }
     }
 
+    /**
+     * Retrieves vehicle markers and displays it on a map.
+     * @returns A callback function.
+     */
     retrieveVehicleMarkers(){
         return () => {
             // console.log("Map panned!");
@@ -265,7 +269,11 @@ export default class RideMap extends MainMap{
         this.rideDestinationUrl = url;
     }
 
-    startLiveTracking(onMarkerClick, vehicle_id){
+    /**
+     * Tracks the 
+     * @param {*} vehicle_id 
+     */
+    startLiveTracking(vehicle_id){
         this.vehicleId = vehicle_id;
         //Get current location
         if(navigator.geolocation){
@@ -316,7 +324,5 @@ export default class RideMap extends MainMap{
 
     stopLiveTracking(tag){
         navigator.geolocation.clearWatch(this.trackingId);
-
-        //@TODO: Change the marker color from blue to gray.
     }
 }
