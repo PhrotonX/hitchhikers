@@ -110,7 +110,8 @@
 
                 btnDrivingMode.addEventListener('click', function(){
                     var drivingMode = "inactive";                    
-                    
+                    selectedDrivingModeOption = document.getElementById("ride-option" + "-" + drivingModeOption.value);
+
                     if(status == "active"){
                         drivingMode = "inactive";
                         selectedDrivingModeOption.setAttribute('data-status', 'inactive');
