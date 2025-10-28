@@ -34,12 +34,11 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::delete('driver/{driver}/leave', [DriverController::class, 'destroy']);
     Route::get('driver/{driver}/edit', [DriverController::class, 'edit']);
     Route::patch('driver/{driver}/update', [DriverController::class, 'update']);
-
     Route::get('vehicle/create', [VehicleController::class, 'create'])->name('vehicle.create');
     Route::post('vehicle/create/submit', [VehicleController::class, 'store'])->name('vehicle.submit');
     Route::get('vehicle/{vehicle}/edit', [VehicleController::class, 'edit'])->name('vehicle.edit');
     Route::patch('vehicle/{vehicle}/update', [VehicleController::class, 'update'])->name('vehicle.update');
-    Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
+    
     Route::delete('vehicle/{vehicle}/delete', [VehicleController::class, 'destroy'])->name('vehicle.delete');
     // Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
     Route::patch('vehicle/{vehicle}/update-location', [VehicleController::class, 'updateLocation']);
@@ -47,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');
     Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');
     Route::patch('ride/{ride}/update-status', [RideController::class, 'updateStatus']);
+    Route::patch('vehicle/{vehicle}/update-status', [VehicleController::class, 'updateStatus']);
 });
 
 
@@ -57,6 +57,10 @@ Route::get('settings', function(){
 })->middleware(['auth'])->name('settings');
 
 
-Route::get('api/ride/all/destinations', [RideDestinationController::class, 'index']);
+Route::get('ride', [RideDestinationController::class, 'index']);
+Route::get('ride/{ride}', [RideDestinationController::class, 'get']);
+Route::get('vehicle', [VehicleController::class, 'index'])->name('vehicle.index');
+Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
+Route::get('vehicle/{vehicle}/rides', [VehicleController::class, 'getRides'])->name('vehicle.rides');
 
 require __DIR__.'/auth.php';

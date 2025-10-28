@@ -6,8 +6,11 @@ use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
 use App\Models\VehicleDriver;
+use App\Models\Ride;
 use App\Http\Requests\UpdateVehicleLocationRequest;
+use App\Http\Requests\UpdateVehicleStatus;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -19,9 +22,21 @@ class VehicleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        // Retrieve URL parameters.
+        $north = $request->input('lat-north');
+        $south = $request->input('lat-south');
+        $east = $request->input('lng-east');
+        $west = $request->input('lng-west');
+
+        // Get rides based on a range of coordinates that forms a bounding box.
+        $results = Vehicle::query('latitude', 'BETWEEN', $north, 'AND', $south, 'AND',
+            'longitude', 'BETWEEN', $east, 'AND', $west)->get();
+
+        return response()->json([
+            "results" => $results,
+        ]);
     }
 
     /**
@@ -90,6 +105,13 @@ class VehicleController extends Controller
         ]);
     }
 
+    public function getRides(Vehicle $vehicle){
+        $results = Ride::where('vehicle_id', $vehicle->id)->get();
+        return response()->json([
+            'rides' => $results,
+        ]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -143,6 +165,17 @@ class VehicleController extends Controller
     }
 
     public function updateLocation(UpdateVehicleLocationRequest $request, Vehicle $vehicle){
+        $this->authorize("update", $vehicle);
+
+        $vehicle->update($request->all());
+
+        return response()->json([
+            "vehicle" => $vehicle
+        ], 200);
+    }
+
+    public function updateStatus(UpdateVehicleStatus $request, Vehicle $vehicle)
+    {
         $this->authorize("update", $vehicle);
 
         $vehicle->update($request->all());

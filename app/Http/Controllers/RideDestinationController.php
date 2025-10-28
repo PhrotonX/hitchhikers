@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 // use App\Http\Requests\StoreDestinationRequest;
 // use App\Http\Requests\UpdateDestinationRequest;
+use App\Models\Ride;
 use App\Models\RideDestination;
 use Illuminate\Http\Request;
 
@@ -25,6 +26,15 @@ class RideDestinationController extends Controller
         // Get rides based on a range of coordinates that forms a bounding box.
         $results = RideDestination::query('latitude', 'BETWEEN', $north, 'AND', $south, 'AND',
             'longitude', 'BETWEEN', $east, 'AND', $west)->get();
+
+        return response()->json([
+            "results" => $results,
+        ]);
+    }
+
+    public function get(Ride $ride)
+    {
+        $results = RideDestination::where('ride_id', $ride->id)->get();
 
         return response()->json([
             "results" => $results,
