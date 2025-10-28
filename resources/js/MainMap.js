@@ -63,10 +63,29 @@ export default class MainMap{
         this.mapPanCallback = callback;
     }
 
+    reverseGeocode(lat, lng, callback = null){
+        return fetch(this.nominatimUrl + "/reverse?lat=" + lat + "&lon=" + lng + '&format=json&zoom=18&addressdetails=1')
+            .then(response => {
+                return response.json();
+            })
+            .then((data) => {
+                // console.log(data);
+                if(callback){
+                    callback(data);
+                }
+                return data;
+            })
+            .catch(error => {
+                throw new Error(error);
+            });
+    }
+
     /**
-     * Retrieves latitude and longitude data.
+     * Reverse geocodes and then pins the location to the map.
+     * 
+     * @TODO: Refactor to make it more general and accept click events.
      */
-    reverseEngineer(e, lat, lng, pinToMap = true){
+    reverseGeocodeAndPin(e, lat, lng, pinToMap = true){
         fetch(this.nominatimUrl + "/reverse?lat=" + lat + "&lon=" + lng + '&format=json&zoom=18&addressdetails=1')
             .then(response => {
                 if(!response.ok){
@@ -85,7 +104,7 @@ export default class MainMap{
                 }
             })
             .catch(error => {
-                console.log("Error: " + error);
+                throw new Error(error);
             });
     }
 
@@ -120,7 +139,7 @@ export default class MainMap{
     enableClickToAddMultipleMarkers(){
         this.map.on('click', (e) => {
             // console.log('Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng);
-            this.reverseEngineer(e, e.latlng.lat, e.latlng.lng);
+            this.reverseGeocodeAndPin(e, e.latlng.lat, e.latlng.lng);
         });
     }
 

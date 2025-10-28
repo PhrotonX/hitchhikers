@@ -56,13 +56,19 @@
             // console.log(data);
 
             infobox.innerHTML =
+                '<div id="ride-popup"><button id="ride-popup-close-btn">Close</button><br>' + 
                 "<p><strong>"+data.vehicle_name+"</strong></p>" + 
+                '<p id="ride-location">Retrieving location...</p>' +
                 "<p><strong>Status:</strong>" + data.status + "</p>" +
                 "<p>"+data.latitude+", "+data.longitude+"</p>" + 
-                "<button>View Reviews</button>";
+                "<button>View Reviews</button></div>";
             
-            @if (Auth::user() == null || !Auth::user()->isDriver())
-                infobox.innerHTML += '<select id="ride-list" name="ride-list"></select>' +
+            map.reverseGeocode(data.latitude, data.longitude).then((location) => {
+                document.getElementById('ride-location').innerHTML = location.display_name;
+            });
+            
+            @if (Auth::user() == null || !(Auth::user()->isDriver()))
+                infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>' +
                 "<button>See More</button>";
             
                 var rideList = document.getElementById('ride-list');
