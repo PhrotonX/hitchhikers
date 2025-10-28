@@ -7,6 +7,7 @@ export default class MainMap{
     constructor(mapId, nominatimUrl, webUrl){
         this.map = L.map(mapId, {doubleClickZoom: false, center: [15.038880837376297, 120.6808276221496], zoom: 13,}).locate({setView: true, maxZoom: 20});
         this.markers = new Object();
+        this.markerIds = new Object();
         // this.markerIcon = null; //Deprecated
         this.markerIcons = new Object();
         this.mapClickCallback = null;

@@ -4,11 +4,12 @@ export default class RideMap extends MainMap{
     constructor(mapId, nominatimUrl, webUrl, rideUrl = '/api/ride/all/destinations?'){
         super(mapId, nominatimUrl, webUrl);
         this.rideUrl = rideUrl;
-
+        this.rideMarkers = new Object();
         this.trackingId = null;
         this.vehicleId = null;
         this.vehicleMarker = null;
         
+        this.rideMarkers = L.markerClusterGroup();
         //@TODO: Use proper event listener values and parameters.
         // this.map.on('', () => {
             //@TODO: Remove markers.
@@ -32,33 +33,33 @@ export default class RideMap extends MainMap{
         this.map.on('moveend', this.retrieveMarkers());
     }
 
-    loadRideDestinations(){
-        const bounds = this.map.getBounds();
-        const northWest = bounds.getNorthEast();
-        const southEast = bounds.getSouthEast();
+    // loadRideDestinations(){
+    //     const bounds = this.map.getBounds();
+    //     const northWest = bounds.getNorthEast();
+    //     const southEast = bounds.getSouthEast();
 
-        var url = this.webUrl + this.rideUrl +
-            'lat-north=' + northWest.lat + '&lng-west=' + northWest.lng +
-            '&lat-south=' + southEast.lat + '&lng-east=' + southEast.lng;
+    //     var url = this.webUrl + this.rideUrl +
+    //         'lat-north=' + northWest.lat + '&lng-west=' + northWest.lng +
+    //         '&lat-south=' + southEast.lat + '&lng-east=' + southEast.lng;
 
-        console.log("Url: " + url);
+    //     console.log("Url: " + url);
 
-        fetch(url
-        ).then((response) => {
-            return response.json();
-        }).then((data) => {
-            // console.log("RideDestinations: " + data.results[0].latitude);
-            //var marker = L.marker([data.results, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
+    //     fetch(url
+    //     ).then((response) => {
+    //         return response.json();
+    //     }).then((data) => {
+    //         // console.log("RideDestinations: " + data.results[0].latitude);
+    //         //var marker = L.marker([data.results, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
 
-            // data.results.forEach(result => {
-            //     L.marker([result.latitude, result.longitude], {icon: this.markerIcon}).addTo(this.map);
-            // });
+    //         // data.results.forEach(result => {
+    //         //     L.marker([result.latitude, result.longitude], {icon: this.markerIcon}).addTo(this.map);
+    //         // });
 
-            L.marker([data.results[0].latitude, data.results[0].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
-        }).catch((error) => {
-            throw new Error(error);
-        });
-    }
+    //         L.marker([data.results[0].latitude, data.results[0].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
+    //     }).catch((error) => {
+    //         throw new Error(error);
+    //     });
+    // }
 
     /**
      * Retrieves map markers within a map boundary.
@@ -81,7 +82,7 @@ export default class RideMap extends MainMap{
             ).then((response) => {
                 return response.json();
             }).then((data) => {
-                console.log("RideDestinations: " + JSON.stringify(data));
+                // console.log("RideDestinations: " + JSON.stringify(data));
                 // var marker = L.marker([data.results, e.latlng.lng], {icon: this.markerIcon}).addTo(this.map);
 
                 // data.results.forEach(result => {
@@ -90,10 +91,17 @@ export default class RideMap extends MainMap{
 
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
-                    if(this.markers["ride-" + data.results[i].id] == null){
-                        this.markers["ride-" + data.results[i].id] = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
+                    // if(this.markers["ride-" + data.results[i].id] == null){
+                    //     this.markers["ride-" + data.results[i].id] = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
+                    // }
+
+                    if(!this.rideMarkers.hasLayer(this.markerIds["ride-" + data.results[i].id])){
+                        this.markerIds["ride-" + data.results[i].id] = this.rideMarkers.addLayer(L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]}).addTo(this.map));
                     }
+
                 }
+
+                console.log("Count: " + Object.keys(this.markerIds).length);
 
                 // L.marker([data.results[0].latitude, data.results[0].longitude], {icon: this.markerIcons["default"]}).addTo(this.map);
             }).catch((error) => {
