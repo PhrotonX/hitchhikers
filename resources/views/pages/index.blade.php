@@ -13,13 +13,13 @@
         @if (Auth::user()->isDriver())
             <a href="/ride/create">Create a ride</a>
             <div id="driving-mode">
-                <button type="button" id="btn-driving-mode" data-state="off">Start driving mode</button>
+                <button type="button" id="btn-driving-mode">Start driving mode</button>
                 {{-- @TODO: Insert a dropdown menu here to be able to choose a ride to begin with. --}}
                 {{-- Use JavaScript to perform the driving mode. --}}
 
                 <select name="driving-mode-option" id="select-driving-vehicle">
                     @foreach (Auth::user()->getRides() as $ride)
-                        <option value="{{$ride->id}}">{{$ride->ride_name}}</option>
+                        <option id="ride-option-{{$ride->id}}" value="{{$ride->id}}" data-status="{{$ride->status}}">{{$ride->ride_name}}</option>
                     @endforeach
                 </select>
             </div>
@@ -50,23 +50,30 @@
         
         var btnDrivingMode = document.getElementById('btn-driving-mode');
         var drivingModeOption = document.getElementById('select-driving-vehicle');
-
+        var selectedDrivingModeOption;
+        var status;
+        
         @auth
             @if (Auth::user()->isDriver())
-                btnDrivingMode.addEventListener('click', function(){
 
-                    var drivingMode = "inactive";
-                
-                    if(btnDrivingMode.getAttribute('data-state') == "off"){
-                        drivingMode = "active";
-                        btnDrivingMode.setAttribute('data-state', 'on');
-                        btnDrivingMode.innerHTML = "Stop driving mode";
-                        
-                    }else if(btnDrivingMode.getAttribute('data-state') == "on"){
+                updateSelectedRideOption();
+
+                drivingModeOption.addEventListener('change', function(){
+                    updateSelectedRideOption();
+                });
+
+                btnDrivingMode.addEventListener('click', function(){
+                    var drivingMode = "inactive";                    
+                    
+                    if(status == "active"){
                         drivingMode = "inactive";
-                        btnDrivingMode.setAttribute('data-state', 'off');
-                        btnDrivingMode.innerHTML = "Start driving mode";
+                        selectedDrivingModeOption.setAttribute('data-status', 'inactive');
+                    }else{
+                        drivingMode = "active";
+                        selectedDrivingModeOption.setAttribute('data-status', 'active');
                     }
+
+                    updateSelectedRideOption();
 
                     console.log("Mode: "+ drivingMode);
                     
@@ -126,6 +133,17 @@
                     
                 });
             @endif
+
+            function updateSelectedRideOption(){
+                selectedDrivingModeOption = document.getElementById("ride-option-" + drivingModeOption.value);
+                status = selectedDrivingModeOption.getAttribute('data-status');
+
+                if(status == "active"){
+                    btnDrivingMode.innerHTML = "Stop driving mode";
+                }else{
+                    btnDrivingMode.innerHTML = "Start driving mode";
+                }
+            }
         @endauth
         
 
