@@ -21,5 +21,6 @@ class Vehicle extends Model
         'type',
         'latitude',
         'longitude',
+        'status',
     ];
 }

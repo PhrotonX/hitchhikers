@@ -68,6 +68,11 @@
                         btnDrivingMode.innerHTML = "Start driving mode";
                     }
 
+                    console.log("Mode: "+ drivingMode);
+                    
+                    // Update both ride and vehicle status
+                    // ================================================
+                    // Update ride status
                     fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value+'/update-status', {
                         method: "PATCH",
                         body: JSON.stringify({
@@ -82,22 +87,43 @@
                     .then((response) => {
                         return response.json();
                     }).then((data) => {
-                        console.log(data);
 
-                        console.log("Vehicle ID: " + data.ride.vehicle_id);
+                        // Update vehicle status
+                        fetch('{{env("APP_URL", "")}}' + '/vehicle/'+data.ride.vehicle_id+'/update-status', {
+                            method: "PATCH",
+                            body: JSON.stringify({
+                                status: drivingMode,
+                            }),
+                            headers: {
+                                "Content-type": "application/json",
+                                "Accept": "application/json",
+                                "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
+                            },
+                        })
+                        .then((response) => {
+                            return response.json();
+                        }).then((vehicleData) => {
+                            console.log(vehicleData);
 
-                        if(drivingMode == "active"){
-                            map.startLiveTracking(null, data.ride.vehicle_id);
-                            console.log("Tracking ID: " + map.trackingId);
-                        }else{
-                            map.stopLiveTracking(map.trackingId);
-                            console.log("Tracking ID Stopped: " + map.trackingId);
-                        }
+                            console.log("Vehicle ID: " + vehicleData.vehicle.id);
 
-                        //@TODO: Update vehicle location here and display it live on map.
+                            if(drivingMode == "active"){
+                                map.startLiveTracking(null, vehicleData.vehicle.id);
+                                console.log("Tracking ID: " + map.trackingId);
+                            }else{
+                                map.stopLiveTracking(map.trackingId);
+                                console.log("Tracking ID Stopped: " + map.trackingId);
+                            }
+
+                            //@TODO: Update vehicle location here and display it live on map.
+                        }).catch((error) => {
+                            throw new Error(error);
+                        });
                     }).catch((error) => {
                         throw new Error(error);
                     });
+
+                    
                 });
             @endif
         @endauth
