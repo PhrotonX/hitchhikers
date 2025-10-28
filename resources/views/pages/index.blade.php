@@ -42,10 +42,10 @@
         var status;
 
         var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
-        map.setMarkerIcon('default', '{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
-        map.setMarkerIcon('currentPos', '{{Vite::asset("resources/img/current_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
-        map.setMarkerIcon('active_vehicle', '{{Vite::asset("resources/img/blue_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
-        map.setMarkerIcon('inactive_vehicle', '{{Vite::asset("resources/img/grey_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.configureMarkerIcon('default', '{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.configureMarkerIcon('currentPos', '{{Vite::asset("resources/img/current_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.configureMarkerIcon('active_vehicle', '{{Vite::asset("resources/img/blue_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.configureMarkerIcon('inactive_vehicle', '{{Vite::asset("resources/img/grey_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.detectLocation();
         // Functionality for viewing vehicle information
         // @TODO: Implement close button with call to map.cachedMarkers.clearLayers();
@@ -124,8 +124,9 @@
 
                     console.log("Mode: "+ drivingMode);
                     
-                    // Update both ride and vehicle status
-                    // ================================================
+                    // Update both ride and vehicle driving mode status and marker icon color.
+                    // ========================================================================
+
                     // Update ride status
                     fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value+'/update-status', {
                         method: "PATCH",
@@ -157,9 +158,9 @@
                         .then((response) => {
                             return response.json();
                         }).then((vehicleData) => {
-                            console.log(vehicleData);
+                            // console.log(vehicleData);
 
-                            console.log("Vehicle ID: " + vehicleData.vehicle.id);
+                            // console.log("Vehicle ID: " + vehicleData.vehicle.id);
 
                             if(drivingMode == "active"){
                                 map.startLiveTracking(null, vehicleData.vehicle.id);
@@ -168,6 +169,9 @@
                                 map.stopLiveTracking(map.trackingId);
                                 console.log("Tracking ID Stopped: " + map.trackingId);
                             }
+
+                            //CHange vehicle icon color
+                            map.setMarkerIcon("vehicle-" + vehicleData.vehicle.id, status + "_vehicle");
 
                             //@TODO: Update vehicle location here and display it live on map.
                         }).catch((error) => {

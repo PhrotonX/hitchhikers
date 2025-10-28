@@ -20,7 +20,7 @@ export default class MainMap{
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(this.map);
 
-        // this.setMarkerIcon("default", this.webUrl + "");
+        // this.configureMarkerIcon("default", this.webUrl + "");
     }
 
     addMarker(tag, latitude, longitude, iconTag){
@@ -89,13 +89,19 @@ export default class MainMap{
             });
     }
 
+    setMarkerIcon(markerTag, iconTag){
+        if(this.markers[markerTag]){
+            this.markers[markerTag].setIcon(this.markerIcons[iconTag]);
+        }
+    }
+
     /**
      * Define the default marker icon.
      * Must be invoked after calling the constructor.
      * @param {*} markerIconParam The main marker icon.
      * @param {*} markerShadowIcon The shadow icon for main marker icon.
      */
-    setMarkerIcon(tag, markerIconParam, markerShadowIcon){
+    configureMarkerIcon(tag, markerIconParam, markerShadowIcon){
         this.markerIcons[tag] = L.icon({
             iconUrl: markerIconParam,
             shadowUrl: markerShadowIcon,

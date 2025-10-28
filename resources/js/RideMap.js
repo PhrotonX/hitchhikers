@@ -222,8 +222,13 @@ export default class RideMap extends MainMap{
                     //Check if the marker already exists to avoid marker duplication.
                     if(!this.vehicleMarkers.hasLayer(this.markers["vehicle-" + data.results[i].id])){
                         //Decide on the marker icon depending on the marker state [INCOMPLETE].
-                        var markerIcon = this.markerIcons["active_vehicle"];
-
+                        var markerIcon;
+                        if(data.results[i].status == "active"){
+                            markerIcon = this.markerIcons["active_vehicle"];
+                        }else{
+                            markerIcon = this.markerIcons["inactive_vehicle"];
+                        }
+                        
                         var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: markerIcon});
 
                         //Setup marker click listener.
