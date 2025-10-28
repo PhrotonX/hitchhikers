@@ -52,13 +52,15 @@
         // Functionality for viewing vehicle information
         map.setOnVehicleMarkerClick((e, data) => {
 
+            // @NOTE: You may use any other elements other than infobox to display the ride-popup.
             infobox.innerHTML =
                 '<div id="ride-popup"><button type="button" id="ride-popup-close-btn">Close</button><br>' + 
                 "<p><strong>"+data.vehicle_name+"</strong></p>" + 
                 '<p id="ride-location">Retrieving location...</p>' +
                 "<p><strong>Status:</strong>" + data.status + "</p>" +
                 "<p>"+data.latitude+", "+data.longitude+"</p>" + 
-                '<button type="button" id="ride-view-review-btn">View Reviews</button></div>';
+                '<button type="button" id="ride-view-review-btn">View Reviews</button>' + 
+                '<button type="button" id="ride-view-review-btn">View Ride Destination List</button><br>';
             infobox.style.display = "block";
             
             // Set up ride-popup-close-btn
@@ -78,7 +80,7 @@
             // If the user is not authenticated or not a driver, then add the ability 
             @if (Auth::user() == null || !(Auth::user()->isDriver()))
                 infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>' +
-                '<button type="button">See More</button>';
+                '<button type="button">See More</button></div>';
             
                 var rideList = document.getElementById('ride-list');
                 
@@ -110,6 +112,8 @@
                 });
 
                 // getRides(rideList.value);
+            @else
+                infobox.innerHTML += "</div>";
             @endif
         });
 
