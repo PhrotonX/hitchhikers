@@ -1,5 +1,9 @@
 import MainMap from '../js/MainMap.js';
 
+/**
+ * Displays a map with ride and vehicle handling.
+ * Expects the following marker icon to be loaded: current, defaultPos, active_vehicle, inactive_vehicle.
+ */
 export default class RideMap extends MainMap{
     constructor(mapId, nominatimUrl, webUrl){
         super(mapId, nominatimUrl, webUrl);
@@ -133,7 +137,10 @@ export default class RideMap extends MainMap{
 
                     //Check if the marker already exists to avoid marker duplication.
                     if(!this.vehicleMarkers.hasLayer(this.markers["vehicle-" + data.results[i].id])){
-                        var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]});
+                        //Decide on the marker icon depending on the marker state [INCOMPLETE].
+                        var markerIcon = this.markerIcons["active_vehicle"];
+
+                        var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: markerIcon});
 
                         //Setup marker click listener.
                         marker.on('click', (e) => {
