@@ -35,7 +35,11 @@
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
 
         var infobox = document.getElementById('infobox');
-        // var select = null;
+        
+        var btnDrivingMode = document.getElementById('btn-driving-mode');
+        var drivingModeOption = document.getElementById('select-driving-vehicle');
+        var selectedDrivingModeOption;
+        var status;
 
         var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
         map.setMarkerIcon('default', '{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
@@ -55,35 +59,45 @@
                 "<p><strong>"+data.vehicle_name+"</strong></p>" + 
                 "<p><strong>Status:</strong>" + data.status + "</p>" +
                 "<p>"+data.latitude+", "+data.longitude+"</p>" + 
-                "<button>View Reviews</button>" +
-                '<select id="ride-list" name="ride-list"></select>' +
+                "<button>View Reviews</button>";
+            
+            @if (Auth::user() == null || !Auth::user()->isDriver())
+                infobox.innerHTML += '<select id="ride-list" name="ride-list"></select>' +
                 "<button>See More</button>";
             
-            map.retrieveRides(data.id)().then((data) => {
-                var count = Object.keys(data.rides).length;
+                var rideList = document.getElementById('ride-list');
                 
-                var select = document.getElementById('ride-list');
+                map.retrieveRides(data.id)().then((data) => {
+                    var count = Object.keys(data.rides).length;
 
-                select.innerHTML = "";
+                    rideList.innerHTML = "";
 
-                for(let i = 0; i < count; i++){
-                    var option = document.createElement("option");
-                    option.setAttribute("value", data.rides[i].id);
-                    option.innerHTML = data.rides[i].ride_name;
+                    for(let i = -1; i < count; i++){
+                        var option = document.createElement("option");
+                        if(i == -1){
+                            option.setAttribute("disabled", true);
+                            option.setAttribute("selected", true);
+                            option.innerHTML = "---";
+                        }else{
+                            option.setAttribute("id", "ride-option-"+data.rides[i].id);
+                            option.setAttribute("value", data.rides[i].id);
+                            option.innerHTML = data.rides[i].ride_name;
+                        }
+                        
 
-                    select.appendChild(option);
-                }
+                        rideList.appendChild(option);
+                    }
 
-            })
+                    rideList.addEventListener('change', () => {
+                        getRides(rideList.value);
+                    });
+                });
+
+                // getRides(rideList.value);
+            @endif
         });
         // map.enablePanToRetrieveAllRideMarkers();
         map.enablePanToRetrieveVehicleMarkers();
-        
-        
-        var btnDrivingMode = document.getElementById('btn-driving-mode');
-        var drivingModeOption = document.getElementById('select-driving-vehicle');
-        var selectedDrivingModeOption;
-        var status;
         
         @auth
             @if (Auth::user()->isDriver())
@@ -167,7 +181,7 @@
             @endif
 
             function updateSelectedRideOption(){
-                selectedDrivingModeOption = document.getElementById("ride-option-" + drivingModeOption.value);
+                var selectedDrivingModeOption = document.getElementById("ride-option" + "-" + drivingModeOption.value);
                 status = selectedDrivingModeOption.getAttribute('data-status');
 
                 if(status == "active"){
@@ -175,11 +189,13 @@
                 }else{
                     btnDrivingMode.innerHTML = "Start driving mode";
                 }
-
-                // console.log(drivingModeOption.value);
+                
                 getRides(drivingModeOption.value);
             }
+
         @endauth
+
+        
         
         function getRides(rideId){
             map.retrieveRideMarkers(rideId)();
