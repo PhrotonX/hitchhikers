@@ -9,6 +9,7 @@ use App\Http\Controllers\DriverController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ReplyController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -67,6 +68,7 @@ Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehic
 Route::get('vehicle/{vehicle}/rides', [VehicleController::class, 'getRides'])->name('vehicle.rides');
 
 Route::get('replies/', [ReplyController::class, 'index']);
+Route::get('reviews/', [ReviewController::class, 'index']);
 Route::delete('replies/{reply}/delete', [ReplyController::class, 'destroy']);
 Route::get('test', function(){
     return view('dist.index');
