@@ -8,7 +8,6 @@ This website uses Docker for containing the website itself and its dependenciesa
 
 ## If you do not want to use Docker and Git
 Please make sure that the following dependencies and software are installed, configured, and tested:
-- Git (account needed)
 - PHP
 - MySQL
 - Composer
@@ -97,7 +96,7 @@ To visit the website with Local VS Code, open [http://localhost:8000/](http://lo
 To visit the website with Github Codespaces, Press Ctrl+\` > Ports > Hover port 8000 > Ctrl+Click or Click "Open in Browser" button.
 
 ## If you do not want to use Git
-Please contact the main developer in order to contribute.
+Please contact the main developer in order to contribute. Contributions is possible through communication tools, file sharing tools, and manual integration of code updates.
 
 ## After configurations
 If a database connection error has occured, please re-run the following commands:
