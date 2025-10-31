@@ -113,7 +113,9 @@ class Model implements \JsonSerializable{
         // Execute the query.
         $exec = $results->execute($parameters);
 
-        return static::fetch($exec, $results);
+        if($exec){
+            return static::where('id', PDO::lastInsertId());
+        }
     }
 
     private function onInsert(){
@@ -140,7 +142,9 @@ class Model implements \JsonSerializable{
         // Execute the query.
         $exec = $results->execute($parameters);
 
-        return static::fetch($exec, $results);
+        if($exec){
+            return static::where('id', PDO::lastInsertId());
+        }
     }
 
     public function jsonSerialize() : mixed{
