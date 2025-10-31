@@ -13,7 +13,9 @@ class ReplyController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json([
+            "replies" => Reply::all(),
+        ]);
     }
 
     /**
@@ -21,7 +23,7 @@ class ReplyController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -29,7 +31,11 @@ class ReplyController extends Controller
      */
     public function store(StoreReplyRequest $request)
     {
-        //
+        $validated = $request->validate();
+        
+        $reply = new Reply();
+        $reply->fill($validated);
+        $reply->save();
     }
 
     /**
@@ -37,20 +43,20 @@ class ReplyController extends Controller
      */
     public function show(Reply $reply)
     {
-        //
+       //
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
+    * Show the form for editing the specified resource.
+    */
     public function edit(Reply $reply)
     {
-        //
+         //
     }
 
     /**
-     * Update the specified resource in storage.
-     */
+    * Update the specified resource in storage.
+    */
     public function update(UpdateReplyRequest $request, Reply $reply)
     {
         //
@@ -61,6 +67,6 @@ class ReplyController extends Controller
      */
     public function destroy(Reply $reply)
     {
-        //
+        // $reply->delete();
     }
 }
