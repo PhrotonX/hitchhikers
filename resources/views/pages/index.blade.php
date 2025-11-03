@@ -35,19 +35,20 @@
     <div id="review-box" hidden>
         @auth
             <!-- Shall not use form tag but use JavaScript to avoid reloading the page upon posting of review. -->
-            <form action="#" method="POST" id="review-form">
-                <input type="text" name="description" placeholder="Write a review...">
+            <!-- <form action="#" method="POST" id="review-form"> -->
+                <input type="text" name="description" id="review-form-description" placeholder="Write a review...">
                 <!-- @TODO: Replace into stars -->
-                <select name="rating">
+                <select name="rating" id="review-form-rating">
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
                     <option value="5">5</option>
                 </select>
-                <input type="submit">
-                <input type="reset">
-            </form>
+                <button type="button" id="review-form-submit">Submit</button>
+                <!-- <input type="submit"> -->
+                <!-- <input type="reset"> -->
+            <!-- </form> -->
         @endauth
         <div id="review-list" hidden></div>
     </div>
@@ -145,8 +146,8 @@
                         viewReviewsBtn.hidden = true;
                     }else{
                         // Change the action route to reflect the ride ID.
-                        var reviewForm = document.getElementById('review-form');
-                        reviewForm.setAttribute('action', '{{env("APP_URL", "")}}' + '/ride/' + rideList.value + '/reviews/submit');
+                        // var reviewForm = document.getElementById('review-form');
+                        // reviewForm.setAttribute('action', '{{env("APP_URL", "")}}' + '/ride/' + rideList.value + '/reviews/submit');
 
                         // var reviewRideIdField = document.getElementById('review-ride-id');
                         // reviewRideIdField.value = rideList.value;
@@ -156,6 +157,28 @@
 
                     // Once the selection from ride list has changed, display all of its associated ride destinations.
                     getRides(rideList.value); 
+                });
+
+                var submitReviewBtn = document.getElementById('review-form-submit');
+                submitReviewBtn.addEventListener('click', () => {
+                    fetch('{{env("APP_URL", "")}}' + '/ride/' + rideList.value + '/reviews/submit', {
+                        method: "POST",
+                        body: JSON.stringify({
+                            description: document.getElementById('review-form-description').value,
+                            rating: parseInt(document.getElementById('review-form-rating').value)
+                        }),
+                        headers: {
+                            "Content-type": "application/json",
+                            "Accept": "application/json",
+                            "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
+                        },
+                    }).then((response) => {
+                        return response.json();
+                    }).then((data) => {
+                        document.getElementById('review-form-description').value = "";
+                    }).catch((error) => {
+                        throw new Error(error);
+                    });
                 });
 
                 // Set up ride-view-review-btn
