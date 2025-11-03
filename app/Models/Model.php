@@ -66,20 +66,20 @@ class Model implements \JsonSerializable{
     private function delete(){
         $dataContext = new DataContext();
 
-        $query = "DELETE FROM " .static::$table." WHERE " .static::primary." = $this->attributes['id']";
+        $query = "DELETE FROM " .static::$table." WHERE " .static::$primary." = $this->attributes['id']";
 
         $results = $dataContext->getPdo()->prepare($query);
         $exec = $results->execute();
     }
 
-    private function fill(array $values){
+    public function fill(array $values){
         foreach ($values as $key => $value) {
             $this->attributes[$key] = $value;
         }
     }
 
     public function save(){
-        if($this->attribute['id'] == null){
+        if($this->attributes->id == null){
             $this->onInsert();
         }else{
             $this->onEdit();
