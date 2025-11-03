@@ -79,7 +79,7 @@ class Model implements \JsonSerializable{
     }
 
     public function save(){
-        if($this->attributes->id == null){
+        if(!isset($this->attributes->id)){
             $this->onInsert();
         }else{
             $this->onEdit();
@@ -102,8 +102,9 @@ class Model implements \JsonSerializable{
         $quoted = $this->getQuotedAttributes();
 
         $setQuery = [];
-        foreach (static::fillable as $field) {
-            $setQuery[] = "$field = $quoted[$field]";
+        foreach (static::$fillable as $field) {
+            if(isset($quoted[$field]))
+                $setQuery[] = "$field = $quoted[$field]";
         }
 
         // Create SQL query and prepare it.
@@ -126,17 +127,20 @@ class Model implements \JsonSerializable{
         $quoted = $this->getQuotedAttributes();
 
         // Add ":" to all parameters.
-        $parameterizedFields = array_map(fn($field) => ':' . $field, static::fillable);
+        $parameterizedFields = array_map(fn($field) => ':' . $field, static::$fillable);
 
         // Create SQL query and prepare it.
         // $query = "INSERT INTO ${static::table}(${implode(static::fillable)}) VALUES(${implode(',', $quoted)})";
-        $query = "INSERT INTO ".static::$table."(${implode(".static::fillable")}) VALUES($parameterizedFields)";
+        $query = "INSERT INTO ".static::$table."(".implode(static::$fillable).") VALUES($parameterizedFields)";
         $results = $dataContext->prepare($query);
 
         // Set the parameter values and filter out attributes that are not part of fillable fields.
         $parameters = [];
-        foreach (static::fillable as $field) {
-            $parameters[":$field"] = $quoted[$field];
+        foreach (static::$fillable as $field) {
+            if(isset($quoted[$field])){
+                $parameters[":$field"] = $quoted[$field];
+            }
+            
         }
 
         // Execute the query.
