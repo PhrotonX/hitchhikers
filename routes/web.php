@@ -48,6 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');
     Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');
     Route::patch('ride/{ride}/update-status', [RideController::class, 'updateStatus']);
+    Route::post('ride/{ride}/reviews/submit', [ReviewController::class, 'store']);
     Route::patch('vehicle/{vehicle}/update-status', [VehicleController::class, 'updateStatus']);
 });
 
@@ -63,7 +64,7 @@ Route::get('ride/destinations', [RideDestinationController::class, 'index']);
 Route::get('ride/destinations/{ride}', [RideDestinationController::class, 'get']);
 Route::get('ride/{ride}', [RideController::class, 'get']);
 Route::get('ride/{ride}/reviews', [RideController::class, 'getReviews']);
-Route::post('ride/{ride}/reviews/submit', [ReviewController::class, 'store']);
+
 Route::get('vehicle', [VehicleController::class, 'index'])->name('vehicle.index');
 Route::get('api/vehicle/{vehicle}', [VehicleController::class, 'get'])->name('vehicle.get');
 Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
