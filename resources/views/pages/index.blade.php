@@ -18,6 +18,8 @@
                 {{-- @TODO: Insert a dropdown menu here to be able to choose a ride to begin with. --}}
                 {{-- Use JavaScript to perform the driving mode. --}}
 
+                {{-- Display a selection of available rides within a vehicle. Options within this
+                element uses ride ID as a value. --}}
                 <select name="driving-mode-option" id="select-driving-vehicle">
                     @foreach (Auth::user()->getRides() as $ride)
                         <option id="ride-option-{{$ride->id}}" value="{{$ride->id}}" data-status="{{$ride->status}}">{{$ride->ride_name}}</option>
@@ -30,16 +32,31 @@
     
     <div id="infobox"></div>
     
+    <div id="review-box" hidden>
+        @auth
+            <!-- Shall not use form tag but use JavaScript to avoid reloading the page upon posting of review. -->
+            <form action="#">
+                <input type="text" name="description" placeholder="Write a review...">
+                <input type="number" name="ride_id" hidden>
+                <input type="submit">
+                <input type="reset">
+            </form>
+        @endauth
+        <div id="review-list"></div>
+    </div>
 @endsection
 
 @push('scripts')
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
 
+        // Intialize variables
         var infobox = document.getElementById('infobox');
         
         var btnDrivingMode = document.getElementById('btn-driving-mode');
         var drivingModeOption = document.getElementById('select-driving-vehicle');
+        var reviewBox = document.getElementById('review-box');
+        var reviewList = document.getElementById('review-list');
         var selectedDrivingModeOption;
         var status;
 
@@ -60,60 +77,86 @@
                 "<p><strong>Status:</strong>" + data.status + "</p>" +
                 "<p>"+data.latitude+", "+data.longitude+"</p>" + 
                 '<button type="button" id="ride-view-review-btn">View Reviews</button>' + 
-                '<button type="button" id="ride-view-review-btn">View Ride Destination List</button><br>';
+                '<button type="button" id="ride-view-destination-list-btn">View Ride Destination List</button><br>';
             infobox.style.display = "block";
+            infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>' +
+            '<button type="button">See More</button></div>';
+
+            var rideList = document.getElementById('ride-list');
             
             // Set up ride-popup-close-btn
+            // Tag: onCloseRide
             infobox.addEventListener('click', (e) => {
                 if (e.target && e.target.id === 'ride-popup-close-btn') {
                     infobox.innerHTML = "";
                     infobox.style.display = "none";
                     map.cachedMarkers.clearLayers();
+                    reviewBox.hidden = true;
                 }
             });
 
+            reviewBox.hidden = false;
+
             // Obtain the human-readable address of latitude and longitude data.
+            // Tag: onMarkerClick-onReverseGeocode
             map.reverseGeocode(data.latitude, data.longitude).then((location) => {
                 document.getElementById('ride-location').innerHTML = location.display_name;
             });
-            
-            // If the user is not authenticated or not a driver, then add the ability 
-            @if (Auth::user() == null || !(Auth::user()->isDriver()))
-                infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>' +
-                '<button type="button">See More</button></div>';
-            
-                var rideList = document.getElementById('ride-list');
                 
-                // Gets all the associated rides of a vehicle and display a selection of it.
-                map.retrieveRides(data.id)().then((data) => {
-                    var count = Object.keys(data.rides).length;
+            // Gets all the associated rides of a vehicle and display a selection of it.
+            // Tag: onMarkerClick-onRetrieveRides
+            map.retrieveRides(data.id)().then((data) => {
+                var count = Object.keys(data.rides).length;
 
-                    rideList.innerHTML = "";
+                rideList.innerHTML = "";
 
-                    for(let i = -1; i < count; i++){
-                        var option = document.createElement("option");
-                        if(i == -1){
-                            option.setAttribute("disabled", true);
-                            option.setAttribute("selected", true);
-                            option.innerHTML = "---";
-                        }else{
-                            option.setAttribute("id", "ride-option-"+data.rides[i].id);
-                            option.setAttribute("value", data.rides[i].id);
-                            option.innerHTML = data.rides[i].ride_name;
-                        }
+                for(let i = -1; i < count; i++){
+                    var option = document.createElement("option");
+                    if(i == -1){
+                        option.setAttribute("disabled", true);
+                        option.setAttribute("selected", true);
+                        option.innerHTML = "---";
+                    }else{
+                        option.setAttribute("id", "ride-option-"+data.rides[i].id);
+                        option.setAttribute("value", data.rides[i].id);
+                        option.innerHTML = data.rides[i].ride_name;
+                    }
 
-                        rideList.appendChild(option);
+                    rideList.appendChild(option);
+                }
+
+                var viewReviewsBtn = document.getElementById('ride-view-review-btn');
+
+                rideList.addEventListener('change', () => {
+                    // Hide/show ride-view-review-btn based on selected ride.
+                    if(rideList.value < 1){
+                        viewReviewsBtn.hidden = true;
+                    }else{
+                        viewReviewsBtn.hidden = false;
                     }
 
                     // Once the selection from ride list has changed, display all of its associated ride destinations.
-                    rideList.addEventListener('change', () => {
-                        getRides(rideList.value);
-                    });
+                    getRides(rideList.value); 
                 });
 
+                // Set up ride-view-review-btn
+                viewReviewsBtn.addEventListener('click', () => {
+                    fetch('{{env("APP_URL", "")}}' + '/ride/' + rideList.value + '/reviews')
+                    .then((response) => {
+                        return response.json();
+                    }).then((data) => {
+                        console.log(data);
+                    }).catch((error) => {
+                        throw new Error(error);
+                    });
+                });
+            });
+
+            // If the user is not authenticated or not a driver, then add the ability to make reviews for each ride.
+            @if (Auth::user() == null || !(Auth::user()->isDriver()))
                 // getRides(rideList.value);
             @else
-                infobox.innerHTML += "</div>";
+                // infobox.innerHTML += "</div>";
             @endif
         });
 
@@ -121,6 +164,9 @@
         map.enablePanToRetrieveVehicleMarkers();
         
         @auth
+            // @TODO: Display review-list
+            // fetch()
+
             @if (Auth::user()->isDriver())
 
                 // Make the driving mode button always update its toggle value after loading the page.
@@ -205,8 +251,6 @@
                     }).catch((error) => {
                         throw new Error(error);
                     });
-
-                    
                 });
             @endif
 
