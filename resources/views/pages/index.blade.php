@@ -35,20 +35,31 @@
     <div id="review-box" hidden>
         @auth
             <!-- Shall not use form tag but use JavaScript to avoid reloading the page upon posting of review. -->
-            <form action="#">
+            <form action="#" method="POST" id="review-form">
                 <input type="text" name="description" placeholder="Write a review...">
-                <input type="number" name="ride_id" hidden>
+                <!-- @TODO: Replace into stars -->
+                <select name="rating">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
                 <input type="submit">
                 <input type="reset">
             </form>
         @endauth
-        <div id="review-list"></div>
+        <div id="review-list" hidden></div>
     </div>
 @endsection
 
 @push('scripts')
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
+        import IndexPage from '{{ Vite::asset("resources/js/IndexPage.js") }}';
+
+        // @NOTE: Newer code shall encapsulate code into IndexPage instead of throwing up every JS code in this file to reduce the mess.
+        var page = new IndexPage('{{env("APP_URL", "")}}');
 
         // Intialize variables
         var infobox = document.getElementById('infobox');
@@ -127,11 +138,19 @@
 
                 var viewReviewsBtn = document.getElementById('ride-view-review-btn');
 
+                // Tag: onRideChange or onRideSelect
                 rideList.addEventListener('change', () => {
                     // Hide/show ride-view-review-btn based on selected ride.
                     if(rideList.value < 1){
                         viewReviewsBtn.hidden = true;
                     }else{
+                        // Change the action route to reflect the ride ID.
+                        var reviewForm = document.getElementById('review-form');
+                        reviewForm.setAttribute('action', '{{env("APP_URL", "")}}' + '/ride/' + rideList.value + '/reviews/submit');
+
+                        // var reviewRideIdField = document.getElementById('review-ride-id');
+                        // reviewRideIdField.value = rideList.value;
+
                         viewReviewsBtn.hidden = false;
                     }
 
@@ -150,14 +169,19 @@
                         throw new Error(error);
                     });
                 });
-            });
 
-            // If the user is not authenticated or not a driver, then add the ability to make reviews for each ride.
-            @if (Auth::user() == null || !(Auth::user()->isDriver()))
-                // getRides(rideList.value);
-            @else
-                // infobox.innerHTML += "</div>";
-            @endif
+                @auth
+                    // If the user is not a driver and does not own the ride, then add the ability to make reviews for each ride.
+                    @if (!(Auth::user()->isDriver()))
+                        reviewList.hidden = false;
+                        // getRides(rideList.value);
+                    @else
+                        reviewList.hidden = true;
+                        // infobox.innerHTML += "</div>";
+                    @endif
+                @endauth
+                
+            });
         });
 
         // map.enablePanToRetrieveAllRideMarkers();
