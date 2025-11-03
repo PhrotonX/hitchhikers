@@ -37,32 +37,44 @@ class ReviewController extends Controller
     /**
      * Display the specified resource.
      */
-    // public function show(Review $review)
-    // {
-    //     //
-    // }
+    public function show(int $review)
+    {
+        $result = Review::where('id', $review);
+        return response()->json(
+            $result
+        );
+
+        // return response()->json([
+        //     $review,
+        // ]);
+    }
 
     // /**
     //  * Show the form for editing the specified resource.
     //  */
     // public function edit(Review $review)
     // {
-    //     //
+        
     // }
 
     // /**
     //  * Update the specified resource in storage.
     //  */
-    // public function update(UpdateReviewRequest $request, Review $review)
-    // {
-    //     //
-    // }
+    public function update(UpdateReviewRequest $request, Review $review)
+    {
+        $result = Review::where('id', $review);
+        
+        $result->fill($request->validated());
+        $result->save();
+    }
 
     // /**
     //  * Remove the specified resource from storage.
     //  */
-    // public function destroy(Review $review)
-    // {
-    //     //
-    // }
+    public function destroy(Review $review)
+    {
+        $result = Review::where('id', $review);
+        
+        $result->delete();
+    }
 }
