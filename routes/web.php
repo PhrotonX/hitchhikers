@@ -62,6 +62,8 @@ Route::get('settings', function(){
 Route::get('ride/destinations', [RideDestinationController::class, 'index']);
 Route::get('ride/destinations/{ride}', [RideDestinationController::class, 'get']);
 Route::get('ride/{ride}', [RideController::class, 'get']);
+Route::get('ride/{ride}/reviews', [RideController::class, 'getReviews']);
+Route::post('ride/{ride}/reviews/submit', [ReviewController::class, 'store']);
 Route::get('vehicle', [VehicleController::class, 'index'])->name('vehicle.index');
 Route::get('api/vehicle/{vehicle}', [VehicleController::class, 'get'])->name('vehicle.get');
 Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
@@ -69,6 +71,7 @@ Route::get('vehicle/{vehicle}/rides', [VehicleController::class, 'getRides'])->n
 
 Route::get('replies/', [ReplyController::class, 'index']);
 Route::get('reviews/', [ReviewController::class, 'index']);
+Route::get('reviews/{review}', [ReviewController::class, 'show']);
 Route::delete('replies/{reply}/delete', [ReplyController::class, 'destroy']);
 Route::get('test', function(){
     return view('dist.index');

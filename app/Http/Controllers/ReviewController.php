@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreReviewRequest;
 use App\Http\Requests\UpdateReviewRequest;
 use App\Models\Review;
+use App\Models\Ride;
 
 class ReviewController extends Controller
 {
@@ -29,9 +30,13 @@ class ReviewController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreReviewRequest $request)
+    public function store(StoreReviewRequest $request, Ride $ride)
     {
-        //
+        $review = new Review();
+        $review->fill($request->validated());
+        $review->user_id = Auth::user()->id;
+        $review->ride_id = $ride->id;
+        $review->save();
     }
 
     /**

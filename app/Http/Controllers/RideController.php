@@ -6,6 +6,7 @@ use App\Http\Requests\StoreRideRequest;
 use App\Http\Requests\UpdateRideRequest;
 use App\Http\Requests\UpdateRideStatus;
 use App\Models\User;
+use App\Models\Review;
 use App\Models\Ride;
 use App\Models\RideDestination;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -101,6 +102,12 @@ class RideController extends Controller
     public function get(Ride $ride){
         return response()->json([
             "ride" => $ride,
+        ]);
+    }
+
+    public function getReviews(Ride $ride){
+        return response()->json([
+            "reviews" => Review::where('ride_id', $ride->id),
         ]);
     }
 
