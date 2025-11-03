@@ -27,7 +27,7 @@ class Model implements \JsonSerializable{
     }
 
     public static function where($field, $value){
-        $query = "SELECT * FROM ${static::table} WHERE $field = $value";
+        $query = "SELECT * FROM " . static::$table . " WHERE $field = $value";
         return static::onSelect($query);
     }
 
@@ -66,7 +66,7 @@ class Model implements \JsonSerializable{
     private function delete(){
         $dataContext = new DataContext();
 
-        $query = "DELETE FROM ${static::table} WHERE ${static::primary} = $this->attributes['id']";
+        $query = "DELETE FROM " .static::$table." WHERE " .static::primary." = $this->attributes['id']";
 
         $results = $dataContext->getPdo()->prepare($query);
         $exec = $results->execute();
@@ -107,7 +107,7 @@ class Model implements \JsonSerializable{
         }
 
         // Create SQL query and prepare it.
-        $query = "UPDATE ${static::table} SET ${implode(',', $setQuery)} WHERE $this->attributes['id'] = $quoted->id";
+        $query = "UPDATE ".static::$table." SET ${implode(',', $setQuery)} WHERE $this->attributes['id'] = $quoted->id";
         $results = $dataContext->prepare($query);
 
         // Execute the query.
@@ -130,7 +130,7 @@ class Model implements \JsonSerializable{
 
         // Create SQL query and prepare it.
         // $query = "INSERT INTO ${static::table}(${implode(static::fillable)}) VALUES(${implode(',', $quoted)})";
-        $query = "INSERT INTO ${static::table}(${implode(static::fillable)}) VALUES($parameterizedFields)";
+        $query = "INSERT INTO ".static::$table."(${implode(".static::fillable")}) VALUES($parameterizedFields)";
         $results = $dataContext->prepare($query);
 
         // Set the parameter values and filter out attributes that are not part of fillable fields.
