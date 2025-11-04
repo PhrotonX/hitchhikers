@@ -2,11 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Model;
 
-class Review extends Model
-{
-    /** @use HasFactory<\Database\Factories\ReviewFactory> */
-    use HasFactory;
+class Review extends Model{
+    protected static $table = "reviews";
+    protected static $object = Review::class;
+    protected static $fillable = [
+        'description',
+        'rating',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'user_id',
+        'ride_id',
+    ];
 }
