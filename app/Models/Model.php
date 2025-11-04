@@ -64,13 +64,15 @@ class Model implements \JsonSerializable{
         }
     }
 
-    private function delete(){
+    public function delete(){
         $dataContext = new DataContext();
 
-        $query = "DELETE FROM " .static::$table." WHERE " .static::$primary." = $this->attributes['id']";
+        $query = "DELETE FROM " .static::$table." WHERE " .static::$primary." = ".$this->attributes['id'];
 
         $results = $dataContext->getPdo()->prepare($query);
         $exec = $results->execute();
+
+        return $exec;
     }
 
     public function fill(array $values){

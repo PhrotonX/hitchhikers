@@ -47,6 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
 
     // Review routes
     Route::put('reviews/{review}/update', [ReviewController::class, 'update']);
+    Route::delete('reviews/{review}/delete', [ReviewController::class, 'destroy']);
 
     // Ride routes
     Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');

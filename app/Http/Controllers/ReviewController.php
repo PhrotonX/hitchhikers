@@ -81,9 +81,9 @@ class ReviewController extends Controller
     // /**
     //  * Remove the specified resource from storage.
     //  */
-    public function destroy(Review $review)
+    public function destroy(int $review)
     {
-        $result = Review::where('id', $review);
+        $result = Review::where('id', $review)[0];
         
         $result->delete();
     }

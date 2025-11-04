@@ -231,7 +231,7 @@
                             @auth
                                 if({{Auth::user()->id}} == data.reviews[i].user_id){
                                     // Shall be displayed on a menu.
-                                    var reviewTagId = 'edit-review-'+data.reviews[i].id;
+                                    var reviewTagId = 'edit-review-btn-'+data.reviews[i].id;
                                     // reviewList.innerHTML += '<button id="'+reviewTagId+'">Edit</button>';
 
                                     var editReviewBtn = document.createElement('button');
@@ -254,7 +254,17 @@
                                             page.onUpdateReview(data.reviews[i].id);
                                         });
                                     });
+
                                     reviewItem.appendChild(editReviewBtn);
+
+                                    var deleteReviewBtn = document.createElement('button');
+                                    deleteReviewBtn.setAttribute('id', 'delete-review-btn-'+data.reviews[i].id);
+                                    deleteReviewBtn.innerHTML = 'Delete';
+                                    deleteReviewBtn.addEventListener('click', () => {
+                                        page.onDeleteReview(data.reviews[i].id);
+                                    });
+
+                                    reviewItem.appendChild(deleteReviewBtn);
                                 }
                             @endauth
                             

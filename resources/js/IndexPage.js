@@ -23,4 +23,21 @@ export default class IndexPage{
             throw new Error(error);
         });
     }
+
+    onDeleteReview(reviewId){
+        fetch(this.appUrl + '/reviews/' + reviewId + '/delete', {
+            method: "DELETE",
+            headers: {
+                "Content-type": "application/json",
+                "Accept": "application/json",
+                "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
+            },
+        }).then((response) => {
+            return response.json();
+        }).then((data) => {
+            console.log(data);
+        }).catch((error) => {
+            throw new Error(error);
+        });
+    }
 }
