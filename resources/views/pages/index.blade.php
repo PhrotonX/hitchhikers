@@ -226,6 +226,7 @@
                             reviewItem.appendChild(reviewDescription);
                             // @TODO: Add ratings and created_at fields.
 
+                            // @NOTE: Known issue: event listeners are duplicated.
                             // Implement edit form per review.
                             @auth
                                 if({{Auth::user()->id}} == data.reviews[i].user_id){
@@ -248,6 +249,10 @@
                                         reviewFormSubmit.hidden = true;
                                         reviewFormEdit.value = data.reviews[i].rating;
                                         reviewFormEdit.hidden = false;
+
+                                        reviewFormEdit.addEventListener('click', () => {
+                                            page.onUpdateReview(data.reviews[i].id);
+                                        });
                                     });
                                     reviewItem.appendChild(editReviewBtn);
                                 }

@@ -45,11 +45,19 @@ Route::middleware(['auth', 'verified'])->group(function(){
     // Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
     Route::patch('vehicle/{vehicle}/update-location', [VehicleController::class, 'updateLocation']);
 
+    // Review routes
+    Route::put('reviews/{review}/update', [ReviewController::class, 'update']);
+
+    // Ride routes
     Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');
     Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');
     Route::patch('ride/{ride}/update-status', [RideController::class, 'updateStatus']);
     Route::post('ride/{ride}/reviews/submit', [ReviewController::class, 'store']);
+
+    // Vehicle routes
     Route::patch('vehicle/{vehicle}/update-status', [VehicleController::class, 'updateStatus']);
+
+
 });
 
 

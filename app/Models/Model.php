@@ -87,6 +87,10 @@ class Model implements \JsonSerializable{
         }
     }
 
+    public function update(){
+        $this->onEdit();
+    }
+
     private function getQuotedAttributes() : array{
         $quoted = [];
         foreach ($this->attributes as $key => $value) {
@@ -102,14 +106,21 @@ class Model implements \JsonSerializable{
         // Add quotation marks to all values.
         // $quoted = $this->getQuotedAttributes();
 
+        Log::debug("Model.onEdit(): ");
+        Log::debug($this->attributes);
         $setQuery = [];
         foreach (static::$fillable as $field) {
-            if(isset($this->attributes[$field]))
-                $setQuery[] = "$field = $this->attributes[$field]";
+            if(isset($this->attributes[$field])){
+                $setQuery[$field] = "$field = \"" . $this->attributes[$field] . '"';
+            }
+            // else{
+            //     $setQuery[$field] = $this->attributes[$field];
+            // }
+                
         }
 
         // Create SQL query and prepare it.
-        $query = "UPDATE ".static::$table." SET ".implode(',', $setQuery)." WHERE ".static::$primary." = $this->attributes['id']";
+        $query = "UPDATE ".static::$table." SET ".implode(',', $setQuery)." WHERE ".static::$primary." = ".$this->attributes['id'];
         Log::debug("Model.onEdit(): " . $query);
         $results = $dataContext->getPdo()->prepare($query);
 

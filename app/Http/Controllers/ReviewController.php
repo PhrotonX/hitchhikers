@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateReviewRequest;
 use App\Models\Review;
 use App\Models\Ride;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ReviewController extends Controller
 {
@@ -66,12 +67,15 @@ class ReviewController extends Controller
     // /**
     //  * Update the specified resource in storage.
     //  */
-    public function update(UpdateReviewRequest $request, Review $review)
+    public function update(UpdateReviewRequest $request, int $review)
     {
-        $result = Review::where('id', $review);
+        $result = Review::where('id', $review)[0];
         
+        Log::debug("ReviewController.update(): ");
+        Log::debug($result->id);
+
         $result->fill($request->validated());
-        $result->save();
+        $result->update();
     }
 
     // /**
