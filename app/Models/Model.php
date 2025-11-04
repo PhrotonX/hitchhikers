@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\DataContext;
+use Illuminate\Support\Facades\Log;
 
 class Model implements \JsonSerializable{
     // public ?int $id = null;
@@ -109,7 +110,8 @@ class Model implements \JsonSerializable{
 
         // Create SQL query and prepare it.
         $query = "UPDATE ".static::$table." SET ${implode(',', $setQuery)} WHERE $this->attributes['id'] = $quoted->id";
-        $results = $dataContext->prepare($query);
+        Log::debug("Model.onEdit(): " . $query);
+        $results = $dataContext->getPdo()->prepare($query);
 
         // Execute the query.
         $exec = $results->execute($parameters);
@@ -124,30 +126,37 @@ class Model implements \JsonSerializable{
 
         // Add quotation marks to all values.
         // $quoted = array_map(fn($value) => '"' . $value . '"', $this->attributes);
-        $quoted = $this->getQuotedAttributes();
+        // $quoted = $this->getQuotedAttributes();
 
         // Add ":" to all parameters.
         $parameterizedFields = array_map(fn($field) => ':' . $field, static::$fillable);
 
         // Create SQL query and prepare it.
         // $query = "INSERT INTO ${static::table}(${implode(static::fillable)}) VALUES(${implode(',', $quoted)})";
-        $query = "INSERT INTO ".static::$table."(".implode(static::$fillable).") VALUES($parameterizedFields)";
-        $results = $dataContext->prepare($query);
+        $query = "INSERT INTO ".static::$table."(".implode(", ",static::$fillable).") VALUES(".implode(", ",$parameterizedFields).")";
+        Log::debug("Model.onInsert(): " . $query);
+        $results = $dataContext->getPdo()->prepare($query);
 
         // Set the parameter values and filter out attributes that are not part of fillable fields.
         $parameters = [];
         foreach (static::$fillable as $field) {
-            if(isset($quoted[$field])){
-                $parameters[":$field"] = $quoted[$field];
+            if(isset($this->attributes[$field])){
+                $parameters[":$field"] = $this->attributes[$field];
+            }else{
+                $parameters[":$field"] = null;
             }
-            
         }
+
+        Log::debug("Model.onInsert(): parameters");
+        Log::debug($parameters);
+        Log::debug("Model.onInsert(): attributes");
+        Log::debug($this->attributes);
 
         // Execute the query.
         $exec = $results->execute($parameters);
 
         if($exec){
-            return static::where('id', PDO::lastInsertId());
+            return static::where('id', $dataContext->getPdo()->lastInsertId());
         }
     }
 
