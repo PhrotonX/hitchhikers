@@ -34,21 +34,28 @@
     
     <div id="review-box" hidden>
         @auth
-            <!-- Shall not use form tag but use JavaScript to avoid reloading the page upon posting of review. -->
-            <!-- <form action="#" method="POST" id="review-form"> -->
-                <input type="text" name="description" id="review-form-description" placeholder="Write a review...">
-                <!-- @TODO: Replace into stars -->
-                <select name="rating" id="review-form-rating">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-                <button type="button" id="review-form-submit">Submit</button>
-                <!-- <input type="submit"> -->
-                <!-- <input type="reset"> -->
-            <!-- </form> -->
+            <!-- @NOTE: Shall be hidden by default, but many JavaScript isn't updated yet. -->
+            <div id="review-form" hidden>
+                <!-- Shall not use form tag but use JavaScript to avoid reloading the page upon posting of review. -->
+                <!-- <form action="#" method="POST" id="review-form"> -->
+                    <input type="number" name="id" id="review-form-id" hidden>
+                    <input type="text" name="description" id="review-form-description" placeholder="Write a review...">
+                    <!-- @TODO: Replace into stars -->
+                    <select name="rating" id="review-form-rating">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                    <button type="button" id="review-form-submit">Submit</button>
+                    <button type="button" id="review-form-edit" hidden>Edit</button>
+                    <button type="button" id="review-form-cancel">Cancel</button>
+                    <!-- <input type="submit"> -->
+                    <!-- <input type="reset"> -->
+                <!-- </form> -->
+            </div>
+            
         @endauth
         <div id="review-list" hidden></div>
     </div>
@@ -68,6 +75,15 @@
         var btnDrivingMode = document.getElementById('btn-driving-mode');
         var drivingModeOption = document.getElementById('select-driving-vehicle');
         var reviewBox = document.getElementById('review-box');
+
+        var reviewForm = document.getElementById('review-form');
+        var reviewFormId = document.getElementById('review-form-id');
+        var reviewFormDescription = document.getElementById('review-form-description');
+        var reviewFormRating = document.getElementById('review-form-rating');
+        var reviewFormSubmit = document.getElementById('review-form-submit');
+        var reviewFormEdit = document.getElementById('review-form-edit');
+        var reviewFormCancel = document.getElementById('review-form-cancel');
+
         var reviewList = document.getElementById('review-list');
         var selectedDrivingModeOption;
         var status;
@@ -152,6 +168,9 @@
                         // var reviewRideIdField = document.getElementById('review-ride-id');
                         // reviewRideIdField.value = rideList.value;
 
+                        reviewForm.hidden = false;
+                        reviewFormSubmit.hidden = false;
+                        reviewFormEdit.hidden = true;
                         viewReviewsBtn.hidden = false;
                     }
 
@@ -159,8 +178,7 @@
                     getRides(rideList.value); 
                 });
 
-                var submitReviewBtn = document.getElementById('review-form-submit');
-                submitReviewBtn.addEventListener('click', () => {
+                reviewFormSubmit.addEventListener('click', () => {
                     fetch('{{env("APP_URL", "")}}' + '/ride/' + rideList.value + '/reviews/submit', {
                         method: "POST",
                         body: JSON.stringify({
@@ -183,11 +201,61 @@
 
                 // Set up ride-view-review-btn
                 viewReviewsBtn.addEventListener('click', () => {
+                    // Display review list.
                     fetch('{{env("APP_URL", "")}}' + '/ride/' + rideList.value + '/reviews')
                     .then((response) => {
                         return response.json();
-                    }).then((data) => {
-                        console.log(data);
+                    })
+                    .then((data) => {
+                        // console.log(data);
+
+                        reviewList.hidden = false;
+                        // Display all reviews
+                        // Tag: onRideChange or onRideSelect -> onDisplayReviews
+                        // @TODO: This shall allow the user from being able to automatically clear up the review list
+                        // @TODO: Use pagination to avoid loading all of the items. This improvement shall take place once APIs are available.
+                        // upon navigating to other rides.
+                        var reviewCount = Object.keys(data.reviews).length;
+                        for(let i = 0; i < reviewCount; i++){
+                            console.log(data.reviews[i]);
+
+                            var reviewItem = document.createElement('div');
+                            // @TODO: Enclose this with div tag.
+                            var reviewDescription = document.createElement('p');
+                            reviewDescription.innerHTML = data.reviews[i].description;
+                            reviewItem.appendChild(reviewDescription);
+                            // @TODO: Add ratings and created_at fields.
+
+                            // Implement edit form per review.
+                            @auth
+                                if({{Auth::user()->id}} == data.reviews[i].user_id){
+                                    // Shall be displayed on a menu.
+                                    var reviewTagId = 'edit-review-'+data.reviews[i].id;
+                                    // reviewList.innerHTML += '<button id="'+reviewTagId+'">Edit</button>';
+
+                                    var editReviewBtn = document.createElement('button');
+                                    editReviewBtn.setAttribute('id', reviewTagId);
+                                    editReviewBtn.innerHTML = 'Edit';
+                                    editReviewBtn.addEventListener('click', () => {
+                                        reviewForm.hidden = false;
+
+                                        // @NOTE: Instead of using existing review creation form, it may be better to make a separate one that
+                                        // appears within the div of a review item.
+                                        reviewFormId.value = data.reviews[i].id;
+                                        reviewFormDescription.value = data.reviews[i].description;
+                                        console.log(reviewFormDescription.value);
+                                        reviewFormRating.value = data.reviews[i].rating;
+                                        reviewFormSubmit.hidden = true;
+                                        reviewFormEdit.value = data.reviews[i].rating;
+                                        reviewFormEdit.hidden = false;
+                                    });
+                                    reviewItem.appendChild(editReviewBtn);
+                                }
+                            @endauth
+                            
+                            reviewList.appendChild(reviewItem);
+                        }
+
                     }).catch((error) => {
                         throw new Error(error);
                     });
@@ -211,9 +279,6 @@
         map.enablePanToRetrieveVehicleMarkers();
         
         @auth
-            // @TODO: Display review-list
-            // fetch()
-
             @if (Auth::user()->isDriver())
 
                 // Make the driving mode button always update its toggle value after loading the page.
