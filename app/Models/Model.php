@@ -100,24 +100,24 @@ class Model implements \JsonSerializable{
         $dataContext = new DataContext();
 
         // Add quotation marks to all values.
-        $quoted = $this->getQuotedAttributes();
+        // $quoted = $this->getQuotedAttributes();
 
         $setQuery = [];
         foreach (static::$fillable as $field) {
-            if(isset($quoted[$field]))
-                $setQuery[] = "$field = $quoted[$field]";
+            if(isset($this->attributes[$field]))
+                $setQuery[] = "$field = $this->attributes[$field]";
         }
 
         // Create SQL query and prepare it.
-        $query = "UPDATE ".static::$table." SET ${implode(',', $setQuery)} WHERE $this->attributes['id'] = $quoted->id";
+        $query = "UPDATE ".static::$table." SET ".implode(',', $setQuery)." WHERE ".static::$primary." = $this->attributes['id']";
         Log::debug("Model.onEdit(): " . $query);
         $results = $dataContext->getPdo()->prepare($query);
 
         // Execute the query.
-        $exec = $results->execute($parameters);
+        $exec = $results->execute();
 
         if($exec){
-            return static::where('id', PDO::lastInsertId());
+            return static::where(static::$primary, $dataContext->getPdo()->lastInsertId());
         }
     }
 
@@ -156,7 +156,7 @@ class Model implements \JsonSerializable{
         $exec = $results->execute($parameters);
 
         if($exec){
-            return static::where('id', $dataContext->getPdo()->lastInsertId());
+            return static::where(static::$primary, $dataContext->getPdo()->lastInsertId());
         }
     }
 
