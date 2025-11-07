@@ -45,7 +45,14 @@ class ReplyController extends Controller
      */
     public function show(int $reply)
     {
-        $result = Review::where('id', $reply);
+        $result = Reply::where('id', $reply);
+        return response()->json(
+            $result
+        );
+    }
+
+    public function getReplies(int $review){
+        $result = Reply::where('replied_review_id', $review);
         return response()->json(
             $result
         );

@@ -105,12 +105,6 @@ class RideController extends Controller
         ]);
     }
 
-    public function getReviews(Ride $ride){
-        return response()->json([
-            "reviews" => Review::where('ride_id', $ride->id),
-        ]);
-    }
-
     /**
      * Show the form for editing the specified resource.
      */
