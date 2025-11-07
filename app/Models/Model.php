@@ -54,6 +54,9 @@ class Model implements \JsonSerializable{
                 $objects[] = $object;
             }
 
+            if($objects == []){
+                return response("Not Found", 404);
+            }
 
             return $objects;
 
@@ -132,6 +135,9 @@ class Model implements \JsonSerializable{
         if($exec){
             return static::where(static::$primary, $dataContext->getPdo()->lastInsertId());
         }
+        // else{
+        //     return response("404 Not Found", 404);
+        // }
     }
 
     private function onInsert(){
@@ -170,6 +176,8 @@ class Model implements \JsonSerializable{
 
         if($exec){
             return static::where(static::$primary, $dataContext->getPdo()->lastInsertId());
+        }else{
+            return response("Internal Server Error", 500);
         }
     }
 
