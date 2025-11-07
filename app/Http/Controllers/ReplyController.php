@@ -21,52 +21,72 @@ class ReplyController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
+    // public function create()
+    // {
         
-    }
+    // }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreReplyRequest $request)
+    public function store(StoreReplyRequest $request, int $ride)
     {
         $validated = $request->validate();
         
         $reply = new Reply();
         $reply->fill($validated);
+        $reply->user_id = Auth::user()->id;
+        $reply->ride_id = $ride->id;
         $reply->save();
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Reply $reply)
+    public function show(int $reply)
     {
-       //
+        $result = Reply::where('id', $reply);
+        return response()->json(
+            $result
+        );
+    }
+
+    public function getReplies(int $review){
+        $result = Reply::where('replied_review_id', $review);
+        return response()->json(
+            $result
+        );
     }
 
     /**
     * Show the form for editing the specified resource.
     */
-    public function edit(Reply $reply)
-    {
-         //
-    }
+    // public function edit(Reply $reply)
+    // {
+    //      //
+    // }
 
     /**
     * Update the specified resource in storage.
     */
-    public function update(UpdateReplyRequest $request, Reply $reply)
+    public function update(UpdateReplyRequest $request, int $reply)
     {
-        //
+        $result = Reply::where('id', $reply)[0];
+        
+        Log::debug("ReplyController.update(): ");
+        Log::debug($result->id);
+
+        $result->fill($request->validated());
+        $result->update();
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Reply $reply)
+    public function destroy(int $reply)
     {
-        // $reply->delete();
+        $result = Reply::where('id', $reply)[0];
+        
+        $result->delete();
     }
 }

@@ -49,6 +49,11 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::put('reviews/{review}/update', [ReviewController::class, 'update']);
     Route::delete('reviews/{review}/delete', [ReviewController::class, 'destroy']);
 
+    // Reply routes
+    Route::post('reviews/{review}/replies/submit', [ReplyController::class, 'store']);
+    Route::put('replies/{reply}/update', [ReplyController::class, 'update']);
+    Route::delete('replies/{reply}/delete', [ReplyController::class, 'destroy']);
+
     // Ride routes
     Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');
     Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');
@@ -72,7 +77,7 @@ Route::get('settings', function(){
 Route::get('ride/destinations', [RideDestinationController::class, 'index']);
 Route::get('ride/destinations/{ride}', [RideDestinationController::class, 'get']);
 Route::get('ride/{ride}', [RideController::class, 'get']);
-Route::get('ride/{ride}/reviews', [RideController::class, 'getReviews']);
+Route::get('ride/{ride}/reviews', [ReviewController::class, 'getReviews']);
 
 Route::get('vehicle', [VehicleController::class, 'index'])->name('vehicle.index');
 Route::get('api/vehicle/{vehicle}', [VehicleController::class, 'get'])->name('vehicle.get');
@@ -80,9 +85,12 @@ Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehic
 Route::get('vehicle/{vehicle}/rides', [VehicleController::class, 'getRides'])->name('vehicle.rides');
 
 Route::get('replies/', [ReplyController::class, 'index']);
+Route::get('replies/{reply}', [ReplyController::class, 'show']);
+
 Route::get('reviews/', [ReviewController::class, 'index']);
 Route::get('reviews/{review}', [ReviewController::class, 'show']);
-Route::delete('replies/{reply}/delete', [ReplyController::class, 'destroy']);
+Route::get('reviews/{review}/replies', [ReplyController::class, 'getReplies']);
+
 Route::get('test', function(){
     return view('dist.index');
 });
