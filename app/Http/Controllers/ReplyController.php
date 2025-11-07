@@ -21,38 +21,43 @@ class ReplyController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
+    // public function create()
+    // {
         
-    }
+    // }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreReplyRequest $request)
+    public function store(StoreReplyRequest $request, int $ride)
     {
         $validated = $request->validate();
         
         $reply = new Reply();
         $reply->fill($validated);
+        $reply->user_id = Auth::user()->id;
+        $reply->ride_id = $ride->id;
         $reply->save();
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Reply $reply)
+    public function show(int $reply)
     {
-       //
+        $result = Review::where('id', $reply);
+        return response()->json(
+            $result
+        );
     }
 
     /**
     * Show the form for editing the specified resource.
     */
-    public function edit(Reply $reply)
-    {
-         //
-    }
+    // public function edit(Reply $reply)
+    // {
+    //      //
+    // }
 
     /**
     * Update the specified resource in storage.
