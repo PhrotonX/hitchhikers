@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreReplyRequest;
 use App\Http\Requests\UpdateReplyRequest;
 use App\Models\Reply;
+use App\Models\Review;
 
 class ReplyController extends Controller
 {
@@ -29,12 +30,13 @@ class ReplyController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreReplyRequest $request, int $ride)
+    public function store(StoreReplyRequest $request, int $review)
     {
         $validated = $request->validate();
         
         $reply = new Reply();
         $reply->fill($validated);
+        $reply->replied_review_id = $review;
         $reply->user_id = Auth::user()->id;
         $reply->ride_id = $ride->id;
         $reply->save();

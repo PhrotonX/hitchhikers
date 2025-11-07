@@ -24,7 +24,7 @@ class StoreReplyRequest extends FormRequest
         return [
             'description' => ['required', 'string', 'max:255'],
             'mentioned_account_id' => ['required', 'numeric'],
-            'replied_review_id' => ['required', 'numeric'],
+            // 'replied_review_id' => ['required', 'numeric'],
             'ride_id' => ['required', 'numeric'],
         ];
     }
