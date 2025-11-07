@@ -57,16 +57,24 @@ class ReplyController extends Controller
     /**
     * Update the specified resource in storage.
     */
-    public function update(UpdateReplyRequest $request, Reply $reply)
+    public function update(UpdateReplyRequest $request, int $reply)
     {
-        //
+        $result = Reply::where('id', $reply)[0];
+        
+        Log::debug("ReplyController.update(): ");
+        Log::debug($result->id);
+
+        $result->fill($request->validated());
+        $result->update();
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Reply $reply)
+    public function destroy(int $reply)
     {
-        // $reply->delete();
+        $result = Reply::where('id', $reply)[0];
+        
+        $result->delete();
     }
 }
