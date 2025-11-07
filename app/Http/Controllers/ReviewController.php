@@ -90,6 +90,10 @@ class ReviewController extends Controller
     public function destroy(int $review)
     {
         $result = Review::where('id', $review)[0];
+
+        // if(Auth::user() !== null && Auth::user()->id == $result->id){
+        //     return response("Forbidden", 403);
+        // }
         
         $result->delete();
     }
