@@ -49,7 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
 
     // Saved Ride routes
     Route::get('saved-rides/', [SavedRideController::class, 'index']); // Dashboard-only route for statistics.
-    Route::get('saved-rides/folders/{folder}/rides', [SavedRideController::class, 'get']);
+    Route::get('saved-rides/folders/{savedRideFolder}/rides', [SavedRideController::class, 'get']);
     Route::get('saved-rides/submit', [SavedRideController::class, 'store']);
     Route::get('saved-rides/{saved-ride}', [SavedRideController::class, 'show']);
     Route::get('saved-rides/{saved-ride}/update', [SavedRideController::class, 'update']);
@@ -57,10 +57,10 @@ Route::middleware(['auth', 'verified'])->group(function(){
 
     // Saved Ride Folder routes
     Route::get('saved-rides/folders', [SavedRideFolderController::class, 'index']);
-    Route::get('saved-rides/folders/{folder}', [SavedRideFolderController::class, 'show']);
+    Route::get('saved-rides/folders/{savedRideFolder}', [SavedRideFolderController::class, 'show']);
     Route::get('saved-rides/folders/submit', [SavedRideFolderController::class, 'store']);
-    Route::get('saved-rides/folders/{folder}/update', [SavedRideFolderController::class, 'update']);
-    Route::get('saved-rides/folders/{folder}/delete', [SavedRideFolderController::class, 'destroy']);
+    Route::get('saved-rides/folders/{savedRideFolder}/update', [SavedRideFolderController::class, 'update']);
+    Route::get('saved-rides/folders/{savedRideFolder}/delete', [SavedRideFolderController::class, 'destroy']);
 
     // Review routes
     Route::put('reviews/{review}/update', [ReviewController::class, 'update']);
