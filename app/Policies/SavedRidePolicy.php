@@ -41,7 +41,7 @@ class SavedRidePolicy
      */
     public function update(User $user, SavedRide $savedRide): bool
     {
-        return false;
+        return $user->id == $savedRide->user_id;
     }
 
     /**
@@ -49,7 +49,7 @@ class SavedRidePolicy
      */
     public function delete(User $user, SavedRide $savedRide): bool
     {
-        return false;
+        return $user->id == $savedRide->user_id;
     }
 
     /**
@@ -57,7 +57,7 @@ class SavedRidePolicy
      */
     public function restore(User $user, SavedRide $savedRide): bool
     {
-        
+        return $user->id == $savedRide->user_id;
     }
 
     /**
@@ -65,6 +65,6 @@ class SavedRidePolicy
      */
     public function forceDelete(User $user, SavedRide $savedRide): bool
     {
-        return false;
+        return $user->id == $savedRide->user_id;
     }
 }
