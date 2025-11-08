@@ -10,6 +10,8 @@ use App\Http\Controllers\RideController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SavedRideController;
+use App\Http\Controllers\SavedRideFolderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -45,6 +47,21 @@ Route::middleware(['auth', 'verified'])->group(function(){
     // Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
     Route::patch('vehicle/{vehicle}/update-location', [VehicleController::class, 'updateLocation']);
 
+    // Saved Ride routes
+    Route::get('saved-rides/', [SavedRideController::class, 'index']); // Dashboard-only route for statistics.
+    Route::get('saved-rides/folders/{folder}/rides', [SavedRideController::class, 'get']);
+    Route::get('saved-rides/submit', [SavedRideController::class, 'store']);
+    Route::get('saved-rides/{saved-ride}', [SavedRideController::class, 'show']);
+    Route::get('saved-rides/{saved-ride}/update', [SavedRideController::class, 'update']);
+    Route::get('saved-rides/{saved-ride}/delete', [SavedRideController::class, 'delete']);
+
+    // Saved Ride Folder routes
+    Route::get('saved-rides/folders', [SavedRideFolderController::class, 'index']);
+    Route::get('saved-rides/folders/{folder}', [SavedRideFolderController::class, 'show']);
+    Route::get('saved-rides/folders/submit', [SavedRideFolderController::class, 'store']);
+    Route::get('saved-rides/folders/{folder}/update', [SavedRideFolderController::class, 'update']);
+    Route::get('saved-rides/folders/{folder}/delete', [SavedRideFolderController::class, 'destroy']);
+
     // Review routes
     Route::put('reviews/{review}/update', [ReviewController::class, 'update']);
     Route::delete('reviews/{review}/delete', [ReviewController::class, 'destroy']);
@@ -62,8 +79,6 @@ Route::middleware(['auth', 'verified'])->group(function(){
 
     // Vehicle routes
     Route::patch('vehicle/{vehicle}/update-status', [VehicleController::class, 'updateStatus']);
-
-
 });
 
 
