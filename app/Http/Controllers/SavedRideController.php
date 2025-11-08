@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\SavedRide;
+use App\Http\Request\StoreSavedRideRequest;
+use App\Http\Request\UpdateSavedRideRequest;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -26,9 +28,18 @@ class SavedRideController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSavedRideRequest $request)
     {
-        //
+        $data = new SavedRide();
+
+        $this->authorize('create', SavedRide::class);
+
+        $data->fill($request->validated());
+        $data->save();
+
+        return response()->json([
+            $data,
+        ]);
     }
 
     /**
@@ -37,6 +48,10 @@ class SavedRideController extends Controller
     public function show(int $savedRide)
     {
         $data = SavedRide::find($savedRide);
+
+        if($data == null){
+            return response('Not Found', 404);
+        }
 
         $this->authorize('view', $data);
 
@@ -49,9 +64,22 @@ class SavedRideController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, SavedRide $savedRide)
+    public function update(UpdateSavedRideRequest $request, int $savedRide)
     {
-        //
+        $data = SavedRide::find($savedRide);
+
+        if($data == null){
+            return response('Not Found', 404);
+        }
+
+        $this->authorize('update', $data);
+
+        $data->fill($request->validated());
+        $data->save();
+
+        return response()->json([
+            $data,
+        ]);
     }
 
     /**
@@ -59,6 +87,8 @@ class SavedRideController extends Controller
      */
     public function destroy(SavedRide $savedRide)
     {
-        //
+        if($data == null){
+            return response('Not Found', 404);
+        }
     }
 }
