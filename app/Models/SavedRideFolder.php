@@ -12,6 +12,7 @@ class SavedRideFolder extends Model{
         'color',
         'icon',
         'description',
+        'user_id',
         'created_at',
         'updated_at',
     ];
