@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('vehicles', function(Blueprint $table){
-            $table->decimal('latitude', 10, 7);
-            $table->decimal('longitude', 10, 7);
+            $table->decimal('latitude', 10, 7)->change();
+            $table->decimal('longitude', 10, 7)->change();
         });
     }
 };
