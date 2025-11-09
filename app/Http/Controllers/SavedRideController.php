@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\SavedRide;
-use App\Http\Request\StoreSavedRideRequest;
-use App\Http\Request\UpdateSavedRideRequest;
+use App\Http\Requests\StoreSavedRideRequest;
+use App\Http\Requests\UpdateSavedRideRequest;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -54,10 +54,9 @@ class SavedRideController extends Controller
         }
 
         $this->authorize('view', $data);
-
-        $results = SavedRide::all();
+        
         return response()->json([
-            $results, 
+            $data,
         ]);
     }
 
@@ -85,10 +84,16 @@ class SavedRideController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SavedRide $savedRide)
+    public function destroy(int $savedRide)
     {
+        $data = SavedRide::find($savedRide);
+
         if($data == null){
             return response('Not Found', 404);
         }
+
+        $this->authorize('forceDelete', $data);
+
+        $data->delete();
     }
 }
