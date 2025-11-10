@@ -56,7 +56,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::put('saved-rides/{savedRide}/update', [SavedRideController::class, 'update']);
     Route::delete('saved-rides/{savedRide}/delete', [SavedRideController::class, 'delete']);
 
-    // Route::patch('saved-rides/{savedRide}/modify-folders', [SavedRideController::class, 'modifyFolders']);
+    Route::patch('saved-rides/{savedRide}/modify-folders', [SavedRideController::class, 'modifyFolders']);
 
     // Saved Ride Folder routes
     Route::get('saved-rides/folders', [SavedRideFolderController::class, 'index']);

@@ -6,7 +6,7 @@ use App\DataContext;
 use App\Models\Model;
 use Illuminate\Support\Facades\Log;
 
-class AssociativeModel implements Model{
+class AssociativeModel extends Model{
     protected static $primary = [];
 
     public static function find($id, $secondId){
@@ -17,7 +17,7 @@ class AssociativeModel implements Model{
     public function delete(){
         $dataContext = new DataContext();
 
-        $query = "DELETE FROM " .static::$table." WHERE " . static::$primary[0] ." = " . $this->atributes[static::$primary[0]] . " AND " . static::$primary[1] . " = " . $this->atributes[static::$primary[1]];
+        $query = "DELETE FROM " .static::$table." WHERE " . static::$primary[0] ." = " . $this->attributes[static::$primary[0]] . " AND " . static::$primary[1] . " = " . $this->attributes[static::$primary[1]];
 
         $results = $dataContext->getPdo()->prepare($query);
         $exec = $results->execute();
@@ -45,7 +45,7 @@ class AssociativeModel implements Model{
         }
 
         // Create SQL query and prepare it.
-        $query = "UPDATE ".static::$table." SET ".implode(',', $setQuery)." WHERE " . static::$primary[0] ." = " . $this->atributes[static::$primary[0]] . " AND " . static::$primary[1] . " = " . $this->atributes[static::$primary[1]];
+        $query = "UPDATE ".static::$table." SET ".implode(',', $setQuery)." WHERE " . static::$primary[0] ." = " . $this->attributes[static::$primary[0]] . " AND " . static::$primary[1] . " = " . $this->attributes[static::$primary[1]];
         Log::debug("Model.onEdit(): " . $query);
         $results = $dataContext->getPdo()->prepare($query);
 
@@ -58,6 +58,36 @@ class AssociativeModel implements Model{
         // else{
         //     return response("404 Not Found", 404);
         // }
+    }
+
+    public function save(){
+        if(!isset($this->attributes[static::$primary[0]]) || $this->attributes[static::$primary[0]] === null){
+            $this->onInsert();
+        }else{
+            $this->onEdit();
+        }
+    }
+
+    private function onInsert(){
+        $dataContext = new DataContext();
+
+        $fields = [];
+        $values = [];
+        
+        foreach (static::$fillable as $field) {
+            if(isset($this->attributes[$field])){
+                $fields[] = $field;
+                $values[] = '"' . $this->attributes[$field] . '"';
+            }
+        }
+
+        $query = "INSERT INTO ".static::$table." (".implode(',', $fields).") VALUES (".implode(',', $values).")";
+        Log::debug("AssociativeModel.onInsert(): " . $query);
+        
+        $results = $dataContext->getPdo()->prepare($query);
+        $exec = $results->execute();
+
+        return $exec;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SavedRide;
+use App\Models\SavedRideFolderItems;
 use App\Models\Ride;
 use App\Http\Requests\StoreSavedRideRequest;
 use App\Http\Requests\UpdateSavedRideRequest;
@@ -138,6 +139,45 @@ class SavedRideController extends Controller
         $this->authorize('forceDelete', $data);
 
         $data->delete();
+    }
+
+    /**
+     * Modify which folders a saved ride belongs to.
+     */
+    public function modifyFolders(Request $request, int $savedRide)
+    {
+        $data = SavedRide::find($savedRide);
+
+        if($data == null){
+            return response('Not Found', 404);
+        }
+
+        $this->authorize('update', $data);
+
+        // Get submitted folder IDs from checkbox form
+        $folderIds = $request->input('folders', []);
+
+        // Remove all existing folder associations for this saved ride
+        $existingItems = SavedRideFolderItems::where('saved_ride_id', $savedRide);
+        foreach($existingItems as $item){
+            $item->delete();
+        }
+
+        // Add new folder associations
+        foreach($folderIds as $folderId){
+            if(is_numeric($folderId)){
+                $folderItem = new SavedRideFolderItems();
+                $folderItem->saved_ride_id = $savedRide;
+                $folderItem->saved_ride_folder_id = $folderId;
+                $folderItem->save();
+            }
+        }
+
+        return response()->json([
+            'message' => 'Folder associations updated successfully',
+            'saved_ride_id' => $savedRide,
+            'folder_ids' => $folderIds,
+        ]);
     }
 
     private function getAssociatedRide($savedRide){
