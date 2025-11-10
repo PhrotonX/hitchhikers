@@ -22,7 +22,7 @@ class SavedRideFolderController extends Controller
         $results = SavedRideFolder::all();
 
         return response()->json([
-            $results,
+            "saved_ride_folders" => $results,
         ]);
     }
 
@@ -38,7 +38,7 @@ class SavedRideFolderController extends Controller
         $data->save();
 
         return response()->json([
-            $data,
+            "saved_ride_folder" => $data,
         ]);
     }
 
@@ -56,7 +56,7 @@ class SavedRideFolderController extends Controller
         $this->authorize('view', $data);
 
         return response()->json([
-            $data,
+            "saved_ride_folder" => $data,
         ]);
     }
 
@@ -76,7 +76,7 @@ class SavedRideFolderController extends Controller
         $data->fill($request->validated());
 
         return response()->json([
-            $data,
+            "saved_ride_folder" => $data,
         ]);
     }
 

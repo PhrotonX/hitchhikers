@@ -62,27 +62,32 @@ class SavedRideController extends Controller
     }
 
     public function get(int $savedRideFolder){
+        if(!is_numeric($savedRideFolder)){
+            return response("Saved Ride Folder ID must be numeric", 400);
+        }
+
+        $data = null;
+
         // If ungrouped...
         if($savedRideFolder == 0){
-            if(!is_numeric($savedRideFolder)){
-                return response("Saved Ride Folder ID must be numeric", 400);
-            }
-
+            // INCORRECT QUERY
             $data = SavedRide::selectRawWhere('user_id = ' . Auth::user()->id);
-
-            if($data == null){
-                return response('Not Found', 404);
-            }
-
-            Log::debug($data);
-
-            $this->authorize('view', $data);
-
-            return response()->json([
-                "saved_rides" => $data,
-                "rides" => $this->getAssociatedRides($data),
-            ]);
+        }else{
+            $results = SavedRideFolderItems::where('saved_ride_folder_id = ' . $savedRideFolder);
         }
+
+        if($data == null){
+            return response('Not Found', 404);
+        }
+
+        Log::debug($data);
+
+        $this->authorize('view', $data);
+
+        return response()->json([
+            "saved_rides" => $data,
+            "rides" => $this->getAssociatedRides($data),
+        ]);
     }
 
     /**
@@ -121,7 +126,8 @@ class SavedRideController extends Controller
         $data->save();
 
         return response()->json([
-            $data,
+            "saved_ride" => $data,
+            "ride" => $this->getAssociatedRide($data),
         ]);
     }
 
