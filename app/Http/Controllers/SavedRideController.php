@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SavedRide;
+use App\Models\Ride;
 use App\Http\Requests\StoreSavedRideRequest;
 use App\Http\Requests\UpdateSavedRideRequest;
 use Illuminate\Http\Request;
@@ -23,7 +24,8 @@ class SavedRideController extends Controller
 
         $results = SavedRide::all();
         return response()->json([
-            $results, 
+            "saved_rides" => $results,
+            "rides" => $this->getAssociatedRides($results),
         ]);
     }
 
@@ -36,7 +38,8 @@ class SavedRideController extends Controller
 
         $results = SavedRide::where('user_id', Auth::user()->id);
         return response()->json([
-            $results, 
+            "saved_rides" => $results,
+            "rides" => $this->getAssociatedRides($results),
         ]);
     }
 
@@ -75,7 +78,8 @@ class SavedRideController extends Controller
             $this->authorize('view', $data);
 
             return response()->json([
-                $data,
+                "saved_rides" => $data,
+                "rides" => $this->getAssociatedRides($data),
             ]);
         }
     }
@@ -94,7 +98,8 @@ class SavedRideController extends Controller
         $this->authorize('view', $data);
 
         return response()->json([
-            $data,
+            "saved_ride" => $data,
+            "ride" => $this->getAssociatedRide($data),
         ]);
     }
 
@@ -133,5 +138,20 @@ class SavedRideController extends Controller
         $this->authorize('forceDelete', $data);
 
         $data->delete();
+    }
+
+    private function getAssociatedRide($savedRide){
+        return Ride::find($savedRide->ride_id);
+    }
+
+    private function getAssociatedRides($savedRides){
+        $results = [];
+        $count = 0;
+        foreach($savedRides as $savedRide){
+            $results[$count] = $this->getAssociatedRide($savedRide);
+            $count++;
+        }
+
+        return $results;
     }
 }
