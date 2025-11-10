@@ -10,6 +10,8 @@ use App\Http\Controllers\RideController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SavedRideController;
+use App\Http\Controllers\SavedRideFolderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -45,6 +47,24 @@ Route::middleware(['auth', 'verified'])->group(function(){
     // Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
     Route::patch('vehicle/{vehicle}/update-location', [VehicleController::class, 'updateLocation']);
 
+    // Saved Ride routes
+    Route::get('saved-rides/', [SavedRideController::class, 'index']);
+    Route::get('saved-rides/all', [SavedRideController::class, 'all']); // Dashboard-only route for statistics.
+    Route::get('saved-rides/folders/{savedRideFolder}/rides', [SavedRideController::class, 'get']);
+    Route::post('saved-rides/submit', [SavedRideController::class, 'store']);
+    Route::get('saved-rides/{savedRide}', [SavedRideController::class, 'show']);
+    Route::put('saved-rides/{savedRide}/update', [SavedRideController::class, 'update']);
+    Route::delete('saved-rides/{savedRide}/delete', [SavedRideController::class, 'delete']);
+
+    Route::patch('saved-rides/{savedRide}/modify-folders', [SavedRideController::class, 'modifyFolders']);
+
+    // Saved Ride Folder routes
+    Route::get('saved-rides/folders', [SavedRideFolderController::class, 'index']);
+    Route::get('saved-rides/folders/{savedRideFolder}', [SavedRideFolderController::class, 'show']);
+    Route::post('saved-rides/folders/submit', [SavedRideFolderController::class, 'store']);
+    Route::put('saved-rides/folders/{savedRideFolder}/update', [SavedRideFolderController::class, 'update']);
+    Route::delete('saved-rides/folders/{savedRideFolder}/delete', [SavedRideFolderController::class, 'destroy']);
+
     // Review routes
     Route::put('reviews/{review}/update', [ReviewController::class, 'update']);
     Route::delete('reviews/{review}/delete', [ReviewController::class, 'destroy']);
@@ -62,8 +82,6 @@ Route::middleware(['auth', 'verified'])->group(function(){
 
     // Vehicle routes
     Route::patch('vehicle/{vehicle}/update-status', [VehicleController::class, 'updateStatus']);
-
-
 });
 
 

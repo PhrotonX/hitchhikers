@@ -27,9 +27,19 @@ class Model implements \JsonSerializable{
         return static::onSelect($query);
     }
 
+    public static function find($id){
+        $query = "SELECT * FROM " . static::$table . " WHERE ". static::$primary ." = $id";
+        return static::onSelect($query)[0] ?? null;
+    }
+
     public static function where($field, $value){
         $query = "SELECT * FROM " . static::$table . " WHERE $field = $value";
         return static::onSelect($query);
+    }
+
+    public static function selectRawWhere($query){
+        $statement = "SELECT * FROM " . static::$table . " WHERE $query";
+        return static::onSelect($statement);
     }
 
     private static function onSelect($query){

@@ -59,15 +59,21 @@
         @endauth
         <div id="review-list" hidden></div>
     </div>
+
+    <div id="saved-ride-list">
+
+    </div>
 @endsection
 
 @push('scripts')
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
         import IndexPage from '{{ Vite::asset("resources/js/IndexPage.js") }}';
+        import SavedRides from '{{ Vite::asset("resources/js/Components/SavedRides.js") }}';
 
         // @NOTE: Newer code shall encapsulate code into IndexPage instead of throwing up every JS code in this file to reduce the mess.
         var page = new IndexPage('{{env("APP_URL", "")}}');
+        var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
 
         // Intialize variables
         var infobox = document.getElementById('infobox');
