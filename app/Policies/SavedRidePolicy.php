@@ -21,6 +21,14 @@ class SavedRidePolicy
     }
 
     /**
+     * Determine whether the user can view all of its own models.
+     */
+    public function viewMany(User $user): bool
+    {
+        return true;
+    }
+
+    /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, SavedRide $savedRide): bool

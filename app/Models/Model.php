@@ -37,6 +37,11 @@ class Model implements \JsonSerializable{
         return static::onSelect($query);
     }
 
+    public static function selectRawWhere($query){
+        $statement = "SELECT * FROM " . static::$table . " WHERE $query";
+        return static::onSelect($statement);
+    }
+
     private static function onSelect($query){
         $dataContext = new DataContext();
 

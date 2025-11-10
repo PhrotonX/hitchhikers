@@ -48,7 +48,8 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::patch('vehicle/{vehicle}/update-location', [VehicleController::class, 'updateLocation']);
 
     // Saved Ride routes
-    Route::get('saved-rides/', [SavedRideController::class, 'index']); // Dashboard-only route for statistics.
+    Route::get('saved-rides/', [SavedRideController::class, 'index']);
+    Route::get('saved-rides/all', [SavedRideController::class, 'all']); // Dashboard-only route for statistics.
     Route::get('saved-rides/folders/{savedRideFolder}/rides', [SavedRideController::class, 'get']);
     Route::post('saved-rides/submit', [SavedRideController::class, 'store']);
     Route::get('saved-rides/{savedRide}', [SavedRideController::class, 'show']);
