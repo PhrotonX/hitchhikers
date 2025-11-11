@@ -5,6 +5,8 @@ namespace App\Models;
 use App\DataContext;
 use Illuminate\Support\Facades\Log;
 
+// A custom ORM or Object-Relational Mapping that avoids Laravel Eloquent and to use PHP PDO Database
+// connections directly.
 class Model implements \JsonSerializable{
     // public ?int $id = null;
 
