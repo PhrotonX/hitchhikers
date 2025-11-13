@@ -7,6 +7,7 @@ use App\Http\Controllers\RideDestinationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\RideController;
+use App\Http\Controllers\RideRequestController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ReviewController;
@@ -79,6 +80,14 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');
     Route::patch('ride/{ride}/update-status', [RideController::class, 'updateStatus']);
     Route::post('ride/{ride}/reviews/submit', [ReviewController::class, 'store']);
+
+    // Ride request routes
+    Route::get('ride/{ride}/requests/', [RideRequestController::class, 'index']);
+    Route::get('ride/requests/create', [RideRequestController::class, 'create']);
+    Route::post('ride/requests/create/submit', [RideRequestController::class, 'submit']);
+    Route::get('ride/{ride}/requests/{request}', [RideRequestController::class, 'show']);
+    Route::put('ride/{ride}/requests/{request}/update', [RideRequestController::class, 'update']);
+    Route::delete('ride/{ride}/requests/{request}/delete', [RideRequestController::class, 'destroy']);
 
     // Vehicle routes
     Route::patch('vehicle/{vehicle}/update-status', [VehicleController::class, 'updateStatus']);
