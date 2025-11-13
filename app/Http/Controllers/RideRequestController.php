@@ -23,7 +23,13 @@ class RideRequestController extends Controller
      */
     public function store(StoreRideRequestRequest $request)
     {
-        
+        $rideRequest = new RideRequest();
+        $rideRequest->fill($request->validated());
+        $rideRequest->save();
+
+        return response()->json([
+            $rideRequest,
+        ]);
     }
 
     /**
@@ -39,16 +45,21 @@ class RideRequestController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, RideRequest $rideRequest)
+    public function update(UpdateRideRequestRequest $request, int $rideRequest)
     {
-        //
+        $data = RideRequest::find($rideRequest);
+
+        $data->fill($request->validated());
+        $data->save();
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RideRequest $rideRequest)
+    public function destroy(int $rideRequest)
     {
-        //
+        $data = RideRequest::find($rideRequest);
+        
+        $data->delete();
     }
 }
