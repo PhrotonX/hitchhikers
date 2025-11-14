@@ -1,9 +1,14 @@
+import Page from '../js/Page.js';
 import SavedRides from '../js/Components/SavedRides.js';
 
-export default class IndexPage{
+export default class IndexPage extends Page{
     constructor(appUrl){
-        this.appUrl = appUrl;
+        super(appUrl);
         this.savedRides = null;
+    }
+
+    onInitializePage(){
+        
     }
 
     loadAuthObjects(ids){
