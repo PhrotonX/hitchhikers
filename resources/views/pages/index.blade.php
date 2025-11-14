@@ -72,6 +72,10 @@
     <div id="saved-ride-list">
 
     </div>
+
+    <div id="ride-request" hidden>
+
+    </div>
 @endsection
 
 @push('scripts')
@@ -121,11 +125,10 @@
                 '<p id="ride-location">Retrieving location...</p>' +
                 "<p><strong>Status:</strong>" + data.status + "</p>" +
                 "<p>"+data.latitude+", "+data.longitude+"</p>" + 
-                '<button type="button" id="ride-view-review-btn">View Reviews</button>' + 
-                '<button type="button" id="ride-view-destination-list-btn">View Ride Destination List</button><br>';
+                '<button type="button" id="ride-view-review-btn">View Reviews</button><br>';
             infobox.style.display = "block";
             infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>' +
-            '<button type="button">See More</button></div>';
+            '<br><button type="button">Make Ride Request</button></div>';
 
             var rideList = document.getElementById('ride-list');
             
