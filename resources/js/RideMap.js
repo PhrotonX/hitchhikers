@@ -274,7 +274,6 @@ export default class RideMap extends MainMap{
 
                     var rideCount = Object.keys(data.rides[vehicle_id]).length;
                     for(let j = 0; j < rideCount; j++){
-                        // Build the item HTML
                         // if(data.rides[vehicle_id][j] != "active"){
                         //     continue;
                         // }
@@ -283,7 +282,7 @@ export default class RideMap extends MainMap{
                         rideSelectorListItem.setAttribute('class', 'ride-selector-list-item');
                         rideSelectorListItem.setAttribute('data-vehicle-id', vehicle_id);
 
-                            console.log(data.rides[vehicle_id]);
+                            // console.log(data.rides[vehicle_id]);
                             var rideSelectorListItemTitle = document.createElement('p');
                             rideSelectorListItemTitle.setAttribute('class', 'title');
                             rideSelectorListItemTitle.innerHTML = data.rides[vehicle_id][j].ride_name;
