@@ -3,6 +3,7 @@
 
 @push('head')
     <meta name="csrf-token" content={{csrf_token()}}
+    @vite(['resources/css/index.css'])
 @endpush
 
 @section('content')
@@ -58,6 +59,14 @@
             
         @endauth
         <div id="review-list" hidden></div>
+    </div>
+
+
+    <div id="ride-selector-wrapper">
+        <h2>Available Rides</h2>
+        <div id="ride-selector">
+
+        </div>
     </div>
 
     <div id="saved-ride-list">
@@ -299,7 +308,7 @@
         });
 
         // map.enablePanToRetrieveAllRideMarkers();
-        map.enablePanToRetrieveVehicleMarkers();
+        map.enablePanToRetrieveVehicles();
         
         @auth
             @if (Auth::user()->isDriver())

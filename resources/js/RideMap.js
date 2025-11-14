@@ -11,6 +11,7 @@ export default class RideMap extends MainMap{
         this.rideMarkers = new Object();
         this.vehicleMarkers = new Object();
         this.trackingId = null;
+        this.rideSelectorList = null;
         this.vehicleId = null;
         this.vehicleMarker = null;
         this.vehicleUrl = '/vehicle';
@@ -40,6 +41,10 @@ export default class RideMap extends MainMap{
         this.map.addLayer(this.vehicleMarkers);
     }
 
+    clearRideSelectorList(){
+        this.rideSelectorList.innerHTML = "";
+    }
+
     enablePanToRetrieveAllRideMarkers(){
         this.map.on('moveend', this.retrieveAllRideMarkers());
     }
@@ -47,8 +52,8 @@ export default class RideMap extends MainMap{
     /**
      * Replaces existing map pan event into an event that retrieves all map markers within the bounding box of the map view.
      */
-    enablePanToRetrieveVehicleMarkers(){
-        this.map.on('moveend', this.retrieveVehicleMarkers());
+    enablePanToRetrieveVehicles(){
+        this.map.on('moveend', this.retrieveVehicles());
     }
 
     setOnRideMarkerClick(callback){
@@ -199,7 +204,7 @@ export default class RideMap extends MainMap{
      * Retrieves vehicle markers and displays it on a map.
      * @returns A callback function.
      */
-    retrieveVehicleMarkers(){
+    retrieveVehicles(){
         return () => {
             // console.log("Map panned!");
 
@@ -214,6 +219,18 @@ export default class RideMap extends MainMap{
 
             // console.log("Url: " + url);
 
+            var rideSelector = document.getElementById('ride-selector');
+
+            if(this.rideSelectorList == null){
+                this.rideSelectorList = document.createElement('div');
+                this.rideSelectorList.setAttribute('class', 'ride-selector-list');
+                rideSelector.appendChild(this.rideSelectorList);
+            }else{
+                // Avoid duplicate items.
+                this.clearRideSelectorList();
+            }
+            
+            
             fetch(url
             ).then((response) => {
                 return response.json();
@@ -222,6 +239,48 @@ export default class RideMap extends MainMap{
                 //Populate the map with markers
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
+
+                    let vehicle_id = data.results[i].id;
+
+                    var rideCount = Object.keys(data.rides[vehicle_id]).length;
+                    for(let j = 0; j < rideCount; j++){
+                        // Build the item HTML
+                        // if(data.rides[vehicle_id][j] != "active"){
+                        //     continue;
+                        // }
+
+                        var rideSelectorListItem = document.createElement('div');
+                        rideSelectorListItem.setAttribute('class', 'ride-selector-list-item');
+                        // rideSelectorList.setAttribute('id', 'ride-selector-id-');
+
+                            console.log(data.rides[vehicle_id]);
+                            var rideSelectorListItemTitle = document.createElement('p');
+                            rideSelectorListItemTitle.setAttribute('class', 'title');
+                            rideSelectorListItemTitle.innerHTML = data.rides[vehicle_id][j].ride_name;
+                            rideSelectorListItem.appendChild(rideSelectorListItemTitle);
+
+                            var rideSelectorListItemDescription = document.createElement('p');
+                            rideSelectorListItemDescription.setAttribute('class', 'description');
+                            rideSelectorListItemDescription.innerHTML = "Description: " + data.rides[vehicle_id][j].description;
+                            rideSelectorListItem.appendChild(rideSelectorListItemDescription);
+
+                            var rideSelectorListItemOn = document.createElement('p');
+                            rideSelectorListItemOn.innerHTML = "Currently on: Obtaining location..." ;
+                            this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
+                                rideSelectorListItemOn.innerHTML = "Currently on: " + result.display_name;
+                            });
+                            rideSelectorListItem.appendChild(rideSelectorListItemOn);
+
+                            // var rideSelectorListItemFrom = document.createElement('p');
+                            // rideSelectorListItemFrom.innerHTML = "From: Obtaining location..." ;
+                            // this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
+                            //     rideSelectorListItemFrom.innerHTML = "Currently on: " + result.display_name;
+                            // });
+                            // rideSelectorListItem.appendChild(rideSelectorListItemFrom);
+                        
+                        this.rideSelectorList.appendChild(rideSelectorListItem);
+                        // rideSelector.appendChild(this.rideSelectorList);
+                    }
 
                     //Check if the marker already exists to avoid marker duplication.
                     if(!this.vehicleMarkers.hasLayer(this.markers["vehicle-" + data.results[i].id])){
@@ -252,6 +311,11 @@ export default class RideMap extends MainMap{
                         this.vehicleMarkers.addLayer(marker);
                     }
                 }
+
+                // var count = Object.keys(data.rides).length;
+                // for(let i = 0; i < count; i++){
+                    
+                // }
 
                 // console.log("Count: " + Object.keys(this.markers).length);
 
