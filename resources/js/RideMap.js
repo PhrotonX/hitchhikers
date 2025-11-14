@@ -267,48 +267,7 @@ export default class RideMap extends MainMap{
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
 
-                    let vehicle_id = data.results[i].id;
-                    
-                    // Store vehicle data for click handler
-                    this.rideSelectorList._vehicleData[vehicle_id] = data.results[i];
-
-                    var rideCount = Object.keys(data.rides[vehicle_id]).length;
-                    for(let j = 0; j < rideCount; j++){
-                        // if(data.rides[vehicle_id][j] != "active"){
-                        //     continue;
-                        // }
-
-                        var rideSelectorListItem = document.createElement('div');
-                        rideSelectorListItem.setAttribute('class', 'ride-selector-list-item');
-                        rideSelectorListItem.setAttribute('data-vehicle-id', vehicle_id);
-
-                            // console.log(data.rides[vehicle_id]);
-                            var rideSelectorListItemTitle = document.createElement('p');
-                            rideSelectorListItemTitle.setAttribute('class', 'title');
-                            rideSelectorListItemTitle.innerHTML = data.rides[vehicle_id][j].ride_name;
-                            rideSelectorListItem.appendChild(rideSelectorListItemTitle);
-
-                            var rideSelectorListItemDescription = document.createElement('p');
-                            rideSelectorListItemDescription.setAttribute('class', 'description');
-                            rideSelectorListItemDescription.innerHTML = "Description: " + data.rides[vehicle_id][j].description;
-                            rideSelectorListItem.appendChild(rideSelectorListItemDescription);
-
-                            var rideSelectorListItemOn = document.createElement('p');
-                            rideSelectorListItemOn.innerHTML = "Currently on: Obtaining location..." ;
-                            this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
-                                rideSelectorListItemOn.innerHTML = "Currently on: " + result.display_name;
-                            });
-                            rideSelectorListItem.appendChild(rideSelectorListItemOn);
-
-                            // var rideSelectorListItemFrom = document.createElement('p');
-                            // rideSelectorListItemFrom.innerHTML = "From: Obtaining location..." ;
-                            // this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
-                            //     rideSelectorListItemFrom.innerHTML = "Currently on: " + result.display_name;
-                            // });
-                            // rideSelectorListItem.appendChild(rideSelectorListItemFrom);
-                        
-                        this.rideSelectorList.appendChild(rideSelectorListItem);
-                    }
+                    this.buildRideSelector(data, i);
 
                     //Check if the marker already exists to avoid marker duplication.
                     if(!this.vehicleMarkers.hasLayer(this.markers["vehicle-" + data.results[i].id])){
@@ -351,6 +310,51 @@ export default class RideMap extends MainMap{
             }).catch((error) => {
                 throw new Error(error);
             });
+        }
+    }
+
+    buildRideSelector(data, i){
+        let vehicle_id = data.results[i].id;
+                    
+        // Store vehicle data for click handler
+        this.rideSelectorList._vehicleData[vehicle_id] = data.results[i];
+
+        var rideCount = Object.keys(data.rides[vehicle_id]).length;
+        for(let j = 0; j < rideCount; j++){
+            // if(data.rides[vehicle_id][j] != "active"){
+            //     continue;
+            // }
+
+            var rideSelectorListItem = document.createElement('div');
+            rideSelectorListItem.setAttribute('class', 'ride-selector-list-item');
+            rideSelectorListItem.setAttribute('data-vehicle-id', vehicle_id);
+
+                // console.log(data.rides[vehicle_id]);
+                var rideSelectorListItemTitle = document.createElement('p');
+                rideSelectorListItemTitle.setAttribute('class', 'title');
+                rideSelectorListItemTitle.innerHTML = data.rides[vehicle_id][j].ride_name;
+                rideSelectorListItem.appendChild(rideSelectorListItemTitle);
+
+                var rideSelectorListItemDescription = document.createElement('p');
+                rideSelectorListItemDescription.setAttribute('class', 'description');
+                rideSelectorListItemDescription.innerHTML = "Description: " + data.rides[vehicle_id][j].description;
+                rideSelectorListItem.appendChild(rideSelectorListItemDescription);
+
+                var rideSelectorListItemOn = document.createElement('p');
+                rideSelectorListItemOn.innerHTML = "Currently on: Obtaining location..." ;
+                this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
+                    rideSelectorListItemOn.innerHTML = "Currently on: " + result.display_name;
+                });
+                rideSelectorListItem.appendChild(rideSelectorListItemOn);
+
+                // var rideSelectorListItemFrom = document.createElement('p');
+                // rideSelectorListItemFrom.innerHTML = "From: Obtaining location..." ;
+                // this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
+                //     rideSelectorListItemFrom.innerHTML = "Currently on: " + result.display_name;
+                // });
+                // rideSelectorListItem.appendChild(rideSelectorListItemFrom);
+            
+            this.rideSelectorList.appendChild(rideSelectorListItem);
         }
     }
 
