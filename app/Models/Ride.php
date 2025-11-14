@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Ride;
+use App\Models\RideDestination;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,4 +21,10 @@ class Ride extends Model
         'updated_at',
         'deleted_at'
     ];
+
+    public function getRideDestinations(){
+        return RideDestination::where('ride_id', $this->id);
+    }
+
+    
 }
