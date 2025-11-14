@@ -46,14 +46,22 @@ export default class RideMap extends MainMap{
     }
 
     enablePanToRetrieveAllRideMarkers(){
-        this.map.on('moveend', this.retrieveAllRideMarkers());
+        // Prevent adding duplicate listeners
+        if(!this._rideRetrievalEnabled){
+            this._rideRetrievalEnabled = true;
+            this.map.on('moveend', this.retrieveAllRideMarkers());
+        }
     }
 
     /**
      * Replaces existing map pan event into an event that retrieves all map markers within the bounding box of the map view.
      */
     enablePanToRetrieveVehicles(){
-        this.map.on('moveend', this.retrieveVehicles());
+        // Prevent adding duplicate listeners
+        if(!this._vehicleRetrievalEnabled){
+            this._vehicleRetrievalEnabled = true;
+            this.map.on('moveend', this.retrieveVehicles());
+        }
     }
 
     setOnRideMarkerClick(callback){
@@ -225,9 +233,28 @@ export default class RideMap extends MainMap{
                 this.rideSelectorList = document.createElement('div');
                 this.rideSelectorList.setAttribute('class', 'ride-selector-list');
                 rideSelector.appendChild(this.rideSelectorList);
+                
+                // Add click listener only once when creating the list
+                this.rideSelectorList.addEventListener('click', (e) => {
+                    // Find the clicked ride item and get its data
+                    const rideItem = e.target.closest('.ride-selector-list-item');
+                    if(rideItem && this.onVehicleMarkerClick){
+                        const vehicleId = rideItem.getAttribute('data-vehicle-id');
+                        const vehicleData = this.rideSelectorList._vehicleData[vehicleId];
+                        if(vehicleData){
+                            this.onVehicleMarkerClick(e, vehicleData);
+                            this.setView(vehicleData.latitude, vehicleData.longitude);
+                        }
+                    }
+                });
             }else{
                 // Avoid duplicate items.
                 this.clearRideSelectorList();
+            }
+            
+            // Store vehicle data for the click handler
+            if(!this.rideSelectorList._vehicleData){
+                this.rideSelectorList._vehicleData = {};
             }
             
             
@@ -241,6 +268,9 @@ export default class RideMap extends MainMap{
                 for(let i = 0; i < count; i++){
 
                     let vehicle_id = data.results[i].id;
+                    
+                    // Store vehicle data for click handler
+                    this.rideSelectorList._vehicleData[vehicle_id] = data.results[i];
 
                     var rideCount = Object.keys(data.rides[vehicle_id]).length;
                     for(let j = 0; j < rideCount; j++){
@@ -251,7 +281,7 @@ export default class RideMap extends MainMap{
 
                         var rideSelectorListItem = document.createElement('div');
                         rideSelectorListItem.setAttribute('class', 'ride-selector-list-item');
-                        // rideSelectorList.setAttribute('id', 'ride-selector-id-');
+                        rideSelectorListItem.setAttribute('data-vehicle-id', vehicle_id);
 
                             console.log(data.rides[vehicle_id]);
                             var rideSelectorListItemTitle = document.createElement('p');
@@ -279,14 +309,6 @@ export default class RideMap extends MainMap{
                             // rideSelectorListItem.appendChild(rideSelectorListItemFrom);
                         
                         this.rideSelectorList.appendChild(rideSelectorListItem);
-                        // rideSelector.appendChild(this.rideSelectorList);
-
-                        this.rideSelectorList.addEventListener('click', (e) => {
-                            if(this.onVehicleMarkerClick){
-                                this.onVehicleMarkerClick(e, data.results[i]);
-                                this.setView(data.results[i].latitude, data.results[i].longitude);
-                            }
-                        });
                     }
 
                     //Check if the marker already exists to avoid marker duplication.
