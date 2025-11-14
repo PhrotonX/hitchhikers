@@ -61,14 +61,17 @@
         <div id="review-list" hidden></div>
     </div>
 
-    @if (!Auth::user()->isDriver())
-        <div id="ride-selector-wrapper">
-            <h2>Available Rides</h2>
-            <div id="ride-selector">
+    @auth
+        @if (!Auth::user()->isDriver())
+            <div id="ride-selector-wrapper">
+                <h2>Available Rides</h2>
+                <div id="ride-selector">
 
+                </div>
             </div>
-        </div>
-    @endif
+        @endif
+    @endauth
+    
     
     <div id="saved-ride-list">
 
@@ -140,9 +143,12 @@
                 '<button type="button" id="ride-view-review-btn">View Reviews</button><br>';
             infobox.style.display = "block";
             infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>';
-            @if (!(Auth::user()->isDriver()))
-                infobox.innerHTML += '<br><button type="button" id="btn-make-ride-request">Make Ride Request</button></div>';
-            @endif
+            @auth
+                @if (!(Auth::user()->isDriver()))
+                    infobox.innerHTML += '<br><button type="button" id="btn-make-ride-request">Make Ride Request</button></div>';
+                @endif
+            @endauth
+            
 
             var rideList = document.getElementById('ride-list');
             
