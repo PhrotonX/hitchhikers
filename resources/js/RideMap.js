@@ -280,6 +280,13 @@ export default class RideMap extends MainMap{
                         
                         this.rideSelectorList.appendChild(rideSelectorListItem);
                         // rideSelector.appendChild(this.rideSelectorList);
+
+                        this.rideSelectorList.addEventListener('click', (e) => {
+                            if(this.onVehicleMarkerClick){
+                                this.onVehicleMarkerClick(e, data.results[i]);
+                                this.setView(data.results[i].latitude, data.results[i].longitude);
+                            }
+                        });
                     }
 
                     //Check if the marker already exists to avoid marker duplication.
@@ -301,6 +308,7 @@ export default class RideMap extends MainMap{
 
                             if(this.onVehicleMarkerClick){
                                 this.onVehicleMarkerClick(e, data.results[i]);
+                                this.setView(data.results[i].latitude, data.results[i].longitude);
                             }
                         });
 
