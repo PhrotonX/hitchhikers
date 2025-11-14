@@ -78,7 +78,7 @@
     </div>
 
     <div id="ride-request" hidden>
-
+        <h2>Make a Ride Request</h2>
     </div>
 @endsection
 
@@ -149,6 +149,9 @@
                 @endif
             @endauth
             
+            document.getElementById('btn-make-ride-request').addEventListener('click', () => {
+                document.getElementById('ride-request').hidden = !document.getElementById('ride-request').hidden;
+            });
 
             var rideList = document.getElementById('ride-list');
             
