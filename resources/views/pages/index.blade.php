@@ -73,7 +73,9 @@
 
         // @NOTE: Newer code shall encapsulate code into IndexPage instead of throwing up every JS code in this file to reduce the mess.
         var page = new IndexPage('{{env("APP_URL", "")}}');
-        var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
+        @auth
+            var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
+        @endauth
 
         // Intialize variables
         var infobox = document.getElementById('infobox');
