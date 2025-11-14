@@ -1,6 +1,13 @@
+import SavedRides from '../js/Components/SavedRides.js';
+
 export default class IndexPage{
     constructor(appUrl){
         this.appUrl = appUrl;
+        this.savedRides = null;
+    }
+
+    loadAuthObjects(ids){
+        var savedRides = new SavedRides(ids.saved_rides, this.appUrl);
     }
 
     onUpdateReview(reviewId){

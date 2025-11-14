@@ -5,8 +5,10 @@ import MainMap from '../js/MainMap.js';
  * Expects the following marker icon to be loaded: current, defaultPos, active_vehicle, inactive_vehicle.
  */
 export default class RideMap extends MainMap{
-    constructor(mapId, nominatimUrl, webUrl){
+    constructor(mapId, nominatimUrl, webUrl, properties){
         super(mapId, nominatimUrl, webUrl);
+        this.isAuth = properties.is_auth ?? false;
+        this.isDriver = properties.is_driver ?? false;
         this.rideDestinationUrl = '/ride/destinations';
         this.rideMarkers = new Object();
         this.vehicleMarkers = new Object();
@@ -267,7 +269,9 @@ export default class RideMap extends MainMap{
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
 
-                    this.buildRideSelector(data, i);
+                    if(!this.isDriver){
+                        this.buildRideSelector(data, i);
+                    }
 
                     //Check if the marker already exists to avoid marker duplication.
                     if(!this.vehicleMarkers.hasLayer(this.markers["vehicle-" + data.results[i].id])){

@@ -61,14 +61,15 @@
         <div id="review-list" hidden></div>
     </div>
 
+    @if (!Auth::user()->isDriver())
+        <div id="ride-selector-wrapper">
+            <h2>Available Rides</h2>
+            <div id="ride-selector">
 
-    <div id="ride-selector-wrapper">
-        <h2>Available Rides</h2>
-        <div id="ride-selector">
-
+            </div>
         </div>
-    </div>
-
+    @endif
+    
     <div id="saved-ride-list">
 
     </div>
@@ -82,12 +83,15 @@
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
         import IndexPage from '{{ Vite::asset("resources/js/IndexPage.js") }}';
-        import SavedRides from '{{ Vite::asset("resources/js/Components/SavedRides.js") }}';
+        // import SavedRides from '{{ Vite::asset("resources/js/Components/SavedRides.js") }}';
 
         // @NOTE: Newer code shall encapsulate code into IndexPage instead of throwing up every JS code in this file to reduce the mess.
         var page = new IndexPage('{{env("APP_URL", "")}}');
         @auth
-            var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
+        //     var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
+            page.loadAuthObjects({
+                'saved_rides': 'saved-ride-list',
+            });
         @endauth
 
         // Intialize variables
@@ -109,7 +113,15 @@
         var selectedDrivingModeOption;
         var status;
 
-        var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
+        var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}', {
+            @auth
+                'is_auth': true,
+                @if (Auth::user()->isDriver())
+                    'is_driver': true
+                @endif
+            @endauth
+        });
+
         map.configureMarkerIcon('default', '{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('currentPos', '{{Vite::asset("resources/img/current_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('active_vehicle', '{{Vite::asset("resources/img/blue_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
@@ -127,8 +139,10 @@
                 "<p>"+data.latitude+", "+data.longitude+"</p>" + 
                 '<button type="button" id="ride-view-review-btn">View Reviews</button><br>';
             infobox.style.display = "block";
-            infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>' +
-            '<br><button type="button">Make Ride Request</button></div>';
+            infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>';
+            @if (!(Auth::user()->isDriver()))
+                infobox.innerHTML += '<br><button type="button" id="btn-make-ride-request">Make Ride Request</button></div>';
+            @endif
 
             var rideList = document.getElementById('ride-list');
             
