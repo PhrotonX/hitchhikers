@@ -49,7 +49,23 @@ export default class RideRequest extends Component{
             var inputTime = document.createElement('input');
             inputTime.setAttribute('name', 'time')
             inputTime.setAttribute('type', 'text');
+
+            var inputMessage = document.createElement('textarea');
+            inputMessage.setAttribute('name', 'message')
+
+            var inputSubmit = document.createElement('button');
+            inputSubmit.setAttribute('type', 'submit');
+
+            var inputReset = document.createElement('button');
+            inputReset.setAttribute('type', 'reset');
         
+        inputDiv.appendChild(inputPickupTime);
+        inputDiv.appendChild(inputTime);
+        inputDiv.appendChild(inputMessage);
+        inputDiv.appendChild(inputSubmit);
+        inputDiv.appendChild(inputReset);
+
+        rideInformation.append(inputDiv);
         this.element.appendChild(rideInformation);
     }
 }
