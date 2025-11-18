@@ -13,6 +13,7 @@ export default class MainMap{
         this.mapPanCallback = null;
         this.nominatimUrl = nominatimUrl;
         this.rideDestinationUrl = '/api/ride/all/destinations?';
+        this.temporaryMarker = null;
         this.webUrl = webUrl;
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -107,7 +108,10 @@ export default class MainMap{
                     //Add markers
                     var marker = L.marker([lat, lng], {icon: this.markerIcons["default"]}).addTo(this.map);
 
-                    this.mapClickCallback(marker, e, data);
+                    if(this.mapClickCallback){
+                        this.mapClickCallback(marker, e, data);
+                    }
+                    
                 }
             })
             .catch(error => {
@@ -159,5 +163,33 @@ export default class MainMap{
         });
     }
 
-    
+    enableClickToAddSingleMarker(){
+        this.map.on('click', (e) => {
+            fetch(this.nominatimUrl + "/reverse?lat=" + e.latlng.lat + "&lon=" + e.latlng.lng + '&format=json&zoom=18&addressdetails=1')
+            .then(response => {
+                if(!response.ok){
+                    throw new Error("Error: " + response);
+                }
+                console.log(response);
+
+                return response.json();
+            })
+            .then(data => {
+                //Add markers
+                if(this.temporaryMarker){
+                    this.map.removeLayer(this.temporaryMarker);
+                }
+                
+                this.temporaryMarker = L.marker([e.latlng.lat, e.latlng.lng], {icon: this.markerIcons["default"]});
+                this.map.addLayer(this.temporaryMarker);
+
+                if(this.mapClickCallback){
+                    this.mapClickCallback(this.temporaryMarker, e, data);
+                }
+            })
+            .catch(error => {
+                throw new Error(error);
+            });
+        });
+    }
 }

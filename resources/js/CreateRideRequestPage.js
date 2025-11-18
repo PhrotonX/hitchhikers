@@ -8,6 +8,7 @@ export default class CreateRideRequestPage extends Page{
         this.rideId = rideId;
 
         this.getRides(this.rideId);
+        this.map.enableClickToAddSingleMarker();
     }
 
     onInitializePage(){
