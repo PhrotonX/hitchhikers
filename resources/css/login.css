@@ -1,15 +1,147 @@
-/* Styles extracted from resources/views/pages/auth/login.blade.php
-   Scoped login card styles */
-.auth-container{display:flex;align-items:center;justify-content:center;padding:2rem}
-.auth-card{width:100%;max-width:420px;background:#fff;border-radius:12px;box-shadow:0 6px 24px rgba(18,18,18,.08);padding:28px}
-.auth-title{font-size:1.4rem;margin-bottom:0.75rem;font-weight:600}
-.auth-sub{color:#6b7280;margin-bottom:1rem;font-size:0.95rem}
-.form-group{display:flex;flex-direction:column;margin-bottom:12px}
-.form-group label{font-size:0.85rem;margin-bottom:6px;color:#374151}
-.form-control{padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.95rem}
-.form-control:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.08)}
-.form-actions{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
-.btn{background:#6366f1;color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
-.link-btn{background:transparent;border:none;color:#6366f1;cursor:pointer}
-.error-msg{color:#b91c1c;font-size:0.9rem;margin-top:6px}
-@media (max-width:480px){.auth-card{padding:20px;margin:8px}}
+body {
+   background: #f9fafb;
+   font-family: 'Poppins', sans-serif;
+   margin: 0;
+   padding: 0;
+   overflow: hidden; 
+}
+.auth-page {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   min-height: 80vh; 
+   padding: 2rem; 
+   overflow-y: auto; 
+}
+.login-card {
+   width: 100%;
+   max-width: 420px;
+   background: #fff;
+   border-radius: 12px;
+   box-shadow: 0 6px 24px rgba(18, 18, 18, 0.08);
+   padding: 28px;
+   text-align: center; /* Center the header content */
+}
+.login-header h1 {
+   font-size: 1.8rem;
+   margin-bottom: 0.25rem;
+   font-weight: 700;
+   color: #1f2937;
+}
+.login-header .subtitle {
+   color: #6b7280;
+   margin-bottom: 1.5rem;
+   font-size: 0.95rem;
+}
+
+/* Form styling */
+.login-form {
+   display: flex;
+   flex-direction: column;
+}
+.input-group {
+   display: flex;
+   align-items: center;
+   margin-bottom: 15px;
+   border: 1px solid #e5e7eb;
+   border-radius: 8px;
+   padding: 10px 12px;
+   transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-group:focus-within {
+   border-color: #6366f1;
+   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+}
+.input-group i {
+   color: #9ca3af;
+   margin-right: 12px;
+   font-size: 1.1rem;
+}
+.input-group input {
+   flex-grow: 1;
+   border: none;
+   outline: none;
+   font-size: 0.95rem;
+   padding: 0; /* Remove padding as it's on the input-group */
+}
+.form-options {
+   display: flex;
+   justify-content: flex-end; /* Align to the right, as 'Remember me' is commented out */
+   align-items: center;
+   margin-top: -5px;
+   margin-bottom: 20px;
+}
+.forgot-password {
+   color: #6366f1;
+   text-decoration: none;
+   font-size: 0.85rem;
+   transition: color 0.2s;
+}
+.forgot-password:hover {
+   color: #4f46e5;
+}
+.login-btn {
+   background: #6366f1;
+   color: #fff;
+   padding: 12px;
+   border-radius: 8px;
+   border: none;
+   cursor: pointer;
+   font-weight: 600;
+   font-size: 1rem;
+   transition: background 0.2s;
+   margin-bottom: 15px;
+}
+.login-btn:hover {
+   background: #4f46e5;
+}
+
+/* Custom style for password visibility toggle */
+.password-toggle {
+   background: transparent;
+   border: none;
+   color: #6366f1;
+   cursor: pointer;
+   font-size: 0.85rem;
+   padding: 0 0 0 10px;
+}
+
+/* Error/Status messages */
+.error-msg {
+   color: #b91c1c;
+   font-size: 0.9rem;
+   margin-top: 6px;
+   text-align: left;
+}
+.status-msg {
+      color: #16a34a; /* Using green for status/success */
+   font-size: 0.9rem;
+   margin-bottom: 12px;
+   text-align: left;
+}
+.validation-error-below-input {
+   margin-top: 4px; /* Adjust spacing for errors shown below the input group */
+}
+
+/* Footer link for registration */
+.register-link-container {
+   margin-top: 15px;
+   font-size: 0.9rem;
+   color: #6b7280;
+}
+.register-link-container button {
+   background: none;
+   border: none;
+   padding: 0;
+   color: #6366f1;
+   cursor: pointer;
+   font-weight: 500;
+}
+
+
+@media (max-width: 480px) {
+   .login-card {
+         padding: 20px;
+         margin: 8px;
+   }
+}
