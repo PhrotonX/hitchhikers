@@ -6,6 +6,7 @@ use App\Models\Ride;
 use App\Models\RideRequest;
 use App\Http\Requests\StoreRideRequestRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RideRequestController extends Controller
 {
@@ -34,11 +35,17 @@ class RideRequestController extends Controller
     {
         $rideRequest = new RideRequest();
         $rideRequest->fill($request->validated());
+
+        $date = new \DateTimeImmutable();
+
+        // Fill up missing fields.
+        $rideRequest->status = "pending";
+        $rideRequest->status_updated_at = $date->format("Y-m-d H:i:s");
+        $rideRequest->sender_user_id = Auth::user()->id;
+
         $rideRequest->save();
 
-        return response()->json([
-            $rideRequest,
-        ]);
+        return view('pages.index');
     }
 
     /**

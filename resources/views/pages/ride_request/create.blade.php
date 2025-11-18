@@ -12,7 +12,8 @@
 
     <button id="ride-request-back">Back</button>
 
-    <form action="ride/requests/create/submit" method="POST">
+    <form action="/ride/requests/create/submit" method="POST">
+        @csrf
         <p><strong><span id="ride-request-destination">{{$ride->ride_name}}</span></strong></p>
         <p><strong>Description: </strong><span id="ride-request-description">{{$ride->description}}</span></p>
         <!-- <p><strong>Currently on: </strong><span id="ride-request-location"></span></p> -->
