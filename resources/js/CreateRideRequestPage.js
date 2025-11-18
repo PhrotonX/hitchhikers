@@ -6,13 +6,15 @@ export default class CreateRideRequestPage extends Page{
 
         this.map = map;
         this.rideId = rideId;
+
+        this.getRides(this.rideId);
     }
 
     onInitializePage(){
-        // this.getRides(this.rideId);
+        
     }
 
     getRides(rideId){
-        this.map.retrieveRideMarkers(rideId)();
+        this.map.retrieveRideMarkers(rideId, true)();
     }
 }
