@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Ride;
 use App\Models\RideRequest;
 use App\Http\Requests\StoreRideRequestRequest;
 use Illuminate\Http\Request;
@@ -19,7 +20,11 @@ class RideRequestController extends Controller
     }
 
     public function create($rideId){
-        return view('pages.ride_request.create');
+        $ride = Ride::find($rideId);
+
+        return view('pages.ride_request.create', [
+            'ride' => $ride,
+        ]);
     }
 
     /**

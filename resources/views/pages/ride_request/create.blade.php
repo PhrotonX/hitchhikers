@@ -2,19 +2,19 @@
 
 <x-map-head/>
 
-{{-- @push('head')
-    @vite('resources/js/Map.js');
-@endpush --}}
+@push('head')
+    @vite('resources/js/RideMap.js');
+@endpush
 
 @section('content')
     <h1>Make a Ride Request</h1>
     <div id="map"></div>
 
+    <button id="ride-request-back">Back</button>
+
     <form>
-        <button id="ride-request-close">Close</button>
-        <h2>Make a Ride Request</h2>
-        <p><strong>Destination: </strong><span id="ride-request-destination"></span></p>
-        <p><strong>Description: </strong><span id="ride-request-description"></span></p>
+        <p><strong><span id="ride-request-destination">{{$ride->ride_name}}</span></strong></p>
+        <p><strong>Description: </strong><span id="ride-request-description">{{$ride->description}}</span></p>
         <!-- <p><strong>Currently on: </strong><span id="ride-request-location"></span></p> -->
         
         <p>Click on the map to choose your ride destination.</p>
@@ -35,7 +35,27 @@
         </button>
     </form>
 
-    
+    <script type="module">
+        import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
+        import CreateRideRequestPage from '{{ Vite::asset("resources/js/CreateRideRequestPage.js") }}';
+
+        var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}', {
+            @auth
+                'is_auth': true,
+                @if (Auth::user()->isDriver())
+                    'is_driver': true
+                @endif
+            @endauth
+        });
+
+        map.configureMarkerIcon('default', '{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.configureMarkerIcon('currentPos', '{{Vite::asset("resources/img/current_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.configureMarkerIcon('active_vehicle', '{{Vite::asset("resources/img/blue_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.configureMarkerIcon('inactive_vehicle', '{{Vite::asset("resources/img/grey_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.detectLocation();
+
+        var page = new CreateRideRequestPage('{{env("APP_URL", "")}}', map, {{$ride->id}});
+    </script>
     
 @endsection
 
