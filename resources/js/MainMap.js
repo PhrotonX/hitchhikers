@@ -180,7 +180,7 @@ export default class MainMap{
                     this.map.removeLayer(this.temporaryMarker);
                 }
                 
-                this.temporaryMarker = L.marker([e.latlng.lat, e.latlng.lng], {icon: this.markerIcons["default"]});
+                this.temporaryMarker = L.marker([e.latlng.lat, e.latlng.lng], {icon: this.markerIcons["selected"]});
                 this.map.addLayer(this.temporaryMarker);
 
                 if(this.mapClickCallback){
