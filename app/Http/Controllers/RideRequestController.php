@@ -45,7 +45,9 @@ class RideRequestController extends Controller
 
         $rideRequest->save();
 
-        return view('pages.index');
+        return view('pages.index', [
+            'status' => 'Ride request saved successfully!',
+        ]);
     }
 
     /**
