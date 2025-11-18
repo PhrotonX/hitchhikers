@@ -38,7 +38,34 @@ export default class RideRequest extends Component{
             // rideInformation.appendChild(rideInformationFrom);
 
             // @TODO: Display all selectable ride destinations here...
+
+        var inputDiv = document.createElement('div');
+        inputDiv.setAttribute('id', 'ride-request-form');
+
+            var inputPickupTime = document.createElement('input');
+            inputPickupTime.setAttribute('name', 'pickup_at')
+            // inputPickupTime.setAttribute('type', )
+
+            var inputTime = document.createElement('input');
+            inputTime.setAttribute('name', 'time')
+            inputTime.setAttribute('type', 'text');
+
+            var inputMessage = document.createElement('textarea');
+            inputMessage.setAttribute('name', 'message')
+
+            var inputSubmit = document.createElement('button');
+            inputSubmit.setAttribute('type', 'submit');
+
+            var inputReset = document.createElement('button');
+            inputReset.setAttribute('type', 'reset');
         
+        inputDiv.appendChild(inputPickupTime);
+        inputDiv.appendChild(inputTime);
+        inputDiv.appendChild(inputMessage);
+        inputDiv.appendChild(inputSubmit);
+        inputDiv.appendChild(inputReset);
+
+        rideInformation.append(inputDiv);
         this.element.appendChild(rideInformation);
     }
 }

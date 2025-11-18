@@ -13,7 +13,9 @@ export default class MainMap{
         this.mapPanCallback = null;
         this.nominatimUrl = nominatimUrl;
         this.rideDestinationUrl = '/api/ride/all/destinations?';
+        this.temporaryMarker = null;
         this.webUrl = webUrl;
+        this.panToCurrentPos = true;
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -41,8 +43,41 @@ export default class MainMap{
      */
     detectLocation(){
         navigator.geolocation.getCurrentPosition((pos) => {
-            this.addMarkerObject("currentPos", L.marker([pos.coords.latitude, pos.coords.longitude], {icon: this.markerIcons.currentPos}));
+            this.markers['currentPos'] = L.marker([pos.coords.latitude, pos.coords.longitude], {icon: this.markerIcons.currentPos});
+            this.addMarkerObject("currentPos", this.markers.currentPos);
         });
+
+        if(navigator.geolocation){
+            this.trackingId = navigator.geolocation.watchPosition((position) => {
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+
+                console.log("Live Marker: Latitude: " + latitude);
+                console.log("Live Marker: Longitude: " + longitude);
+
+                //Position the map where the current location is pointing to.
+                if(this.panToCurrentPos){
+                    this.map.setView([latitude, longitude], 16);
+                }
+
+                //Update the position of the marker indicating the vehicle's position.
+                // @NOTE: The name currentPos may be potentially a source of bugs on driver accounts regardless of driving mode state.
+                this.markers.currentPos.setLatLng([latitude, longitude]);
+
+            }, (error) => {
+            console.log("Error: " + error);
+        });
+        }else{
+            alert("Geolocation is turned off or not supported by this device");
+        }
+    }
+
+    getCurrentMapMarker(){
+        if(this.markers.currentPos){
+            return this.markers.currentPos;
+        }else{
+            return null;
+        }
     }
 
     getMap(){
@@ -61,6 +96,12 @@ export default class MainMap{
 
     onMapPan(callback){
         this.mapPanCallback = callback;
+    }
+
+    removeTemporaryMarker(){
+        if(this.temporaryMarker){
+            this.map.removeLayer(this.temporaryMarker);
+        }
     }
 
     /**
@@ -107,7 +148,10 @@ export default class MainMap{
                     //Add markers
                     var marker = L.marker([lat, lng], {icon: this.markerIcons["default"]}).addTo(this.map);
 
-                    this.mapClickCallback(marker, e, data);
+                    if(this.mapClickCallback){
+                        this.mapClickCallback(marker, e, data);
+                    }
+                    
                 }
             })
             .catch(error => {
@@ -159,5 +203,33 @@ export default class MainMap{
         });
     }
 
-    
+    enableClickToAddSingleMarker(){
+        this.map.on('click', (e) => {
+            fetch(this.nominatimUrl + "/reverse?lat=" + e.latlng.lat + "&lon=" + e.latlng.lng + '&format=json&zoom=18&addressdetails=1')
+            .then(response => {
+                if(!response.ok){
+                    throw new Error("Error: " + response);
+                }
+                console.log(response);
+
+                return response.json();
+            })
+            .then(data => {
+                //Add markers
+                if(this.temporaryMarker){
+                    this.map.removeLayer(this.temporaryMarker);
+                }
+                
+                this.temporaryMarker = L.marker([e.latlng.lat, e.latlng.lng], {icon: this.markerIcons["selected"]});
+                this.map.addLayer(this.temporaryMarker);
+
+                if(this.mapClickCallback){
+                    this.mapClickCallback(this.temporaryMarker, e, data);
+                }
+            })
+            .catch(error => {
+                throw new Error(error);
+            });
+        });
+    }
 }

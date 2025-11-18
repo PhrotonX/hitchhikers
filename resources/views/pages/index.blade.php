@@ -84,10 +84,6 @@
     <div id="saved-ride-list">
 
     </div>
-
-    <div id="ride-request" hidden>
-        <h2>Make a Ride Request</h2>
-    </div>
 @endsection
 
 @push('scripts')
@@ -153,13 +149,14 @@
             infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>';
             @auth
                 @if (!(Auth::user()->isDriver()))
-                    infobox.innerHTML += '<br><button type="button" id="btn-make-ride-request">Make Ride Request</button></div>';
+                    infobox.innerHTML += '<br><a id="btn-make-ride-request">Make Ride Request</button></div>';
                 @endif
             @endauth
             
-            document.getElementById('btn-make-ride-request').addEventListener('click', () => {
-                document.getElementById('ride-request').hidden = !document.getElementById('ride-request').hidden;
-            });
+            // Shows or hides Ride Request button.
+            // document.getElementById('btn-make-ride-request').addEventListener('click', () => {
+            //     document.getElementById('ride-request').hidden = !document.getElementById('ride-request').hidden;
+            // });
 
             var rideList = document.getElementById('ride-list');
             
@@ -209,6 +206,7 @@
                 // Tag: onRideChange or onRideSelect
                 rideList.addEventListener('change', () => {
                     // Hide/show ride-view-review-btn based on selected ride.
+                    let rideId = rideList.value;
                     if(rideList.value < 1){
                         viewReviewsBtn.hidden = true;
                     }else{
@@ -224,6 +222,9 @@
                         reviewFormEdit.hidden = true;
                         viewReviewsBtn.hidden = false;
                     }
+
+                    var btnMakeRideRequest = document.getElementById('btn-make-ride-request');
+                    btnMakeRideRequest.setAttribute('href', '/ride/'+rideId+'/requests/create');
 
                     // Once the selection from ride list has changed, display all of its associated ride destinations.
                     getRides(rideList.value); 

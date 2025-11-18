@@ -83,8 +83,8 @@ Route::middleware(['auth', 'verified'])->group(function(){
 
     // Ride request routes
     Route::get('ride/{ride}/requests/', [RideRequestController::class, 'index']);
-    Route::get('ride/requests/create', [RideRequestController::class, 'create']);
-    Route::post('ride/requests/create/submit', [RideRequestController::class, 'submit']);
+    Route::get('ride/{ride}/requests/create', [RideRequestController::class, 'create']);
+    Route::post('ride/requests/create/submit', [RideRequestController::class, 'store']);
     Route::get('ride/{ride}/requests/{request}', [RideRequestController::class, 'show']);
     Route::put('ride/{ride}/requests/{request}/update', [RideRequestController::class, 'update']);
     Route::delete('ride/{ride}/requests/{request}/delete', [RideRequestController::class, 'destroy']);

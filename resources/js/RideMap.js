@@ -159,7 +159,7 @@ export default class RideMap extends MainMap{
      * @param {*} rideId 
      * @returns 
      */
-    retrieveRideMarkers(rideId){
+    retrieveRideMarkers(rideId, hasLine = false){
         return () => {
             // console.log("Map panned!");
 
@@ -169,6 +169,8 @@ export default class RideMap extends MainMap{
             const southEast = bounds.getSouthEast();
 
             var url = this.webUrl + this.rideDestinationUrl + "/" + rideId;
+
+            var latlngs = [];
 
             // console.log("Url: " + url);
 
@@ -187,6 +189,9 @@ export default class RideMap extends MainMap{
                     if(!this.cachedMarkers.hasLayer(this.markers["ride-" + data.results[i].id])){
                         var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]});
 
+                        latlngs.push([data.results[i].latitude, data.results[i].longitude]);
+
+
                         //Setup marker click listener.
                         marker.on('click', (e) => {
                             if(this.onRideMarkerClick){
@@ -202,7 +207,16 @@ export default class RideMap extends MainMap{
                     }
                 }
 
+                // Draw the line on the map.
+                if(hasLine){
+                    var polyline = L.polyline(latlngs, {
+                        color: 'blue'
+                    }).addTo(this.map);
+                }
+
                 // console.log("Count: " + Object.keys(this.markers).length);
+
+                return data;
 
             }).catch((error) => {
                 throw new Error(error);

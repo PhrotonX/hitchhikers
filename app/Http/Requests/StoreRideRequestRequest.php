@@ -23,13 +23,13 @@ class StoreRideRequestRequest extends FormRequest
     {
         return [
             'ride_id' => ['required', 'numeric'],
-            'sender_user_id' => ['required', 'numeric'],
+            // 'sender_user_id' => ['required', 'numeric'],
             'destination_id' => ['nullable', 'numeric'],
-            'from_latitude' => ['nullable', 'decimal:10,7'],
-            'from_longitude' => ['nullable', 'decimal:10,7'],
-            'to_latitude' => ['nullable', 'decimal:10,7'],
-            'to_longitude' => ['nullable', 'decimal:10,7'],
-            'pickup_at' => ['required', 'string', 'max:255'],
+            'from_latitude' => ['required', 'numeric'],
+            'from_longitude' => ['required', 'numeric'],
+            'to_latitude' => ['required', 'numeric'],
+            'to_longitude' => ['required', 'numeric'],
+            'pickup_at' => ['required', 'string', 'max:1000'],
             'time' => ['required'],
             'message' => ['nullable', 'string', 'max:5000'],
         ];
