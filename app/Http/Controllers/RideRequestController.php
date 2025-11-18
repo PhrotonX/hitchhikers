@@ -18,6 +18,10 @@ class RideRequestController extends Controller
         ]);
     }
 
+    public function create($rideId){
+        return view('pages.ride_request.create');
+    }
+
     /**
      * Store a newly created resource in storage.
      */
