@@ -3,6 +3,15 @@
 
 @push('head')
     <meta name="csrf-token" content={{csrf_token()}}
+    @vite(['resources/css/index.css'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body{
+            background: #f9fafb;
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -60,8 +69,24 @@
         <div id="review-list" hidden></div>
     </div>
 
+    @auth
+        @if (!Auth::user()->isDriver())
+            <div id="ride-selector-wrapper">
+                <h2>Available Rides</h2>
+                <div id="ride-selector">
+
+                </div>
+            </div>
+        @endif
+    @endauth
+    
+    
     <div id="saved-ride-list">
 
+    </div>
+
+    <div id="ride-request" hidden>
+        <h2>Make a Ride Request</h2>
     </div>
 @endsection
 
@@ -69,11 +94,16 @@
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
         import IndexPage from '{{ Vite::asset("resources/js/IndexPage.js") }}';
-        import SavedRides from '{{ Vite::asset("resources/js/Components/SavedRides.js") }}';
+        // import SavedRides from '{{ Vite::asset("resources/js/Components/SavedRides.js") }}';
 
         // @NOTE: Newer code shall encapsulate code into IndexPage instead of throwing up every JS code in this file to reduce the mess.
         var page = new IndexPage('{{env("APP_URL", "")}}');
-        var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
+        @auth
+        //     var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
+            page.loadAuthObjects({
+                'saved_rides': 'saved-ride-list',
+            });
+        @endauth
 
         // Intialize variables
         var infobox = document.getElementById('infobox');
@@ -94,7 +124,15 @@
         var selectedDrivingModeOption;
         var status;
 
-        var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
+        var map = new RideMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}', {
+            @auth
+                'is_auth': true,
+                @if (Auth::user()->isDriver())
+                    'is_driver': true
+                @endif
+            @endauth
+        });
+
         map.configureMarkerIcon('default', '{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('currentPos', '{{Vite::asset("resources/img/current_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('active_vehicle', '{{Vite::asset("resources/img/blue_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
@@ -110,11 +148,18 @@
                 '<p id="ride-location">Retrieving location...</p>' +
                 "<p><strong>Status:</strong>" + data.status + "</p>" +
                 "<p>"+data.latitude+", "+data.longitude+"</p>" + 
-                '<button type="button" id="ride-view-review-btn">View Reviews</button>' + 
-                '<button type="button" id="ride-view-destination-list-btn">View Ride Destination List</button><br>';
+                '<button type="button" id="ride-view-review-btn">View Reviews</button><br>';
             infobox.style.display = "block";
-            infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>' +
-            '<button type="button">See More</button></div>';
+            infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>';
+            @auth
+                @if (!(Auth::user()->isDriver()))
+                    infobox.innerHTML += '<br><button type="button" id="btn-make-ride-request">Make Ride Request</button></div>';
+                @endif
+            @endauth
+            
+            document.getElementById('btn-make-ride-request').addEventListener('click', () => {
+                document.getElementById('ride-request').hidden = !document.getElementById('ride-request').hidden;
+            });
 
             var rideList = document.getElementById('ride-list');
             
@@ -297,7 +342,7 @@
         });
 
         // map.enablePanToRetrieveAllRideMarkers();
-        map.enablePanToRetrieveVehicleMarkers();
+        map.enablePanToRetrieveVehicles();
         
         @auth
             @if (Auth::user()->isDriver())

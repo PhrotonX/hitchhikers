@@ -18,9 +18,9 @@
     </head>
     <body>
         @include('layouts.header')
-        @include('layouts.navigation')
+        {{--@include('layouts.navigation')--}}
         
-        <main>
+        <main style="padding-top:80px">
             @yield('content')
         </main>
         

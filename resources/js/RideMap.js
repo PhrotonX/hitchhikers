@@ -5,12 +5,15 @@ import MainMap from '../js/MainMap.js';
  * Expects the following marker icon to be loaded: current, defaultPos, active_vehicle, inactive_vehicle.
  */
 export default class RideMap extends MainMap{
-    constructor(mapId, nominatimUrl, webUrl){
+    constructor(mapId, nominatimUrl, webUrl, properties){
         super(mapId, nominatimUrl, webUrl);
+        this.isAuth = properties.is_auth ?? false;
+        this.isDriver = properties.is_driver ?? false;
         this.rideDestinationUrl = '/ride/destinations';
         this.rideMarkers = new Object();
         this.vehicleMarkers = new Object();
         this.trackingId = null;
+        this.rideSelectorList = null;
         this.vehicleId = null;
         this.vehicleMarker = null;
         this.vehicleUrl = '/vehicle';
@@ -40,15 +43,27 @@ export default class RideMap extends MainMap{
         this.map.addLayer(this.vehicleMarkers);
     }
 
+    clearRideSelectorList(){
+        this.rideSelectorList.innerHTML = "";
+    }
+
     enablePanToRetrieveAllRideMarkers(){
-        this.map.on('moveend', this.retrieveAllRideMarkers());
+        // Prevent adding duplicate listeners
+        if(!this._rideRetrievalEnabled){
+            this._rideRetrievalEnabled = true;
+            this.map.on('moveend', this.retrieveAllRideMarkers());
+        }
     }
 
     /**
      * Replaces existing map pan event into an event that retrieves all map markers within the bounding box of the map view.
      */
-    enablePanToRetrieveVehicleMarkers(){
-        this.map.on('moveend', this.retrieveVehicleMarkers());
+    enablePanToRetrieveVehicles(){
+        // Prevent adding duplicate listeners
+        if(!this._vehicleRetrievalEnabled){
+            this._vehicleRetrievalEnabled = true;
+            this.map.on('moveend', this.retrieveVehicles());
+        }
     }
 
     setOnRideMarkerClick(callback){
@@ -199,7 +214,7 @@ export default class RideMap extends MainMap{
      * Retrieves vehicle markers and displays it on a map.
      * @returns A callback function.
      */
-    retrieveVehicleMarkers(){
+    retrieveVehicles(){
         return () => {
             // console.log("Map panned!");
 
@@ -214,6 +229,37 @@ export default class RideMap extends MainMap{
 
             // console.log("Url: " + url);
 
+            var rideSelector = document.getElementById('ride-selector');
+
+            if(this.rideSelectorList == null){
+                this.rideSelectorList = document.createElement('div');
+                this.rideSelectorList.setAttribute('class', 'ride-selector-list');
+                rideSelector.appendChild(this.rideSelectorList);
+                
+                // Add click listener only once when creating the list
+                this.rideSelectorList.addEventListener('click', (e) => {
+                    // Find the clicked ride item and get its data
+                    const rideItem = e.target.closest('.ride-selector-list-item');
+                    if(rideItem && this.onVehicleMarkerClick){
+                        const vehicleId = rideItem.getAttribute('data-vehicle-id');
+                        const vehicleData = this.rideSelectorList._vehicleData[vehicleId];
+                        if(vehicleData){
+                            this.onVehicleMarkerClick(e, vehicleData);
+                            this.setView(vehicleData.latitude, vehicleData.longitude);
+                        }
+                    }
+                });
+            }else{
+                // Avoid duplicate items.
+                this.clearRideSelectorList();
+            }
+            
+            // Store vehicle data for the click handler
+            if(!this.rideSelectorList._vehicleData){
+                this.rideSelectorList._vehicleData = {};
+            }
+            
+            
             fetch(url
             ).then((response) => {
                 return response.json();
@@ -222,6 +268,10 @@ export default class RideMap extends MainMap{
                 //Populate the map with markers
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
+
+                    if(!this.isDriver){
+                        this.buildRideSelector(data, i);
+                    }
 
                     //Check if the marker already exists to avoid marker duplication.
                     if(!this.vehicleMarkers.hasLayer(this.markers["vehicle-" + data.results[i].id])){
@@ -242,6 +292,7 @@ export default class RideMap extends MainMap{
 
                             if(this.onVehicleMarkerClick){
                                 this.onVehicleMarkerClick(e, data.results[i]);
+                                this.setView(data.results[i].latitude, data.results[i].longitude);
                             }
                         });
 
@@ -253,11 +304,61 @@ export default class RideMap extends MainMap{
                     }
                 }
 
+                // var count = Object.keys(data.rides).length;
+                // for(let i = 0; i < count; i++){
+                    
+                // }
+
                 // console.log("Count: " + Object.keys(this.markers).length);
 
             }).catch((error) => {
                 throw new Error(error);
             });
+        }
+    }
+
+    buildRideSelector(data, i){
+        let vehicle_id = data.results[i].id;
+                    
+        // Store vehicle data for click handler
+        this.rideSelectorList._vehicleData[vehicle_id] = data.results[i];
+
+        var rideCount = Object.keys(data.rides[vehicle_id]).length;
+        for(let j = 0; j < rideCount; j++){
+            // if(data.rides[vehicle_id][j] != "active"){
+            //     continue;
+            // }
+
+            var rideSelectorListItem = document.createElement('div');
+            rideSelectorListItem.setAttribute('class', 'ride-selector-list-item');
+            rideSelectorListItem.setAttribute('data-vehicle-id', vehicle_id);
+
+                // console.log(data.rides[vehicle_id]);
+                var rideSelectorListItemTitle = document.createElement('p');
+                rideSelectorListItemTitle.setAttribute('class', 'title');
+                rideSelectorListItemTitle.innerHTML = data.rides[vehicle_id][j].ride_name;
+                rideSelectorListItem.appendChild(rideSelectorListItemTitle);
+
+                var rideSelectorListItemDescription = document.createElement('p');
+                rideSelectorListItemDescription.setAttribute('class', 'description');
+                rideSelectorListItemDescription.innerHTML = "Description: " + data.rides[vehicle_id][j].description;
+                rideSelectorListItem.appendChild(rideSelectorListItemDescription);
+
+                var rideSelectorListItemOn = document.createElement('p');
+                rideSelectorListItemOn.innerHTML = "Currently on: Obtaining location..." ;
+                this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
+                    rideSelectorListItemOn.innerHTML = "Currently on: " + result.display_name;
+                });
+                rideSelectorListItem.appendChild(rideSelectorListItemOn);
+
+                // var rideSelectorListItemFrom = document.createElement('p');
+                // rideSelectorListItemFrom.innerHTML = "From: Obtaining location..." ;
+                // this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
+                //     rideSelectorListItemFrom.innerHTML = "Currently on: " + result.display_name;
+                // });
+                // rideSelectorListItem.appendChild(rideSelectorListItemFrom);
+            
+            this.rideSelectorList.appendChild(rideSelectorListItem);
         }
     }
 

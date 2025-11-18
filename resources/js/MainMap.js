@@ -126,6 +126,10 @@ export default class MainMap{
         }
     }
 
+    setView(latitude, longitude, zoom = 16){
+        this.getMap().setView([latitude, longitude], zoom);
+    }
+
     /**
      * Defines a marker icon.
      * Must be invoked after calling the constructor.

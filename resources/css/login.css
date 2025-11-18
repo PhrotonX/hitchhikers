@@ -1,0 +1,15 @@
+/* Styles extracted from resources/views/pages/auth/login.blade.php
+   Scoped login card styles */
+.auth-container{display:flex;align-items:center;justify-content:center;padding:2rem}
+.auth-card{width:100%;max-width:420px;background:#fff;border-radius:12px;box-shadow:0 6px 24px rgba(18,18,18,.08);padding:28px}
+.auth-title{font-size:1.4rem;margin-bottom:0.75rem;font-weight:600}
+.auth-sub{color:#6b7280;margin-bottom:1rem;font-size:0.95rem}
+.form-group{display:flex;flex-direction:column;margin-bottom:12px}
+.form-group label{font-size:0.85rem;margin-bottom:6px;color:#374151}
+.form-control{padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.95rem}
+.form-control:focus{outline:none;border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.08)}
+.form-actions{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+.btn{background:#6366f1;color:#fff;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+.link-btn{background:transparent;border:none;color:#6366f1;cursor:pointer}
+.error-msg{color:#b91c1c;font-size:0.9rem;margin-top:6px}
+@media (max-width:480px){.auth-card{padding:20px;margin:8px}}

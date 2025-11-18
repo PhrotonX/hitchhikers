@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateVehicleRequest;
 use App\Models\Vehicle;
 use App\Models\VehicleDriver;
 use App\Models\Ride;
+use App\Models\RideDestination;
 use App\Http\Requests\UpdateVehicleLocationRequest;
 use App\Http\Requests\UpdateVehicleStatus;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -34,8 +35,12 @@ class VehicleController extends Controller
         $results = Vehicle::query('latitude', 'BETWEEN', $north, 'AND', $south, 'AND',
             'longitude', 'BETWEEN', $east, 'AND', $west)->get();
 
+        $rides = $this->getAssociatedRidesFromVehicles($results);
+
         return response()->json([
             "results" => $results,
+            "rides" => $rides,
+            "destinations" => $this->getRideDestinationsWithRideId($rides),
         ]);
     }
 
@@ -108,6 +113,7 @@ class VehicleController extends Controller
     public function get(Vehicle $vehicle){
         return response()->json([
             'vehicle' => $vehicle,
+            'rides' => $this->getAssociatedRidesFromVehicle($vehicle),
         ]);
     }
 
@@ -221,5 +227,33 @@ class VehicleController extends Controller
         return [
             'status' => "Vehicle $vehicle->vehicle_name deleted",
         ];
+    }
+
+    private function getAssociatedRidesFromVehicle($vehicle){
+        return Ride::where('vehicle_id', $vehicle->id)->get();
+    }
+
+    private function getAssociatedRidesFromVehicles($vehicles){
+        $results = [];
+        foreach($vehicles as $vehicle){
+            $results[$vehicle->id] = $this->getAssociatedRidesFromVehicle($vehicle);
+        }
+
+        return $results;
+    }
+
+    private function getRideDestinations(Ride $ride){
+        return RideDestination::where('ride_id', $ride->id)->get();
+    }
+
+    private function getRideDestinationsWithRideId($rides){
+        $results = [];
+        foreach($rides as $rideGroup){
+            foreach($rideGroup as $ride){
+                $results[$ride->id] = static::getRideDestinations($ride);
+            }
+        }
+
+        return $results;
     }
 }
