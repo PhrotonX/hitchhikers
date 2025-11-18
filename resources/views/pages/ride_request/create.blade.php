@@ -12,17 +12,30 @@
 
     <button id="ride-request-back">Back</button>
 
-    <form>
+    <form action="ride/requests/create/submit" method="POST">
         <p><strong><span id="ride-request-destination">{{$ride->ride_name}}</span></strong></p>
         <p><strong>Description: </strong><span id="ride-request-description">{{$ride->description}}</span></p>
         <!-- <p><strong>Currently on: </strong><span id="ride-request-location"></span></p> -->
         
         <p>Click on the map to choose your ride destination.</p>
-        <label for="pickup_at">Pickup At:</label>
-        <input type="text" name="pickup_at" id="ride-request-pickup-at"></input>
+
+        <p>From your location: <span id="ride-request-from-label">Retrieving location...</span></p>
+        <p>To location: <span id="ride-request-to-label">N/A</span></p>
+
+        <input type="number" name="ride_id" id="ride-request-ride-id" hidden>
+        <input type="number" name="destination_id" id="ride-request-destination-id" hidden>
+
+        <input type="text" name="from_latitude" id="ride-request-from-latitude" hidden>
+        <input type="text" name="from_longitude" id="ride-request-from-longitude" hidden>
+
+        <input type="text" name="to_latitude" id="ride-request-to-latitude" hidden>
+        <input type="text" name="to_longitude" id="ride-request-to-longitude" hidden>
+
+        <label for="pickup_at">To location / Pickup At:</label>
+        <input type="text" name="pickup_at" id="ride-request-pickup-at" required></input>
 
         <label for="time">Pickup Time:</label>
-        <input type="time" name="time" id="ride-request-time"></input>
+        <input type="time" name="time" id="ride-request-time" required></input>
 
         <label for="message">Message (Optional):</label>
         <textarea name="message" id="ride-request-message"></textarea>

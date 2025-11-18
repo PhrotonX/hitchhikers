@@ -64,6 +64,12 @@ export default class MainMap{
         this.mapPanCallback = callback;
     }
 
+    removeTemporaryMarker(){
+        if(this.temporaryMarker){
+            this.map.removeLayer(this.temporaryMarker);
+        }
+    }
+
     /**
      * Obtains a human-readable address based on latitude and longitude data.
      * @param {*} lat 
