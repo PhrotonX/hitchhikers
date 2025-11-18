@@ -40,13 +40,16 @@ export default class CreateRideRequestPage extends Page{
                 var longitude = position.coords.longitude;
 
                 var rideRequestFromLabel = document.getElementById('ride-request-from-label');
-                rideRequestFromLabel.innerHTML = latitude + ", " + longitude;
 
                 var rideRequestFromLatitude = document.getElementById('ride-request-from-latitude');
                 rideRequestFromLatitude.value = latitude;
 
                 var rideRequestFromLongitude = document.getElementById('ride-request-from-longitude');
                 rideRequestFromLongitude.value = longitude;
+
+                this.map.reverseGeocode(latitude, longitude, (data) => {
+                    rideRequestFromLabel.innerHTML = data.display_name + " - " + latitude + ", " + longitude;
+                });
             }, (error) => {
             console.log("Error: " + error);
         });
