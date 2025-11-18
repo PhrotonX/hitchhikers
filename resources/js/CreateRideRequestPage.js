@@ -60,8 +60,8 @@ export default class CreateRideRequestPage extends Page{
     }
 
     setRequestIds(data){
-        let rideIdField = document.getElementById('ride-request-ride-id');
-        rideIdField.value = data.ride_id;
+        // let rideIdField = document.getElementById('ride-request-ride-id');
+        // rideIdField.value = data.ride_id;
 
         let destinationIdField = document.getElementById('ride-request-destination-id');
         destinationIdField.value = data.id;

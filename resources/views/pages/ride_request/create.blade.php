@@ -23,7 +23,7 @@
         <p>From your location: <span id="ride-request-from-label">Retrieving location...</span></p>
         <p>To location: <span id="ride-request-to-label">N/A</span></p>
 
-        <input type="number" name="ride_id" id="ride-request-ride-id" hidden>
+        <input type="number" name="ride_id" id="ride-request-ride-id" value="{{$ride->id}}" hidden>
         <input type="number" name="destination_id" id="ride-request-destination-id" hidden>
 
         <input type="text" name="from_latitude" id="ride-request-from-latitude" hidden>

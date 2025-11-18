@@ -224,7 +224,7 @@
                     }
 
                     var btnMakeRideRequest = document.getElementById('btn-make-ride-request');
-                    btnMakeRideRequest.setAttribute('href', 'ride/'+rideId+'/requests/create');
+                    btnMakeRideRequest.setAttribute('href', '/ride/'+rideId+'/requests/create');
 
                     // Once the selection from ride list has changed, display all of its associated ride destinations.
                     getRides(rideList.value); 
