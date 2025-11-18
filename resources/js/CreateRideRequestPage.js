@@ -32,10 +32,27 @@ export default class CreateRideRequestPage extends Page{
                 this.onReverseGeocode(data);
                 this.onSelectMapArea(e, data);
             });
-
-            
-            
         });
+
+        if(navigator.geolocation){
+            this.trackingId = navigator.geolocation.watchPosition((position) => {
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+
+                var rideRequestFromLabel = document.getElementById('ride-request-from-label');
+                rideRequestFromLabel.innerHTML = latitude + ", " + longitude;
+
+                var rideRequestFromLatitude = document.getElementById('ride-request-from-latitude');
+                rideRequestFromLatitude.value = latitude;
+
+                var rideRequestFromLongitude = document.getElementById('ride-request-from-longitude');
+                rideRequestFromLongitude.value = longitude;
+            }, (error) => {
+            console.log("Error: " + error);
+        });
+        }else{
+            alert("Geolocation is turned off or not supported by this device");
+        }
     }
 
     onReverseGeocode(data){
@@ -49,6 +66,12 @@ export default class CreateRideRequestPage extends Page{
 
         let rideRequestToLabel = document.getElementById('ride-request-to-label');
         rideRequestToLabel.innerHTML = data.display_name + " - " + e.latlng.lat + ", " + e.latlng.lng;
+
+        let rideRequestToLatitude = document.getElementById('ride-request-to-latitude');
+        rideRequestToLatitude.value = e.latlng.lat;
+
+        let rideRequestToLongitude = document.getElementById('ride-request-to-longitude');
+        rideRequestToLongitude.value = e.latlng.lng;
     }
 
     onInitializePage(){

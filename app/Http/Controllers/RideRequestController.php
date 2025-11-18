@@ -39,6 +39,10 @@ class RideRequestController extends Controller
         $date = new \DateTimeImmutable();
 
         // Fill up missing fields.
+        $rideRequest->to_latitude = round($rideRequest->to_latitude, 7);
+        $rideRequest->to_longitude = round($rideRequest->to_longitude, 7);
+        $rideRequest->from_latitude = round($rideRequest->from_latitude, 7);
+        $rideRequest->from_longitude = round($rideRequest->from_longitude, 7);
         $rideRequest->status = "pending";
         $rideRequest->status_updated_at = $date->format("Y-m-d H:i:s");
         $rideRequest->sender_user_id = Auth::user()->id;
