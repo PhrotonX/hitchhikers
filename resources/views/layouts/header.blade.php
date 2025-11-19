@@ -1,6 +1,6 @@
 <style>
     .main-header {
-    width: 100%;
+    width: 99vw;
     padding: 12px 40px;
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(8px);
@@ -55,6 +55,7 @@
 
 .header-btn {
     margin-left: auto;
+    margin-right: 2vw;
     padding: 8px 16px;
     border-radius: 8px;
     background: var(--primary);
@@ -77,16 +78,16 @@
 
 <header class="main-header">
     <div class="header-logo">
-        <img src="{{ asset('favicon.ico') }}" alt="Hitchhikers Logo" style="width:40px; height:40px;"> <!-- Hitch Hike Logo -->
-        <span>Hitchhikers</span>
+        <img src="{{ asset('Hitchhike Logo.png') }}" alt="Logo"> <!-- Hitch Hike Logo -->
+        <span>Hitchhike</span>
     </div>
 
     <nav class="header-nav">
         <span class="separator">|</span> 
-        <!-- Link Home with a query param to load index without Vite assets when needed -->
-        <a href="/">Home</a> <!-- Route to Home (pages.index) -->
+        <a href="/">Home</a> <!-- Route to Dashboard -->
+        <a href="/about">About</a> <!-- Route to About -->
         <a href="/login">Login</a> <!-- Route to Log In -->
     </nav>
 
-    <a href="{{ url('/register') }}" class="header-btn">Get Started</a> <!-- Route to Sign Up -->
+    <a href="/register" class="header-btn">Get Started</a> <!-- Route to SignUp -->
 </header>

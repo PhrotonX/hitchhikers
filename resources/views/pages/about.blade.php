@@ -1,0 +1,623 @@
+@extends('layouts.app')
+
+@push('head')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+  
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #1a2a6c;
+            --secondary: #fffefe;
+            --accent: #cccccc;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 0.5rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .nav-tab {
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            background: transparent;
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            color: var(--primary);
+        }
+        
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 2rem;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .banner {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/World_map_blank_without_borders.svg/1024px-World_map_blank_without_borders.svg.png');
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+        
+        .banner h2 {
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .mission-vision {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .mission, .vision {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .mission h3, .vision h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .mission h3 i, .vision h3 i {
+            margin-right: 0.5rem;
+        }
+        
+        .values {
+            margin: 2rem 0;
+        }
+        
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .value-card {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .value-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .value-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .team-section {
+            margin: 3rem 0;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .team-member {
+            text-align: center;
+        }
+        
+        .member-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1rem;
+            border: 4px solid var(--primary);
+        }
+        
+        .history {
+            margin: 3rem 0;
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 8px;
+        }
+        
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+        
+        .contact-info {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 8px;
+            height: fit-content;
+        }
+        
+        .contact-info h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .contact-details {
+            margin-bottom: 2rem;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        
+        .contact-item i {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-right: 1rem;
+            margin-top: 0.2rem;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background: var(--secondary);
+            transform: translateY(-3px);
+        }
+        
+        .map-placeholder {
+            background: var(--gray);
+            height: 200px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-top: 1rem;
+        }
+        
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: auto;
+            padding: 2rem 0;
+            color: white;
+            width: 100%;
+        }
+        
+        footer p {
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .mission-vision {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .banner h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+@endpush
+
+@section('content')
+<div class="container">
+        <header>
+            <h1>About Our Company</h1>
+            <p class="subtitle">Learn more about our mission, values, and team. Get in touch with us for any inquiries or collaborations.</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-target="about">About Us</button>
+            <button class="nav-tab" data-target="contact">Contact Us</button>
+        </div>
+        
+        <section id="about" class="content-section active">
+            <div class="banner">
+                <h2>HitchHike</h2>
+            </div>
+            
+            <div class="company-description">
+                <h2>Company Description</h2>
+                <p>We are a technology company dedicated to creating innovative solutions that simplify complex problems. Founded in 2015, we've grown from a small startup to a team of 50+ professionals serving clients across 20 countries.</p>
+                <p>Our platform connects people with cutting-edge tools that enhance productivity, foster collaboration, and drive business growth. We believe in the power of technology to transform industries and improve lives.</p>
+            </div>
+            
+            <div class="mission-vision">
+                <div class="mission">
+                    <h3><i class="fas fa-bullseye"></i> Our Mission</h3>
+                    <p>To empower businesses and individuals with intuitive technology solutions that streamline workflows, enhance connectivity, and unlock new possibilities for growth and innovation.</p>
+                </div>
+                
+                <div class="vision">
+                    <h3><i class="fas fa-eye"></i> Our Vision</h3>
+                    <p>To create a world where technology seamlessly integrates with human potential, breaking down barriers and creating opportunities for all to thrive in the digital age.</p>
+                </div>
+            </div>
+            
+            <div class="values">
+                <h2>Our Core Values</h2>
+                <div class="values-grid">
+                    <div class="value-card">
+                        <i class="fas fa-users"></i>
+                        <h3>Collaboration</h3>
+                        <p>We believe in the power of teamwork and diverse perspectives to solve complex challenges.</p>
+                    </div>
+                    
+                    <div class="value-card">
+                        <i class="fas fa-lightbulb"></i>
+                        <h3>Innovation</h3>
+                        <p>We constantly push boundaries and explore new possibilities to deliver cutting-edge solutions.</p>
+                    </div>
+                    
+                    <div class="value-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Integrity</h3>
+                        <p>We operate with transparency, honesty, and ethical practices in all our interactions.</p>
+                    </div>
+                    
+                    <div class="value-card">
+                        <i class="fas fa-heart"></i>
+                        <h3>Customer Focus</h3>
+                        <p>Our customers are at the heart of everything we do, and their success is our ultimate measure.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="team-section">
+                <h2>Meet Our Leadership Team</h2>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <img src="https://www.pngmart.com/files/12/Stuart-Minion-PNG-Clipart.png" alt="Johan Emmanuel Inigo" class="member-photo">
+                        <h3>Johan Emmanuel Inigo</h3>
+                        <p>Vice CEO</p>
+                        <p>Visionary leader with 3 years in tech industry(Project sa School)</p>
+                    </div>
+                    
+                    <div class="team-member">
+                        <img src="https://w0.peakpx.com/wallpaper/381/798/HD-wallpaper-minions-funny.jpg" alt="Josef Zedril" class="member-photo">
+                        <h3>Josef Zedril</h3>
+                        <p>CEO</p>
+                        <p>Expert in software architecture, Design, and innovation(Nag isip neto nakakamatay na project)</p>
+                    </div>
+                    
+                    <div class="team-member">
+                        <img src="https://gallery.yopriceville.com/var/albums/Free-Clipart-Pictures/Cartoons-PNG/Transparent_Minion_PNG_Image.png?m=1629784138" alt="Royce Lawrence" class="member-photo">
+                        <h3>Royce Lawrence</h3>
+                        <p>Head of Back-End Team</p>
+                        <p>Passionate about user experience and back-end management(ay basta)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="history">
+                <h2>Our Journey</h2>
+                <p>Founded in a small garage in 2015, our company started with a simple idea: technology should work for people, not the other way around. Our first product, a collaboration tool for remote teams, quickly gained traction.</p>
+                <p>By 2018, we had expanded our product line and secured our first round of funding. Today, we serve over 10,000 businesses worldwide and continue to innovate with new solutions that address evolving market needs.</p>
+                <p>Our commitment to excellence has earned us several industry awards, including "Most Innovative Tech Company" in 2022 and "Best Workplace" in 2023.</p>
+            </div>
+        </section>
+        
+        <!-- Contact Us Section -->
+        <section id="contact" class="content-section">
+            <h2>Get In Touch</h2>
+            <p>Have questions or want to learn more about our services? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+            
+            <div class="contact-container">
+                <div class="contact-info">
+                    <h3>Contact Information</h3>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <h4>Email</h4>
+                                <p>hello@company.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <div>
+                                <h4>Phone</h4>
+                                <p>+1 (555) 123-4567</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <h4>Office Address</h4>
+                                <p>123 Innovation Drive<br>Tech Valley, CA 94025<br>United States</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3>Follow Us</h3>
+                    <div class="social-links">
+                        <a href="#" class="social-link" target="_blank">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" target="_blank">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                    
+                    <div class="map-placeholder">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span style="margin-left: 10px;">Interactive Map Would Appear Here</span>
+                    </div>
+                </div>
+                
+                <div class="contact-form-container">
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" class="form-control" placeholder="What is this regarding?">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" class="form-control" placeholder="How can we help you?" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-block">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>&copy; 2025 Company Name. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab navigation
+            const navTabs = document.querySelectorAll('.nav-tab');
+            const contentSections = document.querySelectorAll('.content-section');
+            
+            navTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    
+                    // Update active tab
+                    navTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show target section
+                    contentSections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Contact form submission
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Get form values
+                    const name = document.getElementById('name').value;
+                    const email = document.getElementById('email').value;
+                    const message = document.getElementById('message').value;
+                    
+                    // In a real application, you would send this data to a server
+                    // For this example, we'll just show an alert
+                    alert(`Thank you, ${name}! Your message has been sent successfully. We'll get back to you at ${email} as soon as possible.`);
+                    
+                    // Reset form
+                    contactForm.reset();
+                });
+            }
+            
+            // Form validation
+            const formInputs = document.querySelectorAll('.form-control');
+            formInputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value.trim() === '' && this.hasAttribute('required')) {
+                        this.style.borderColor = 'red';
+                    } else {
+                        this.style.borderColor = '#ddd';
+                    }
+                });
+            });
+        });
+    </script>
+@endsection
