@@ -4,15 +4,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-        /*
-         * 1. CSS Variables Definition (Minimized to used variables only)
-         * 2. General Body and Layout Reset
-         * 3. Navigation Bar Fix (New)
-         * 4. Advanced Component Styles and Responsiveness
-         * 5. Error/Status Messages
-         */
-
-        /* ---------------------- 1. CSS VARIABLES (MINIMIZED) ---------------------- */
         :root {
             /* Light Mode Colors (Used Only) */
             --primary: #1E3A8A;
@@ -243,7 +234,7 @@
             color: var(--text-light);
             text-align: center;
         }
-        .register-link-container button {
+        .register-link-container a {
             background: none;
             border: none;
             padding: 0;
@@ -339,7 +330,7 @@
                     
                     {{-- Form Options --}}
                     <div class="form-options">
-                        <a href="{{ url('forgot-password') }}" class="forgot-password">{{ __('credentials.forgot_password') }}</a>
+                        <a href='/forgot-password' class="reset-password">{{ __('credentials.forgot_password') }}</a>
                     </div>
 
                     {{-- Login Button --}}
@@ -349,7 +340,7 @@
                 {{-- Create Account Link --}}
                 <div class="register-link-container">
                     Don't have an account? 
-                    <button type="button" onclick="window.location.href='{{ url('/register') }}'">Create account</button>
+                    <a href="/register" class="header-btn">Create account</a>
                 </div>
                 
             </div>

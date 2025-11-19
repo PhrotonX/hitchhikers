@@ -1,6 +1,6 @@
 <style>
     .main-header {
-    width: 98vw;
+    width: 99vw;
     padding: 12px 40px;
     background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(8px);
@@ -85,9 +85,9 @@
     <nav class="header-nav">
         <span class="separator">|</span> 
         <a href="/">Home</a> <!-- Route to Dashboard -->
-        <a href="about.html">About</a> <!-- Route to About -->
+        <a href="/about">About</a> <!-- Route to About -->
         <a href="/login">Login</a> <!-- Route to Log In -->
     </nav>
 
-    <a href="signup.html" class="header-btn">Get Started</a> <!-- Route to SignUp -->
+    <a href="/register" class="header-btn">Get Started</a> <!-- Route to SignUp -->
 </header>

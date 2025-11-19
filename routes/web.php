@@ -27,6 +27,14 @@ Route::get('register', function(){
     return view('pages.auth.register');
 });
 
+Route::get('about', function(){
+    return view('pages.about');
+});
+
+Route::get('forgot-password', function(){
+    return view('pages.auth.reset-password');
+});
+
 Route::get('user/{user}', [UserController::class, 'show'])->name('user.view');
 Route::get('user/{user}/edit', [UserController::class, 'edit'])->middleware(['auth']);
 Route::patch('user/{user}/update', [UserController::class, 'update'])->middleware(['auth', 'verified']);
