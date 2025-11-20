@@ -90,6 +90,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::post('ride/{ride}/reviews/submit', [ReviewController::class, 'store']);
 
     // Ride request routes
+    Route::get('ride/requests/created', [RideRequestController::class, 'created']);
     Route::get('ride/{ride}/requests/', [RideRequestController::class, 'index']);
     Route::get('ride/{ride}/requests/create', [RideRequestController::class, 'create']);
     Route::post('ride/requests/create/submit', [RideRequestController::class, 'store']);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ride;
 use App\Models\RideRequest;
+use App\Models\Vehicle;
 use App\Http\Requests\StoreRideRequestRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,6 +26,32 @@ class RideRequestController extends Controller
 
         return view('pages.ride_request.create', [
             'ride' => $ride,
+        ]);
+    }
+
+    public function created(){
+        $id = Auth::user()->id;
+
+        $results = RideRequest::where('sender_user_id', $id);
+        $rides = [];
+        $vehicles = [];
+
+        foreach ($results as $key => $value) {
+
+            $ride = Ride::find($value->ride_id);
+            $rides[$value->ride_id] = $ride;
+        }
+
+        foreach ($rides as $key => $value) {
+
+            $vehicle = Vehicle::find($value->vehicle_id);
+            $vehicles[$value->vehicle_id] = $vehicle;
+        }
+
+        return view('pages.ride_request.created', [
+            'rideRequests' => $results,
+            'rides' => $rides,
+            'vehicles' => $vehicles,
         ]);
     }
 
