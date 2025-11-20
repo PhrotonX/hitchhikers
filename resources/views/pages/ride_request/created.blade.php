@@ -40,6 +40,9 @@
                 const vlng = parseFloat(item.getAttribute('data-vehicle-lng'));
                 const vstatus = item.getAttribute('data-vehicle-status');
 
+                const toLat = parseFloat(item.getAttribute('data-to-lat'));
+                const toLng = parseFloat(item.getAttribute('data-to-lng'));
+
                 // Clear unneeded markers to make way for another ride request info displayed on map.
                 map.cachedMarkers.clearLayers();
                 map.vehicleMarkers.clearLayers();
@@ -52,11 +55,19 @@
                 });
 
                 // Display the vehicle marker.
-                const iconTag = vstatus === 'active' ? 'active_vehicle' : 'inactive_vehicle';
-                const vehicleMarker = L.marker([vlat, vlng], {icon: map.markerIcons[iconTag]});
-                map.vehicleMarkers.addLayer(vehicleMarker);
-
-                //@TODO: Display the selected destination location using "selected" marker.
+                if(vlat != NaN && vlng != NaN){
+                    const iconTag = vstatus === 'active' ? 'active_vehicle' : 'inactive_vehicle';
+                    const vehicleMarker = L.marker([vlat, vlng], {icon: map.markerIcons[iconTag]});
+                    map.vehicleMarkers.addLayer(vehicleMarker);
+                }
+                
+                // Display the selected destination location using "selected" marker.
+                if(toLat != NaN && toLng != NaN){
+                    map.temporaryMarker = L.marker([toLat, toLng], {
+                        icon: map.markerIcons['selected']
+                    });
+                }
+                
 
                 //Display ride destination markers
                 map.retrieveRideMarkers(rideId, true)();
@@ -65,7 +76,16 @@
     </script>
 
     @foreach ($rideRequests as $rideRequest)
-        <div class="ride-request" id="ride-request-{{$rideRequest->id}}" data-ride-id="{{$rideRequest->ride_id}}" data-vehicle-lat="{{$vehicles[$rides[$rideRequest->ride_id]->id]->latitude}}" data-vehicle-lng="{{$vehicles[$rides[$rideRequest->ride_id]->id]->longitude}}" data-vehicle-status="{{$vehicles[$rides[$rideRequest->ride_id]->id]->status}}">
+        <div
+            class="ride-request"
+            id="ride-request-{{$rideRequest->id}}"
+            data-ride-id="{{$rideRequest->ride_id}}"
+            data-vehicle-lat="{{$vehicles[$rides[$rideRequest->ride_id]->id]->latitude}}"
+            data-vehicle-lng="{{$vehicles[$rides[$rideRequest->ride_id]->id]->longitude}}"
+            data-vehicle-status="{{$vehicles[$rides[$rideRequest->ride_id]->id]->status}}"
+            data-to-lat="{{$rideRequest->to_latitude}}"
+            data-to-lng="{{$rideRequest->to_longitude}}"
+        >
             <p><strong><span id="ride-request-destination">{{$rideRequest->ride_name}}</span></strong></p>
             {{-- @dump($rideRequest)
             @dump($rides) --}}
