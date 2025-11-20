@@ -94,6 +94,8 @@
             <p><strong>Vehicle Distance: </strong><span id="ride-request-{{$rideRequest->id}}-vehicle-distance">Calculating...</span></p>
             <p><strong>Time: </strong><span id="ride-request-time">{{$rideRequest->time}}</span></p>
             <p><strong>Status: </strong><span id="ride-request-status">{{$rideRequest->status}}</span></p>
+            <button type="button" id="ride-request-{{$rideRequest->id}}-cancel-btn">Delete</button>
+            <button type="button" id="ride-request-{{$rideRequest->id}}-delete-btn" delete>Cancel</button>
             <hr>
 
             <script type="module">
@@ -111,6 +113,21 @@
                     console.log("Error: " + error);
                     });
                 }
+
+                var cancelButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-cancel-btn');
+                var deleteButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-delete-btn');
+
+                if("{{$rideRequest->status}}" != "cancelled"){
+                    cancelButton.hidden = true;
+                    deleteButton.hidden = false;
+                }else{
+                    cancelButton.hidden = false;
+                    deleteButton.hidden = true;
+                }
+
+                cancelButton.addEventListener('click', () => {
+                    
+                });
             </script>
         </div>
     @endforeach
