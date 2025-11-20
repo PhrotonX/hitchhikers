@@ -30,10 +30,42 @@
         map.configureMarkerIcon('inactive_vehicle', '{{Vite::asset("resources/img/grey_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('selected', '{{Vite::asset("resources/img/selected_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.detectLocation();
+
+        document.addEventListener('click', (e) => {
+            const item = e.target.closest('.ride-request');
+            if(item){
+                const rideId = item.getAttribute('data-ride-id');
+                // Vehicle marker
+                const vlat = parseFloat(item.getAttribute('data-vehicle-lat'));
+                const vlng = parseFloat(item.getAttribute('data-vehicle-lng'));
+                const vstatus = item.getAttribute('data-vehicle-status');
+
+                // Clear unneeded markers to make way for another ride request info displayed on map.
+                map.cachedMarkers.clearLayers();
+                map.vehicleMarkers.clearLayers();
+
+                // Remove lines from the map.
+                map.getMap().eachLayer((layer) => {
+                    if(layer instanceof L.Polyline){
+                        map.getMap().removeLayer(layer);
+                    }
+                });
+
+                // Display the vehicle marker.
+                const iconTag = vstatus === 'active' ? 'active_vehicle' : 'inactive_vehicle';
+                const vehicleMarker = L.marker([vlat, vlng], {icon: map.markerIcons[iconTag]});
+                map.vehicleMarkers.addLayer(vehicleMarker);
+
+                //@TODO: Display the selected destination location using "selected" marker.
+
+                //Display ride destination markers
+                map.retrieveRideMarkers(rideId, true)();
+            }
+        });
     </script>
 
     @foreach ($rideRequests as $rideRequest)
-        <div class="ride-request" id="ride-request-{{$rideRequest->id}}">
+        <div class="ride-request" id="ride-request-{{$rideRequest->id}}" data-ride-id="{{$rideRequest->ride_id}}" data-vehicle-lat="{{$vehicles[$rides[$rideRequest->ride_id]->id]->latitude}}" data-vehicle-lng="{{$vehicles[$rides[$rideRequest->ride_id]->id]->longitude}}" data-vehicle-status="{{$vehicles[$rides[$rideRequest->ride_id]->id]->status}}">
             <p><strong><span id="ride-request-destination">{{$rideRequest->ride_name}}</span></strong></p>
             {{-- @dump($rideRequest)
             @dump($rides) --}}
