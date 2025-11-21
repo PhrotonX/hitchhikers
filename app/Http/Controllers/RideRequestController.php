@@ -38,8 +38,15 @@ class RideRequestController extends Controller
         $rides = [];
         $vehicles = [];
 
-        foreach ($results as $key => $value) {
+        if(!is_array($results)){
+            return view('pages.ride_request.created', [
+                'rideRequests' => null,
+                'rides' => null,
+                'vehicles' => null,
+            ]);
+        }
 
+        foreach ($results as $key => $value) {
             $ride = Ride::find($value->ride_id);
             $rides[$value->ride_id] = $ride;
         }
@@ -102,6 +109,10 @@ class RideRequestController extends Controller
 
         $data->fill($request->validated());
         $data->update();
+
+        return response()->json([
+            $data
+        ]);
     }
 
     /**
@@ -114,6 +125,10 @@ class RideRequestController extends Controller
         $data->fill($request->validated());
         $data->status_updated_at = $data->now();
         $data->update();
+
+        return response()->json([
+            $data
+        ]);
     }
 
     /**
