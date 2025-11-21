@@ -6,6 +6,8 @@ use App\Models\Ride;
 use App\Models\RideRequest;
 use App\Models\Vehicle;
 use App\Http\Requests\StoreRideRequestRequest;
+use App\Http\Requests\UpdateRideRequestRequest;
+use App\Http\Requests\UpdateRideRequestStatusRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -99,6 +101,18 @@ class RideRequestController extends Controller
         $data = RideRequest::find($rideRequest);
 
         $data->fill($request->validated());
+        $data->save();
+    }
+
+    /**
+     * Update the status field of the specified resource in storage.
+     */
+    public function updateStatus(UpdateRideRequestStatusRequest $request, int $rideRequest)
+    {
+        $data = RideRequest::find($rideRequest);
+
+        $data->fill($request->validated());
+        $data->status_updated_at = $data->now();
         $data->save();
     }
 

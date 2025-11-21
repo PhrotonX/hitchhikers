@@ -94,9 +94,10 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('ride/{ride}/requests/', [RideRequestController::class, 'index']);
     Route::get('ride/{ride}/requests/create', [RideRequestController::class, 'create']);
     Route::post('ride/requests/create/submit', [RideRequestController::class, 'store']);
-    Route::get('ride/{ride}/requests/{request}', [RideRequestController::class, 'show']);
-    Route::put('ride/{ride}/requests/{request}/update', [RideRequestController::class, 'update']);
-    Route::delete('ride/{ride}/requests/{request}/delete', [RideRequestController::class, 'destroy']);
+    Route::get('ride/{ride}/requests/{rideRequest}', [RideRequestController::class, 'show']);
+    Route::put('ride/{ride}/requests/{rideRequest}/update', [RideRequestController::class, 'update']);
+    Route::delete('ride/requests/{rideRequest}/delete', [RideRequestController::class, 'destroy']);
+    Route::patch('ride/requests/{rideRequest}/update-status', [RideRequestController::class, 'updateStatus']);
 
     // Vehicle routes
     Route::patch('vehicle/{vehicle}/update-status', [VehicleController::class, 'updateStatus']);
