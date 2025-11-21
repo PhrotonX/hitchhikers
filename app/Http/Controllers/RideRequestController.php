@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Ride;
 use App\Models\RideRequest;
+use App\Models\Vehicle;
 use App\Http\Requests\StoreRideRequestRequest;
+use App\Http\Requests\UpdateRideRequestRequest;
+use App\Http\Requests\UpdateRideRequestStatusRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,6 +28,39 @@ class RideRequestController extends Controller
 
         return view('pages.ride_request.create', [
             'ride' => $ride,
+        ]);
+    }
+
+    public function created(){
+        $id = Auth::user()->id;
+
+        $results = RideRequest::where('sender_user_id', $id);
+        $rides = [];
+        $vehicles = [];
+
+        if(!is_array($results)){
+            return view('pages.ride_request.created', [
+                'rideRequests' => null,
+                'rides' => null,
+                'vehicles' => null,
+            ]);
+        }
+
+        foreach ($results as $key => $value) {
+            $ride = Ride::find($value->ride_id);
+            $rides[$value->ride_id] = $ride;
+        }
+
+        foreach ($rides as $key => $value) {
+
+            $vehicle = Vehicle::find($value->vehicle_id);
+            $vehicles[$value->vehicle_id] = $vehicle;
+        }
+
+        return view('pages.ride_request.created', [
+            'rideRequests' => $results,
+            'rides' => $rides,
+            'vehicles' => $vehicles,
         ]);
     }
 
@@ -72,7 +108,27 @@ class RideRequestController extends Controller
         $data = RideRequest::find($rideRequest);
 
         $data->fill($request->validated());
-        $data->save();
+        $data->update();
+
+        return response()->json([
+            $data
+        ]);
+    }
+
+    /**
+     * Update the status field of the specified resource in storage.
+     */
+    public function updateStatus(UpdateRideRequestStatusRequest $request, int $rideRequest)
+    {
+        $data = RideRequest::find($rideRequest);
+
+        $data->fill($request->validated());
+        $data->status_updated_at = $data->now();
+        $data->update();
+
+        return response()->json([
+            $data
+        ]);
     }
 
     /**
@@ -83,5 +139,9 @@ class RideRequestController extends Controller
         $data = RideRequest::find($rideRequest);
         
         $data->delete();
+
+        return response()->json([
+            'status' => 'Item deleted successfully!',
+        ]);
     }
 }

@@ -15,6 +15,7 @@ class Model implements \JsonSerializable{
     protected static $table;
     protected static $class;
     protected static $fillable;
+    protected static $timestamps = true;
 
     public function __get($key){
         return $this->attributes[$key] ?? null;
@@ -79,6 +80,11 @@ class Model implements \JsonSerializable{
         }
     }
 
+    public function now(){
+        $date = new \DateTimeImmutable();
+        return $date->format("Y-m-d H:i:s");
+    }
+
     public function delete(){
         $dataContext = new DataContext();
 
@@ -118,6 +124,10 @@ class Model implements \JsonSerializable{
     }
 
     private function onEdit(){
+        if(array_key_exists('updated_at', $this->attributes)){
+            $this->attributes['updated_at'] = $this->now();
+        }
+
         $dataContext = new DataContext();
 
         // Add quotation marks to all values.
@@ -153,6 +163,18 @@ class Model implements \JsonSerializable{
     }
 
     private function onInsert(){
+        // if(array_key_exists('created_at', $this->attributes)){
+        //     $this->attributes['created_at'] = $this->now();
+        // }
+        // if(array_key_exists('updated_at', $this->attributes)){
+        //     $this->attributes['updated_at'] = $this->now();
+        // }
+
+        if(static::$timestamps){
+            $this->attributes['created_at'] = $this->now();
+            $this->attributes['updated_at'] = $this->now();
+        }
+
         $dataContext = new DataContext();
 
         // Add quotation marks to all values.
