@@ -94,7 +94,7 @@
                 <p><strong>Pickup Location: </strong><span id="ride-request-{{$rideRequest->id}}-time">{{$rideRequest->pickup_at}}</span></p>
                 <p><strong>Vehicle Distance: </strong><span id="ride-request-{{$rideRequest->id}}-vehicle-distance">Calculating...</span></p>
                 <p><strong>Time: </strong><span id="ride-request-{{$rideRequest->id}}-time">{{$rideRequest->time}}</span></p>
-                <p><strong>Status: </strong><span id="ride-request-{{$rideRequest->id}}-status">{{$rideRequest->status}}</span></p>
+                <p><strong>Status: </strong><span id="ride-request-{{$rideRequest->id}}-status">{{__("ride_request_status.$rideRequest->status")}}</span></p>
                 <button type="button" class="ride-request-cancel-btn" id="ride-request-{{$rideRequest->id}}-cancel-btn">Cancel</button>
                 <button type="button" class="ride-request-delete-btn" id="ride-request-{{$rideRequest->id}}-delete-btn">Delete</button>
                 <hr>
@@ -139,6 +139,8 @@
                         }).then((response) => {
                             return response.json();
                         }).then((data) => {
+                            var statusParagraph = document.getElementById('ride-request-'+{{$rideRequest->id}}+'-status');
+                            statusParagraph.innerHTML = "{{__('ride_request_status.cancelled')}}";
                             cancelButton.hidden = true;
                             deleteButton.hidden = false;
                         }).catch((error) => {
