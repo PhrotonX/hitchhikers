@@ -76,7 +76,7 @@
 
                 </div>
             </div>
-
+            
             <div id="saved-ride-list">
 
             </div>
@@ -109,16 +109,20 @@
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
         import IndexPage from '{{ Vite::asset("resources/js/IndexPage.js") }}';
+        import PassengerRequestList from '{{ Vite::asset("resources/js/Components/PassengerRequestList.js") }}';
         // import SavedRides from '{{ Vite::asset("resources/js/Components/SavedRides.js") }}';
 
         // @NOTE: Newer code shall encapsulate code into IndexPage instead of throwing up every JS code in this file to reduce the mess.
         var page = new IndexPage('{{env("APP_URL", "")}}');
+        var passengerRequest = null;
         @auth
             @if (!Auth::user()->isDriver())
                 //var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
                 page.loadAuthObjects({
                     'saved_rides': 'saved-ride-list',
                 });
+            @else
+                passengerRequest = new PassengerRequestList('passenger-request', '{{env("APP_URL", "")}}', {{Auth::user()->getDriverAccount()->id}});
             @endif
         @endauth
 
