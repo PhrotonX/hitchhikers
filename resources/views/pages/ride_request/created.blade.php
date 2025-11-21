@@ -157,11 +157,11 @@
                         }).then((response) => {
                             return response.json();
                         }).then((data) => {
-                            cancelButton.removeEventListener('click', cancelItem),
-                            deleteButton.removeEventListener('click', deleteItem),
-                            document.removeChild(itemDiv);
+                            cancelButton.removeEventListener('click', cancelItem);
+                            deleteButton.removeEventListener('click', deleteItem);
+                            itemDiv.remove();
                         }).catch((error) => {
-                            throw new Error(error);
+                            console.error(error);
                         });
                     }
 

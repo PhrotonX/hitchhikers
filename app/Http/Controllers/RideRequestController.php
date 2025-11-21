@@ -139,5 +139,9 @@ class RideRequestController extends Controller
         $data = RideRequest::find($rideRequest);
         
         $data->delete();
+
+        return response()->json([
+            'status' => 'Item deleted successfully!',
+        ]);
     }
 }
