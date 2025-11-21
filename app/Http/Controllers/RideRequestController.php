@@ -101,7 +101,7 @@ class RideRequestController extends Controller
         $data = RideRequest::find($rideRequest);
 
         $data->fill($request->validated());
-        $data->save();
+        $data->update();
     }
 
     /**
@@ -113,7 +113,7 @@ class RideRequestController extends Controller
 
         $data->fill($request->validated());
         $data->status_updated_at = $data->now();
-        $data->save();
+        $data->update();
     }
 
     /**
