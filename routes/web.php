@@ -113,6 +113,7 @@ Route::get('settings', function(){
 
 Route::get('ride/destinations', [RideDestinationController::class, 'index']);
 Route::get('ride/destinations/{ride}', [RideDestinationController::class, 'get']);
+Route::get('driver/{driver}/ride/', [RideController::class, 'index']);
 Route::get('ride/{ride}', [RideController::class, 'get']);
 Route::get('ride/{ride}/reviews', [ReviewController::class, 'getReviews']);
 
