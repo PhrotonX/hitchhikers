@@ -75,78 +75,113 @@
         });
     </script>
 
-    @foreach ($rideRequests as $rideRequest)
-        <div
-            class="ride-request"
-            id="ride-request-{{$rideRequest->id}}"
-            data-ride-id="{{$rideRequest->ride_id}}"
-            data-vehicle-lat="{{$vehicles[$rides[$rideRequest->ride_id]->id]->latitude}}"
-            data-vehicle-lng="{{$vehicles[$rides[$rideRequest->ride_id]->id]->longitude}}"
-            data-vehicle-status="{{$vehicles[$rides[$rideRequest->ride_id]->id]->status}}"
-            data-to-lat="{{$rideRequest->to_latitude}}"
-            data-to-lng="{{$rideRequest->to_longitude}}"
-        >
-            <p><strong><span id="ride-request-destination">{{$rideRequest->ride_name}}</span></strong></p>
-            {{-- @dump($rideRequest)
-            @dump($rides) --}}
-            <p><strong>Ride: </strong><span id="ride-request-{{$rideRequest->id}}-ride">{{$rides[$rideRequest->ride_id]->ride_name}}</span></p>
-            <p><strong>Pickup Location: </strong><span id="ride-request-{{$rideRequest->id}}-time">{{$rideRequest->pickup_at}}</span></p>
-            <p><strong>Vehicle Distance: </strong><span id="ride-request-{{$rideRequest->id}}-vehicle-distance">Calculating...</span></p>
-            <p><strong>Time: </strong><span id="ride-request-time">{{$rideRequest->time}}</span></p>
-            <p><strong>Status: </strong><span id="ride-request-status">{{$rideRequest->status}}</span></p>
-            <button type="button" class="ride-request-cancel-btn" id="ride-request-{{$rideRequest->id}}-cancel-btn">Cancel</button>
-            <button type="button" class="ride-request-delete-btn" id="ride-request-{{$rideRequest->id}}-delete-btn">Delete</button>
-            <hr>
+    @isset($rideRequests)
+        @foreach ($rideRequests as $rideRequest)
+            <div
+                class="ride-request"
+                id="ride-request-{{$rideRequest->id}}"
+                data-ride-id="{{$rideRequest->ride_id}}"
+                data-vehicle-lat="{{$vehicles[$rides[$rideRequest->ride_id]->id]->latitude}}"
+                data-vehicle-lng="{{$vehicles[$rides[$rideRequest->ride_id]->id]->longitude}}"
+                data-vehicle-status="{{$vehicles[$rides[$rideRequest->ride_id]->id]->status}}"
+                data-to-lat="{{$rideRequest->to_latitude}}"
+                data-to-lng="{{$rideRequest->to_longitude}}"
+            >
+                <p><strong><span id="ride-request-{{$rideRequest->id}}-destination">{{$rideRequest->ride_name}}</span></strong></p>
+                {{-- @dump($rideRequest)
+                @dump($rides) --}}
+                <p><strong>Ride: </strong><span id="ride-request-{{$rideRequest->id}}-ride">{{$rides[$rideRequest->ride_id]->ride_name}}</span></p>
+                <p><strong>Pickup Location: </strong><span id="ride-request-{{$rideRequest->id}}-time">{{$rideRequest->pickup_at}}</span></p>
+                <p><strong>Vehicle Distance: </strong><span id="ride-request-{{$rideRequest->id}}-vehicle-distance">Calculating...</span></p>
+                <p><strong>Time: </strong><span id="ride-request-{{$rideRequest->id}}-time">{{$rideRequest->time}}</span></p>
+                <p><strong>Status: </strong><span id="ride-request-{{$rideRequest->id}}-status">{{$rideRequest->status}}</span></p>
+                <button type="button" class="ride-request-cancel-btn" id="ride-request-{{$rideRequest->id}}-cancel-btn">Cancel</button>
+                <button type="button" class="ride-request-delete-btn" id="ride-request-{{$rideRequest->id}}-delete-btn">Delete</button>
+                <hr>
 
-            <script type="module">
-                import getDistance from '{{ Vite::asset("resources/js/math.js") }}';                
+                <script type="module">
+                    import getDistance from '{{ Vite::asset("resources/js/math.js") }}';                
 
-                if(navigator.geolocation){
-                    navigator.geolocation.watchPosition((position) => {
-                        var latitude = position.coords.latitude;
-                        var longitude = position.coords.longitude;
+                    if(navigator.geolocation){
+                        navigator.geolocation.watchPosition((position) => {
+                            var latitude = position.coords.latitude;
+                            var longitude = position.coords.longitude;
 
-                        var vehicleDistanceElement = document.getElementById("ride-request-" + {{$rideRequest->id}} + "-vehicle-distance");
+                            var vehicleDistanceElement = document.getElementById("ride-request-" + {{$rideRequest->id}} + "-vehicle-distance");
 
-                        vehicleDistanceElement.innerHTML = getDistance([latitude, longitude], [{{$vehicles[$rides[$rideRequest->ride_id]->id]->latitude}}, {{$vehicles[$rides[$rideRequest->ride_id]->id]->longitude}}]);
-                    }, (error) => {
-                    console.log("Error: " + error);
-                    });
-                }
+                            vehicleDistanceElement.innerHTML = getDistance([latitude, longitude], [{{$vehicles[$rides[$rideRequest->ride_id]->id]->latitude}}, {{$vehicles[$rides[$rideRequest->ride_id]->id]->longitude}}]);
+                        }, (error) => {
+                        console.log("Error: " + error);
+                        });
+                    }
 
-                var cancelButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-cancel-btn');
-                var deleteButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-delete-btn');
+                    var itemDiv = document.getElementById('ride-request-' + {{$rideRequest->id}});
+                    var cancelButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-cancel-btn');
+                    var deleteButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-delete-btn');
 
-                if("{{$rideRequest->status}}" == "cancelled"){
-                    cancelButton.hidden = true;
-                    deleteButton.hidden = false;
-                }else{
-                    cancelButton.hidden = false;
-                    deleteButton.hidden = true;
-                }
+                    toggleButtons();
+                    
+                    cancelButton.addEventListener('click', cancelItem);
 
-                cancelButton.addEventListener('click', () => {
-                    fetch('{{env("APP_URL", "")}}/ride/requests/'+{{$rideRequest->id}}+'/update-status', {
-                        method: 'PATCH',
-                        body: JSON.stringify({
-                            status: 'cancelled'
-                        }),
-                        headers: {
-                            "Content-type": "application/json",
-                            "Accept": "application/json",
-                            "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
-                        },
-                    }).then((response) => {
-                        return response.json();
-                    }).then((data) => {
-                        console.log(data);
-                    }).catch((error) => {
-                        throw new Error(error);
-                    });
-                });
-            </script>
-        </div>
-    @endforeach
+                    deleteButton.addEventListener('click', deleteItem);
+
+                    function cancelItem(){
+                        fetch('{{env("APP_URL", "")}}/ride/requests/'+{{$rideRequest->id}}+'/update-status', {
+                            method: 'PATCH',
+                            body: JSON.stringify({
+                                status: 'cancelled'
+                            }),
+                            headers: {
+                                "Content-type": "application/json",
+                                "Accept": "application/json",
+                                "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
+                            },
+                        }).then((response) => {
+                            return response.json();
+                        }).then((data) => {
+                            cancelButton.hidden = true;
+                            deleteButton.hidden = false;
+                        }).catch((error) => {
+                            throw new Error(error);
+                        });
+                    }
+
+                    function deleteItem(){
+                        fetch('{{env("APP_URL", "")}}' + '/ride/requests/'+{{$rideRequest->id}}+'/delete', {
+                            method: 'DELETE',
+                            headers: {
+                                "Content-type": "application/json",
+                                "Accept": "application/json",
+                                "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
+                            },
+                        }).then((response) => {
+                            return response.json();
+                        }).then((data) => {
+                            cancelButton.removeEventListener('click', cancelItem),
+                            deleteButton.removeEventListener('click', deleteItem),
+                            document.removeChild(itemDiv);
+                        }).catch((error) => {
+                            throw new Error(error);
+                        });
+                    }
+
+                    function toggleButtons(){
+                        if("{{$rideRequest->status}}" == "cancelled"){
+                            cancelButton.hidden = true;
+                            deleteButton.hidden = false;
+                        }else{
+                            cancelButton.hidden = false;
+                            deleteButton.hidden = true;
+                        }
+
+                    }
+                </script>
+            </div>
+        @endforeach
+    @else
+        <p>Empty!</p>
+    @endisset
+    
     
     
 @endsection
