@@ -55,14 +55,14 @@
                 });
 
                 // Display the vehicle marker.
-                if(vlat != NaN && vlng != NaN){
+                if(vlat && vlng){
                     const iconTag = vstatus === 'active' ? 'active_vehicle' : 'inactive_vehicle';
                     const vehicleMarker = L.marker([vlat, vlng], {icon: map.markerIcons[iconTag]});
                     map.vehicleMarkers.addLayer(vehicleMarker);
                 }
                 
                 // Display the selected destination location using "selected" marker.
-                if(toLat != NaN && toLng != NaN){
+                if(toLat && toLng){
                     map.temporaryMarker = L.marker([toLat, toLng], {
                         icon: map.markerIcons['selected']
                     });
@@ -94,8 +94,8 @@
             <p><strong>Vehicle Distance: </strong><span id="ride-request-{{$rideRequest->id}}-vehicle-distance">Calculating...</span></p>
             <p><strong>Time: </strong><span id="ride-request-time">{{$rideRequest->time}}</span></p>
             <p><strong>Status: </strong><span id="ride-request-status">{{$rideRequest->status}}</span></p>
-            <button type="button" id="ride-request-{{$rideRequest->id}}-cancel-btn">Delete</button>
-            <button type="button" id="ride-request-{{$rideRequest->id}}-delete-btn" delete>Cancel</button>
+            <button type="button" class="ride-request-cancel-btn" id="ride-request-{{$rideRequest->id}}-cancel-btn">Cancel</button>
+            <button type="button" class="ride-request-delete-btn" id="ride-request-{{$rideRequest->id}}-delete-btn">Delete</button>
             <hr>
 
             <script type="module">
@@ -117,7 +117,7 @@
                 var cancelButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-cancel-btn');
                 var deleteButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-delete-btn');
 
-                if("{{$rideRequest->status}}" != "cancelled"){
+                if("{{$rideRequest->status}}" == "cancelled"){
                     cancelButton.hidden = true;
                     deleteButton.hidden = false;
                 }else{
@@ -126,7 +126,23 @@
                 }
 
                 cancelButton.addEventListener('click', () => {
-                    
+                    fetch('{{env("APP_URL", "")}}/ride/requests/'+{{$rideRequest->id}}+'/update-status', {
+                        method: 'PATCH',
+                        body: JSON.stringify({
+                            status: 'cancelled'
+                        }),
+                        headers: {
+                            "Content-type": "application/json",
+                            "Accept": "application/json",
+                            "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
+                        },
+                    }).then((response) => {
+                        return response.json();
+                    }).then((data) => {
+                        console.log(data);
+                    }).catch((error) => {
+                        throw new Error(error);
+                    });
                 });
             </script>
         </div>
