@@ -76,13 +76,33 @@
 
                 </div>
             </div>
+
+            <div id="saved-ride-list">
+
+            </div>
+        @else
+            <div id="passenger-request">
+                <!-- <p id="passenger-request-title">Passenger Requests</p>
+                
+                <select id="passenger-request-ride-selector">
+
+                </select>
+
+                <div id="passenger-request--item">
+                    <p id="passenger-request--item-to"></p>
+                    <p id="passenger-request--item-from"></p>
+                    <p id="passenger-request--item-time"></p>
+                    <label for="message">Message (Optional):</label>
+                    <input type="text" name="message" id="passenger-request--item-message">
+                    <button type="button" id="passenger-request--item-btn-accept"></button>
+                    <button type="button" id="passenger-request--item-btn-reject"></button>
+                </div> -->
+            </div>
         @endif
     @endauth
     
     
-    <div id="saved-ride-list">
-
-    </div>
+    
 @endsection
 
 @push('scripts')
@@ -94,10 +114,12 @@
         // @NOTE: Newer code shall encapsulate code into IndexPage instead of throwing up every JS code in this file to reduce the mess.
         var page = new IndexPage('{{env("APP_URL", "")}}');
         @auth
-        //     var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
-            page.loadAuthObjects({
-                'saved_rides': 'saved-ride-list',
-            });
+            @if (!Auth::user()->isDriver())
+                //var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
+                page.loadAuthObjects({
+                    'saved_rides': 'saved-ride-list',
+                });
+            @endif
         @endauth
 
         // Intialize variables
@@ -477,7 +499,7 @@
         
         // Retrieves ride destinations based on ride ID.
         function getRides(rideId){
-            map.retrieveRideMarkers(rideId)();
+            map.retrieveRideMarkers(rideId, true)();
         }
         
     </script>
