@@ -2,18 +2,197 @@
 <x-map-head/>
 
 @push('head')
-    @vite(['resources/css/index.css'])
+    @vite(['resources/css/index.css', 'resources/css/app.css'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body{
             background: #f9fafb;
             font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #map {
+            width: 100%;
+            height: calc(100vh - 80px);
+            position: relative;
+            z-index: 1;
+        }
+        #ride-selector-wrapper {
+            position: fixed;
+            right: 20px;
+            top: 100px;
+            width: 350px;
+            max-height: calc(100vh - 120px);
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-hover);
+            padding: 20px;
+            z-index: 10;
+            overflow-y: auto;
+        }
+        #ride-selector-wrapper h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+        #ride-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        #driving-mode {
+            position: fixed;
+            left: 20px;
+            top: 100px;
+            width: 300px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-hover);
+            padding: 20px;
+            z-index: 10;
+        }
+        #driving-mode button {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        #driving-mode button:hover {
+            background: var(--primary-light);
+        }
+        #driving-mode select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        #infobox {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-hover);
+            z-index: 10;
+            display: none;
+        }
+        #review-box {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 350px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-hover);
+            z-index: 10;
+        }
+        #passenger-request {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            width: 350px;
+            max-height: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-hover);
+            z-index: 10;
+            overflow-y: auto;
         }
     </style>
 @endpush
 
 @section('content')
+    <header class="toolbar">
+        <div class="container toolbar-content">
+            <a href="/" class="logo">
+                <img src="{{ Vite::asset('resources/img/Hitchhike Logo.png') }}" alt="Hitchhike Logo" class="logo-img">
+                <span class="logo-text">Hitchhike</span>
+            </a>
+
+            <div class="search-bar">
+                <input type="text" class="search-input" id="toolbar-search-input" placeholder="Where are you going?">
+                <button class="search-button" id="toolbar-search-button">Find Rides</button>
+            </div>
+
+            <div class="nav-links">
+                <a href="/dashboard">Home</a>
+                <a href="#">My Trips</a>
+                <a href="#">Help</a>
+            </div>
+
+            <div class="user-actions">
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fa-solid fa-toggle-off"></i>
+                </button>
+
+                <div class="notif">
+                    <div class="notif-icon" id="notif-icon">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="notif-badge" id="notif-badge">0</span>
+                    </div>
+                </div>
+
+                <div class="notif-list" id="notif-list">
+                    <label class="notif-label">Notifications</label>
+                    <ul>
+                        <li><a href="#">New Message</a></li>
+                        <li><a href="#">Reminder:</a></li>
+                        <li><a href="#">Trip Accepted</a></li>
+                    </ul>
+                    <div class="view-all">
+                        <a href="#" class="viewAll-link">View All</a>
+                    </div>
+                </div>
+
+                <div class="user-icon" id="user-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div class="sidebar" id="sidebar-menu">
+                    <div class="sidebar-top">
+                        <div class="profile">
+                            <h3 id="user-name">{{ Auth::user()->name ?? 'User Name' }}</h3>
+                            <a href="/profile" class="edit-profile">Edit profile  >  </a>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <a href="/dashboard" class="sidebar-menu-links">Dashboard</a>
+                        <a href="#" class="sidebar-menu-links">Messages</a>
+                        <a href="#" class="sidebar-menu-links">History</a>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <a href="#" class="sidebar-menu-links">Settings</a>
+                        <div class="logout-icon">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <a href="{{ route('logout') }}" class="logout-link"
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Logout
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <div id="map"></div>
 
     @auth
@@ -106,10 +285,12 @@
 @endsection
 
 @push('scripts')
+    @vite(['resources/js/dashboard.js'])
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
         import IndexPage from '{{ Vite::asset("resources/js/IndexPage.js") }}';
         import PassengerRequestList from '{{ Vite::asset("resources/js/Components/PassengerRequestList.js") }}';
+
         // import SavedRides from '{{ Vite::asset("resources/js/Components/SavedRides.js") }}';
 
         // @NOTE: Newer code shall encapsulate code into IndexPage instead of throwing up every JS code in this file to reduce the mess.

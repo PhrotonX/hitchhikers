@@ -16,8 +16,38 @@ use App\Http\Controllers\SavedRideFolderController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('pages.index');
+    return view('pages.landing');
 })->name('home');
+
+Route::get('/dashboard', function () {
+    return view('pages.index');
+})->middleware(['auth'])->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function(){
+    Route::get('/driver/dashboard', function () {
+        return view('pages.driver.dashboard');
+    })->name('driver.dashboard');
+    
+    Route::get('/driver/rides', function () {
+        return view('pages.driver.rides');
+    })->name('driver.rides');
+    
+    Route::get('/driver/earnings', function () {
+        return view('pages.driver.earnings');
+    })->name('driver.earnings');
+    
+    Route::get('/driver/notifications', function () {
+        return view('pages.driver.notifications');
+    })->name('driver.notifications');
+    
+    Route::get('/driver/profile', function () {
+        return view('pages.driver.profile');
+    })->name('driver.profile');
+    
+    Route::get('/profile', function () {
+        return view('pages.user.passenger-profile');
+    })->name('profile');
+});
 
 Route::get('login', function(){
     return view('pages.auth.login');

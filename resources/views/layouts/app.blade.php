@@ -18,14 +18,7 @@
         @stack('head')
     </head>
     <body>
-        @include('layouts.header')
-        {{--@include('layouts.navigation')--}}
-        
-        <main style="padding-top:80px">
-            @yield('content')
-        </main>
-        
-        @include('layouts.footer')
+        @yield('content')
 
         @stack('scripts')
     </body>
