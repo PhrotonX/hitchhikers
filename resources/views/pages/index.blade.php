@@ -122,7 +122,7 @@
                     'saved_rides': 'saved-ride-list',
                 });
             @else
-                passengerRequest = new PassengerRequestList('passenger-request', '{{env("APP_URL", "")}}', {{Auth::user()->getDriverAccount()->id}});
+                passengerRequest = new PassengerRequestList('passenger-request', '{{env("APP_URL", "")}}', '{{env("NOMINATIM_URL", "")}}', {{Auth::user()->getDriverAccount()->id}});
             @endif
         @endauth
 
@@ -241,6 +241,9 @@
 
                         // var reviewRideIdField = document.getElementById('review-ride-id');
                         // reviewRideIdField.value = rideList.value;
+
+                        passengerRequest.destroyItems();
+                        passengerRequest.displayItems(rideId);
 
                         reviewForm.hidden = false;
                         reviewFormSubmit.hidden = false;
