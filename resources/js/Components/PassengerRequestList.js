@@ -91,28 +91,67 @@ export default class PassengerRequestList extends Component{
                     itemTime.innerHTML = "Time: " + data[0][i].time;
                     item.appendChild(itemTime);
 
+                    // Modal div for message input and action buttons
+                    var modalDiv = document.createElement('div');
+                    modalDiv.setAttribute('id', this.id + '-' + data[0][i].id + '-item-modal');
+                    modalDiv.style.display = 'none';
+
                     var itemMessageLabel = document.createElement('label');
                     itemMessageLabel.setAttribute('for', 'message');
                     itemMessageLabel.innerHTML = "Your Message: ";
-                    item.appendChild(itemMessageLabel);
+                    modalDiv.appendChild(itemMessageLabel);
 
                     var itemMessageInput = document.createElement('input');
                     itemMessageInput.setAttribute('type', 'text');
                     itemMessageInput.setAttribute('name', 'message');
                     itemMessageInput.setAttribute('id', this.id + '-' + data[0][i].id + '-item-message');
-                    item.appendChild(itemMessageInput);
+                    modalDiv.appendChild(itemMessageInput);
 
                     var btnAccept = document.createElement('button');
                     btnAccept.setAttribute('type', 'button');
                     btnAccept.setAttribute('id', this.id + '-' + data[0][i].id + '-item-btn-accept');
                     btnAccept.innerHTML = "Accept";
-                    item.appendChild(btnAccept);
+                    modalDiv.appendChild(btnAccept);
 
                     var btnReject = document.createElement('button');
                     btnReject.setAttribute('type', 'button');
                     btnReject.setAttribute('id', this.id + '-' + data[0][i].id + '-item-btn-reject');
                     btnReject.innerHTML = "Reject";
-                    item.appendChild(btnReject);
+                    modalDiv.appendChild(btnReject);
+
+                    item.appendChild(modalDiv);
+
+                    // Add click event listener to toggle modal visibility
+                    item.style.cursor = 'pointer';
+                    item.addEventListener('click', (e) => {
+                        // Prevent toggle when clicking buttons or input
+                        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') {
+                            return;
+                        }
+                        if (modalDiv.style.display === 'none') {
+                            modalDiv.style.display = 'block';
+                        } else {
+                            modalDiv.style.display = 'none';
+                        }
+                    });
+
+                    // Add event listener for accept button
+                    btnAccept.addEventListener('click', () => {
+                        const message = itemMessageInput.value;
+                        const requestId = data[0][i].id;
+                        console.log('Accepting request:', requestId, 'with message:', message);
+                        // @TODO: Implement API call to accept request
+                        // Example: this.acceptRequest(requestId, rideId, message);
+                    });
+
+                    // Add event listener for reject button
+                    btnReject.addEventListener('click', () => {
+                        const message = itemMessageInput.value;
+                        const requestId = data[0][i].id;
+                        console.log('Rejecting request:', requestId, 'with message:', message);
+                        // @TODO: Implement API call to reject request
+                        // Example: this.rejectRequest(requestId, rideId, message);
+                    });
 
                 this.list.appendChild(item);
             }
