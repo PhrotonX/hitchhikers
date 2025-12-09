@@ -118,14 +118,66 @@
                     var itemDiv = document.getElementById('ride-request-' + {{$rideRequest->id}});
                     var cancelButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-cancel-btn');
                     var deleteButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-delete-btn');
+                    var statusSpan = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-status');
 
+                    // Apply initial styling based on status
+                    applyStyling();
                     toggleButtons();
                     
                     cancelButton.addEventListener('click', cancelItem);
 
                     deleteButton.addEventListener('click', deleteItem);
 
+                    function applyStyling() {
+                        const status = "{{$rideRequest->status}}";
+                        
+                        if (status === 'approved') {
+                            statusSpan.innerHTML = "<span style='color: green;'>✓ Approved</span>";
+                            itemDiv.style.backgroundColor = '#d4edda';
+                            itemDiv.style.border = '2px solid #28a745';
+                            itemDiv.style.padding = '10px';
+                            itemDiv.style.marginBottom = '10px';
+                            itemDiv.style.borderRadius = '5px';
+                            cancelButton.style.display = 'none';
+                            deleteButton.style.display = 'none';
+                        } else if (status === 'rejected') {
+                            statusSpan.innerHTML = "<span style='color: red;'>✗ Rejected</span>";
+                            itemDiv.style.backgroundColor = '#f8d7da';
+                            itemDiv.style.border = '2px solid #dc3545';
+                            itemDiv.style.padding = '10px';
+                            itemDiv.style.marginBottom = '10px';
+                            itemDiv.style.borderRadius = '5px';
+                            cancelButton.style.display = 'none';
+                            deleteButton.style.display = 'inline-block';
+                        } else if (status === 'cancelled') {
+                            statusSpan.innerHTML = "<span style='color: gray;'>✗ Cancelled</span>";
+                            itemDiv.style.backgroundColor = '#f8f9fa';
+                            itemDiv.style.border = '2px solid #6c757d';
+                            itemDiv.style.padding = '10px';
+                            itemDiv.style.marginBottom = '10px';
+                            itemDiv.style.borderRadius = '5px';
+                        } else if (status === 'pending') {
+                            statusSpan.innerHTML = "<span style='color: orange;'>⏳ Pending</span>";
+                            itemDiv.style.backgroundColor = '#fff3cd';
+                            itemDiv.style.border = '2px solid #ffc107';
+                            itemDiv.style.padding = '10px';
+                            itemDiv.style.marginBottom = '10px';
+                            itemDiv.style.borderRadius = '5px';
+                        } else {
+                            itemDiv.style.padding = '10px';
+                            itemDiv.style.marginBottom = '10px';
+                            itemDiv.style.border = '1px solid #ddd';
+                            itemDiv.style.borderRadius = '5px';
+                        }
+                    }
+
                     function cancelItem(){
+                        if (!confirm('Are you sure you want to cancel this ride request?')) {
+                            return;
+                        }
+                        
+                        cancelButton.disabled = true;
+                        
                         fetch('{{env("APP_URL", "")}}/ride/requests/'+{{$rideRequest->id}}+'/update-status', {
                             method: 'PATCH',
                             body: JSON.stringify({
@@ -139,16 +191,26 @@
                         }).then((response) => {
                             return response.json();
                         }).then((data) => {
-                            var statusParagraph = document.getElementById('ride-request-'+{{$rideRequest->id}}+'-status');
-                            statusParagraph.innerHTML = "{{__('ride_request_status.cancelled')}}";
+                            statusSpan.innerHTML = "<span style='color: gray;'>✗ Cancelled</span>";
+                            itemDiv.style.backgroundColor = '#f8f9fa';
+                            itemDiv.style.border = '2px solid #6c757d';
                             cancelButton.hidden = true;
                             deleteButton.hidden = false;
+                            alert('Ride request cancelled successfully.');
                         }).catch((error) => {
-                            throw new Error(error);
+                            console.error(error);
+                            alert('Failed to cancel request. Please try again.');
+                            cancelButton.disabled = false;
                         });
                     }
 
                     function deleteItem(){
+                        if (!confirm('Are you sure you want to delete this ride request? This action cannot be undone.')) {
+                            return;
+                        }
+                        
+                        deleteButton.disabled = true;
+                        
                         fetch('{{env("APP_URL", "")}}' + '/ride/requests/'+{{$rideRequest->id}}+'/delete', {
                             method: 'DELETE',
                             headers: {
@@ -161,9 +223,15 @@
                         }).then((data) => {
                             cancelButton.removeEventListener('click', cancelItem);
                             deleteButton.removeEventListener('click', deleteItem);
-                            itemDiv.remove();
+                            itemDiv.style.transition = 'opacity 0.3s';
+                            itemDiv.style.opacity = '0';
+                            setTimeout(() => {
+                                itemDiv.remove();
+                            }, 300);
                         }).catch((error) => {
                             console.error(error);
+                            alert('Failed to delete request. Please try again.');
+                            deleteButton.disabled = false;
                         });
                     }
 
