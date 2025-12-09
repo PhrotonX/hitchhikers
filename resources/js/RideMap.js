@@ -159,7 +159,7 @@ export default class RideMap extends MainMap{
      * @param {*} rideId 
      * @returns 
      */
-    retrieveRideMarkers(rideId, hasLine = false){
+    retrieveRideMarkers(rideId, hasLine = false, fitBounds = false){
         return () => {
             // console.log("Map panned!");
 
@@ -212,6 +212,22 @@ export default class RideMap extends MainMap{
                     var polyline = L.polyline(latlngs, {
                         color: 'blue'
                     }).addTo(this.map);
+                }
+
+                // Fit bounds to show all markers and lines
+                if(fitBounds && latlngs.length > 0){
+                    // Include vehicle markers in bounds calculation
+                    let allPoints = [...latlngs];
+                    
+                    // Add vehicle marker positions if they exist
+                    this.vehicleMarkers.eachLayer((layer) => {
+                        allPoints.push(layer.getLatLng());
+                    });
+                    
+                    if(allPoints.length > 0){
+                        const boundsToFit = L.latLngBounds(allPoints);
+                        this.map.fitBounds(boundsToFit, {padding: [50, 50]});
+                    }
                 }
 
                 // console.log("Count: " + Object.keys(this.markers).length);

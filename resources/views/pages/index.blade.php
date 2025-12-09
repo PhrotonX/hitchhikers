@@ -71,7 +71,7 @@
     @auth
         @if (!Auth::user()->isDriver())
             <div id="ride-selector-wrapper">
-                <h2>Available Rides</h2>
+                <h2>Available Vehicles</h2>
                 <div id="ride-selector">
 
                 </div>
@@ -242,8 +242,12 @@
                         // var reviewRideIdField = document.getElementById('review-ride-id');
                         // reviewRideIdField.value = rideList.value;
 
-                        passengerRequest.destroyItems();
-                        passengerRequest.displayItems(rideId);
+                        @auth
+                            @if (Auth::user()->isDriver())
+                                passengerRequest.destroyItems();
+                                passengerRequest.displayItems(rideId);
+                            @endif
+                        @endauth
 
                         reviewForm.hidden = false;
                         reviewFormSubmit.hidden = false;
@@ -252,7 +256,9 @@
                     }
 
                     var btnMakeRideRequest = document.getElementById('btn-make-ride-request');
-                    btnMakeRideRequest.setAttribute('href', '/ride/'+rideId+'/requests/create');
+                    if(btnMakeRideRequest){
+                        btnMakeRideRequest.setAttribute('href', '/ride/'+rideId+'/requests/create');
+                    }
 
                     // Once the selection from ride list has changed, display all of its associated ride destinations.
                     getRides(rideList.value); 
@@ -506,7 +512,7 @@
         
         // Retrieves ride destinations based on ride ID.
         function getRides(rideId){
-            map.retrieveRideMarkers(rideId, true)();
+            map.retrieveRideMarkers(rideId, true, true)();
         }
         
     </script>
