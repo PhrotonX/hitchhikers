@@ -22,7 +22,11 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'chat_content' => ['string', 'required'],
+            'ride_request_id' => ['numeric', 'required'],
+            'driver_id' => ['numeric', 'required'],
+            'passenger_id' => ['numeric', 'required'],
+            'content_type' => ['string', 'required'],
         ];
     }
 }

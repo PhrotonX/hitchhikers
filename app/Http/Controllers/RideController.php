@@ -18,11 +18,15 @@ class RideController extends Controller
     use AuthorizesRequests;
 
     /**
-     * Display a listing of the resource.
+     * Display a listing of drivers rides.
      */
-    public function index()
+    public function index(int $driver)
     {
-        return view('pages.ride.show');
+        $rides = Ride::where('driver_id', $driver)->get();
+
+        return response()->json([
+            $rides,
+        ]);
     }
     
     /**

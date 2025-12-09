@@ -76,28 +76,54 @@
 
                 </div>
             </div>
+            
+            <div id="saved-ride-list">
+
+            </div>
+        @else
+            <div id="passenger-request">
+                <!-- <p id="passenger-request-title">Passenger Requests</p>
+                
+                <select id="passenger-request-ride-selector">
+
+                </select>
+
+                <div id="passenger-request--item">
+                    <p id="passenger-request--item-to"></p>
+                    <p id="passenger-request--item-from"></p>
+                    <p id="passenger-request--item-time"></p>
+                    <label for="message">Message (Optional):</label>
+                    <input type="text" name="message" id="passenger-request--item-message">
+                    <button type="button" id="passenger-request--item-btn-accept"></button>
+                    <button type="button" id="passenger-request--item-btn-reject"></button>
+                </div> -->
+            </div>
         @endif
     @endauth
     
     
-    <div id="saved-ride-list">
-
-    </div>
+    
 @endsection
 
 @push('scripts')
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
         import IndexPage from '{{ Vite::asset("resources/js/IndexPage.js") }}';
+        import PassengerRequestList from '{{ Vite::asset("resources/js/Components/PassengerRequestList.js") }}';
         // import SavedRides from '{{ Vite::asset("resources/js/Components/SavedRides.js") }}';
 
         // @NOTE: Newer code shall encapsulate code into IndexPage instead of throwing up every JS code in this file to reduce the mess.
         var page = new IndexPage('{{env("APP_URL", "")}}');
+        var passengerRequest = null;
         @auth
-        //     var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
-            page.loadAuthObjects({
-                'saved_rides': 'saved-ride-list',
-            });
+            @if (!Auth::user()->isDriver())
+                //var savedRides = new SavedRides('saved-ride-list', '{{env("APP_URL", "")}}');
+                page.loadAuthObjects({
+                    'saved_rides': 'saved-ride-list',
+                });
+            @else
+                passengerRequest = new PassengerRequestList('passenger-request', '{{env("APP_URL", "")}}', '{{env("NOMINATIM_URL", "")}}', {{Auth::user()->getDriverAccount()->id}});
+            @endif
         @endauth
 
         // Intialize variables
@@ -215,6 +241,9 @@
 
                         // var reviewRideIdField = document.getElementById('review-ride-id');
                         // reviewRideIdField.value = rideList.value;
+
+                        passengerRequest.destroyItems();
+                        passengerRequest.displayItems(rideId);
 
                         reviewForm.hidden = false;
                         reviewFormSubmit.hidden = false;
@@ -477,7 +506,7 @@
         
         // Retrieves ride destinations based on ride ID.
         function getRides(rideId){
-            map.retrieveRideMarkers(rideId)();
+            map.retrieveRideMarkers(rideId, true)();
         }
         
     </script>
