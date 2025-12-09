@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\DriverController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\RideRequestController;
+use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ReviewController;
@@ -101,6 +102,8 @@ Route::middleware(['auth', 'verified'])->group(function(){
 
     // Vehicle routes
     Route::patch('vehicle/{vehicle}/update-status', [VehicleController::class, 'updateStatus']);
+
+    Route::post('messages/submit', [MessageController::class, 'store']);
 });
 
 

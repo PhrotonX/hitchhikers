@@ -29,7 +29,14 @@ class MessageController extends Controller
      */
     public function store(StoreMessageRequest $request)
     {
-        //
+        $message = new Message();
+        $message->fill($request->validated());
+
+        $message->save();
+
+        return response()->json([
+            'status' => 'OK',
+        ]);
     }
 
     /**

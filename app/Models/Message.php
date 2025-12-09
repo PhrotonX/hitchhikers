@@ -13,6 +13,8 @@ class Message extends Model
     protected $fillable = [
         'chat_content',
         'content_type',
-        'sender_id',
+        'driver_id',
+        'passenger_id',
+        'ride_request_id',
     ];
 }
