@@ -96,16 +96,16 @@ export default class PassengerRequestList extends Component{
                     modalDiv.setAttribute('id', this.id + '-' + data[0][i].id + '-item-modal');
                     modalDiv.style.display = 'none';
 
-                    var itemMessageLabel = document.createElement('label');
-                    itemMessageLabel.setAttribute('for', 'message');
-                    itemMessageLabel.innerHTML = "Your Message: ";
-                    modalDiv.appendChild(itemMessageLabel);
+                    // var itemMessageLabel = document.createElement('label');
+                    // itemMessageLabel.setAttribute('for', 'message');
+                    // itemMessageLabel.innerHTML = "Your Message: ";
+                    // modalDiv.appendChild(itemMessageLabel);
 
-                    var itemMessageInput = document.createElement('input');
-                    itemMessageInput.setAttribute('type', 'text');
-                    itemMessageInput.setAttribute('name', 'message');
-                    itemMessageInput.setAttribute('id', this.id + '-' + data[0][i].id + '-item-message');
-                    modalDiv.appendChild(itemMessageInput);
+                    // var itemMessageInput = document.createElement('input');
+                    // itemMessageInput.setAttribute('type', 'text');
+                    // itemMessageInput.setAttribute('name', 'message');
+                    // itemMessageInput.setAttribute('id', this.id + '-' + data[0][i].id + '-item-message');
+                    // modalDiv.appendChild(itemMessageInput);
 
                     var btnAccept = document.createElement('button');
                     btnAccept.setAttribute('type', 'button');
@@ -137,20 +137,66 @@ export default class PassengerRequestList extends Component{
 
                     // Add event listener for accept button
                     btnAccept.addEventListener('click', () => {
-                        const message = itemMessageInput.value;
                         const requestId = data[0][i].id;
-                        console.log('Accepting request:', requestId, 'with message:', message);
-                        // @TODO: Implement API call to accept request
-                        // Example: this.acceptRequest(requestId, rideId, message);
+                        console.log('Accepting request:', requestId);
+                        
+                        fetch(this.appUrl + '/ride/requests/' + requestId + '/update-status', {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                status: 'approved'
+                            })
+                        })
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error('Failed to accept request');
+                            }
+                            return response.json();
+                        })
+                        .then((result) => {
+                            console.log('Request accepted:', result);
+                            // Remove the item from the list
+                            item.remove();
+                        })
+                        .catch((error) => {
+                            console.error('Error accepting request:', error);
+                            alert('Failed to accept request. Please try again.');
+                        });
                     });
 
                     // Add event listener for reject button
                     btnReject.addEventListener('click', () => {
-                        const message = itemMessageInput.value;
                         const requestId = data[0][i].id;
-                        console.log('Rejecting request:', requestId, 'with message:', message);
-                        // @TODO: Implement API call to reject request
-                        // Example: this.rejectRequest(requestId, rideId, message);
+                        console.log('Rejecting request:', requestId);
+                        
+                        fetch(this.appUrl + '/ride/requests/' + requestId + '/update-status', {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                status: 'rejected'
+                            })
+                        })
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error('Failed to reject request');
+                            }
+                            return response.json();
+                        })
+                        .then((result) => {
+                            console.log('Request rejected:', result);
+                            // Remove the item from the list
+                            item.remove();
+                        })
+                        .catch((error) => {
+                            console.error('Error rejecting request:', error);
+                            alert('Failed to reject request. Please try again.');
+                        });
                     });
 
                 this.list.appendChild(item);
