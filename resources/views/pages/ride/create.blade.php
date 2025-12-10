@@ -21,6 +21,15 @@
         /><br>
         <x-input-error :messages="$errors->get('ride_name')"/>
 
+        <x-input-label>Minimum Fare</x-input-label>
+        <x-text-input
+            :name="'minimum_fare'"
+            :placeholder="'Enter minimum fare'"
+            :value="old('minimum_fare')"
+            :required="true"
+        /><br>
+        <x-input-error :messages="$errors->get('minimum_fare')"/>
+
         <x-input-label>{{__('string.fare_rate')}}</x-input-label>
         <x-text-input
             :name="'fare_rate'"
