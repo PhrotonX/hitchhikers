@@ -21,7 +21,14 @@ class ProfitLogsController extends Controller
      */
     public function store(StoreProfitLogsRequest $request)
     {
-        
+        $profitLog = new ProfitLogs();
+
+        $profitLog->fill($request->validated());
+        $profitLog->save();
+
+        return response()->json([
+            $profitLog,
+        ]);
     }
 
     /**
