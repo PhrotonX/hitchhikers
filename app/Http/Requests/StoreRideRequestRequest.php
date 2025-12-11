@@ -32,6 +32,7 @@ class StoreRideRequestRequest extends FormRequest
             'pickup_at' => ['required', 'string', 'max:1000'],
             'time' => ['required'],
             'message' => ['nullable', 'string', 'max:5000'],
+            'price' => ['numeric', 'required'],
         ];
     }
 }

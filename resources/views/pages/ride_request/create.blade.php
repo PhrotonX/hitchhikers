@@ -23,23 +23,26 @@
         <p>From your location: <span id="ride-request-from-label">Retrieving location...</span></p>
         <p>To location: <span id="ride-request-to-label">N/A</span></p>
 
-        <input type="number" name="ride_id" id="ride-request-ride-id" value="{{$ride->id}}" hidden>
-        <input type="number" name="destination_id" id="ride-request-destination-id" hidden>
+        <input type="number" name="ride_id" id="ride-request-ride-id" value="{{$ride->id}}" hidden value="{{old('ride_id')}}">
+        <input type="number" name="destination_id" id="ride-request-destination-id" hidden value="{{old('destination_id')}}">
 
-        <input type="text" name="from_latitude" id="ride-request-from-latitude" hidden>
-        <input type="text" name="from_longitude" id="ride-request-from-longitude" hidden>
+        <input type="text" name="from_latitude" id="ride-request-from-latitude" hidden value="{{old('from_latitude')}}">
+        <input type="text" name="from_longitude" id="ride-request-from-longitude" hidden value="{{old('from_longitude')}}">
 
-        <input type="text" name="to_latitude" id="ride-request-to-latitude" hidden>
-        <input type="text" name="to_longitude" id="ride-request-to-longitude" hidden>
+        <input type="text" name="to_latitude" id="ride-request-to-latitude" hidden value="{{old('to_latitude')}}">
+        <input type="text" name="to_longitude" id="ride-request-to-longitude" hidden value="{{old('to_longitude')}}">
 
         <label for="pickup_at">To location / Pickup At:</label>
-        <input type="text" name="pickup_at" id="ride-request-pickup-at" required></input>
+        <input type="text" name="pickup_at" id="ride-request-pickup-at" required value="{{old('pickup_at')}}"></input>
+
+        <label for="price">Price: &#x20B1;<span id="price-value"></span></label>
+        <input type="text" name="price" id="ride-request-price" hidden value="{{old('price')}}">
 
         <label for="time">Pickup Time:</label>
-        <input type="time" name="time" id="ride-request-time" required></input>
+        <input type="time" name="time" id="ride-request-time" required value="{{old('time')}}"></input>
 
         <label for="message">Message (Optional):</label>
-        <textarea name="message" id="ride-request-message"></textarea>
+        <textarea name="message" id="ride-request-message" value="{{old('message')}}"></textarea>
 
         @if ($errors)
             <p>{{$errors}}</p>
@@ -49,6 +52,10 @@
         </button>
     </form>
 
+    <script>
+        window.fare_rate = {{ $ride->fare_rate ?? 0 }};
+        window.minimum_rate = {{ $ride->minimum_rate ?? 0 }};
+    </script>
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
         import CreateRideRequestPage from '{{ Vite::asset("resources/js/CreateRideRequestPage.js") }}';

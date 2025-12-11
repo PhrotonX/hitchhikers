@@ -2,7 +2,7 @@
 <x-map-head/>
 
 @push('head')
-    @vite(['resources/css/index.css'])
+    @vite(['resources/css/index.css', 'resources/css/ride_request/item.css'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -34,6 +34,7 @@
                     @endforeach
                 </select>
                 <div id="driving-mode-infobox"></div>
+                <button type="button" id="driver-view-details-btn" style="margin-top: 10px;">View Ride Details</button>
             </div>
         @endif
     @endauth
@@ -121,8 +122,6 @@
                 page.loadAuthObjects({
                     'saved_rides': 'saved-ride-list',
                 });
-            @else
-                passengerRequest = new PassengerRequestList('passenger-request', '{{env("APP_URL", "")}}', '{{env("NOMINATIM_URL", "")}}', {{Auth::user()->getDriverAccount()->id}});
             @endif
         @endauth
 
@@ -158,7 +157,38 @@
         map.configureMarkerIcon('currentPos', '{{Vite::asset("resources/img/current_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('active_vehicle', '{{Vite::asset("resources/img/blue_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('inactive_vehicle', '{{Vite::asset("resources/img/grey_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.configureMarkerIcon('selected', '{{Vite::asset("resources/img/selected_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.configureMarkerIcon('selected2', '{{Vite::asset("resources/img/selected_pin_2.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.detectLocation();
+        
+        // Set up ride marker click handler to show address tooltip
+        map.setOnRideMarkerClick((e, destination) => {
+            // Close any existing tooltips
+            map.cachedMarkers.eachLayer((layer) => {
+                if (layer.getTooltip()) {
+                    layer.closeTooltip();
+                    layer.unbindTooltip();
+                }
+            });
+
+            // Fetch and display address above the marker
+            fetch("{{env('NOMINATIM_URL', '')}}/reverse?lat=" + destination.latitude + "&lon=" + destination.longitude + '&format=json&zoom=18&addressdetails=1')
+                .then(response => response.json())
+                .then(data => {
+                    e.target.bindTooltip(data.display_name, {
+                        permanent: true,
+                        direction: 'top',
+                        className: 'destination-tooltip'
+                    }).openTooltip();
+                })
+                .catch(error => {
+                    console.log("Error: " + error);
+                    e.target.bindTooltip('Location', {
+                        permanent: true,
+                        direction: 'top'
+                    }).openTooltip();
+                });
+        });
         // Functionality for viewing vehicle information
         map.setOnVehicleMarkerClick((e, data) => {
 
@@ -172,11 +202,13 @@
                 '<button type="button" id="ride-view-review-btn">View Reviews</button><br>';
             infobox.style.display = "block";
             infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>';
+            infobox.innerHTML += '<br><button type="button" id="ride-view-details-btn" style="margin-top: 10px; display: none;">View Ride Details</button>';
             @auth
                 @if (!(Auth::user()->isDriver()))
-                    infobox.innerHTML += '<br><a id="btn-make-ride-request">Make Ride Request</button></div>';
+                    infobox.innerHTML += '<br><a id="btn-make-ride-request">Make Ride Request</a>';
                 @endif
             @endauth
+            infobox.innerHTML += '</div>';
             
             // Shows or hides Ride Request button.
             // document.getElementById('btn-make-ride-request').addEventListener('click', () => {
@@ -227,6 +259,7 @@
                 }
 
                 var viewReviewsBtn = document.getElementById('ride-view-review-btn');
+                var viewDetailsBtn = document.getElementById('ride-view-details-btn');
 
                 // Tag: onRideChange or onRideSelect
                 rideList.addEventListener('change', () => {
@@ -234,6 +267,7 @@
                     let rideId = rideList.value;
                     if(rideList.value < 1){
                         viewReviewsBtn.hidden = true;
+                        viewDetailsBtn.style.display = 'none';
                     }else{
                         // Change the action route to reflect the ride ID.
                         // var reviewForm = document.getElementById('review-form');
@@ -253,6 +287,7 @@
                         reviewFormSubmit.hidden = false;
                         reviewFormEdit.hidden = true;
                         viewReviewsBtn.hidden = false;
+                        viewDetailsBtn.style.display = 'inline-block';
                     }
 
                     var btnMakeRideRequest = document.getElementById('btn-make-ride-request');
@@ -262,6 +297,11 @@
 
                     // Once the selection from ride list has changed, display all of its associated ride destinations.
                     getRides(rideList.value); 
+                });
+
+                // Handle View Ride Details button click
+                viewDetailsBtn.addEventListener('click', () => {
+                    window.location.href = '{{env("APP_URL", "")}}' + '/ride/' + rideList.value;
                 });
 
                 reviewFormSubmit.addEventListener('click', () => {
@@ -381,9 +421,16 @@
         
         @auth
             @if (Auth::user()->isDriver())
+                // Initialize PassengerRequestList with map reference
+                passengerRequest = new PassengerRequestList('passenger-request', '{{env("APP_URL", "")}}', '{{env("NOMINATIM_URL", "")}}', {{Auth::user()->getDriverAccount()->id}}, map);
 
                 // Make the driving mode button always update its toggle value after loading the page.
                 updateSelectedRideOption();
+
+                // Set up event listener for View Ride Details button
+                document.getElementById('driver-view-details-btn').addEventListener('click', () => {
+                    window.location.href = '{{env("APP_URL", "")}}' + '/ride/' + drivingModeOption.value;
+                });
 
                 // Toggle the text of driving mode button once the user changes selection from the ride list.
                 drivingModeOption.addEventListener('change', function(){
@@ -482,6 +529,10 @@
                 }
                 
                 getRides(drivingModeOption.value);
+                
+                // Display passenger requests for this ride
+                passengerRequest.destroyItems();
+                passengerRequest.displayItems(drivingModeOption.value);
 
                 // Zoom into the position of associated vehicle from a selected ride.
                 fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value)
@@ -495,7 +546,7 @@
                         return response.json();
                     }).then((vehicleData) => {
                         // Displays information into driving-mode-infobox.
-                        infobox.innerHTML = "<p>"+vehicleData.vehicle.vehicle_name+"</p>"
+                        infobox.innerHTML = "<p>"+vehicleData.vehicle.vehicle_name+"</p>";
 
                         map.getMap().setView([vehicleData.vehicle.latitude, vehicleData.vehicle.longitude], 16);
                     }).catch((error) => {

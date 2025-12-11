@@ -2,9 +2,9 @@
 
 <x-map-head/>
 
-{{-- @push('head')
-    @vite('resources/js/Map.js');
-@endpush --}}
+@push('head')
+    @vite('resources/js/ride-destination.js');
+@endpush
 
 @section('content')
     <h1>{{__('string.create_ride')}}</h1>
@@ -20,6 +20,15 @@
             :required="true"
         /><br>
         <x-input-error :messages="$errors->get('ride_name')"/>
+
+        <x-input-label>Minimum Fare</x-input-label>
+        <x-text-input
+            :name="'minimum_fare'"
+            :placeholder="'Enter minimum fare'"
+            :value="old('minimum_fare')"
+            :required="true"
+        /><br>
+        <x-input-error :messages="$errors->get('minimum_fare')"/>
 
         <x-input-label>{{__('string.fare_rate')}}</x-input-label>
         <x-text-input
@@ -78,12 +87,11 @@
                                 map.getMap().removeLayer(marker);
                                 destinationList.removeChild(destinationItem);
                             });
-
-                            destinationItem.appendChild(removeButton);
-
                             var destinationCoordinates = document.createElement('p');
                             destinationCoordinates.innerHTML = 'Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng;
                             destinationItem.appendChild(destinationCoordinates);
+
+                            destinationItem.appendChild(removeButton);
 
                             var orderField = document.createElement('input');
                             orderField.setAttribute('type', 'number');
@@ -105,6 +113,9 @@
                             longitudeField.setAttribute('value', e.latlng.lng);
                             longitudeField.setAttribute('hidden', true);
                             destinationItem.appendChild(longitudeField);
+
+                            var horizontalLine = document.createElement('hr');
+                            destinationItem.appendChild(horizontalLine);
 
                         destinationList.appendChild(destinationItem);
                 });
@@ -136,9 +147,8 @@
         </div>
 
         <div id="destination-list">
-            <h3>{{__('string.from')}}</h3>
-            <h3>{{__('string.to')}}</h3>
-            
+            {{-- <h3>From</h3>
+            <h3>To</h3> --}}
         </div>
 
         @if ($errors)

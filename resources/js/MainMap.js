@@ -39,6 +39,17 @@ export default class MainMap{
     }
 
     /**
+     * Removes a marker from the map by its tag.
+     * @param {*} tag The key or name of the marker to remove.
+     */
+    clearMarker(tag){
+        if(this.markers[tag]){
+            this.map.removeLayer(this.markers[tag]);
+            delete this.markers[tag];
+        }
+    }
+
+    /**
      * Detects the current device location and adds a marker object on it.
      */
     detectLocation(){
