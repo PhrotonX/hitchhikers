@@ -3,7 +3,7 @@
 <x-map-head/>
 
 @push('head')
-    @vite('resources/js/RideMap.js');
+    @vite(['resources/js/RideMap.js', 'resources/css/ride_request/item.css']);
 @endpush
 
 @section('content')
@@ -47,6 +47,12 @@
                 map.cachedMarkers.clearLayers();
                 map.vehicleMarkers.clearLayers();
 
+                // Remove temporary marker if it exists
+                if(map.temporaryMarker){
+                    map.getMap().removeLayer(map.temporaryMarker);
+                    map.temporaryMarker = null;
+                }
+
                 // Remove lines from the map.
                 map.getMap().eachLayer((layer) => {
                     if(layer instanceof L.Polyline){
@@ -65,7 +71,8 @@
                 if(toLat && toLng){
                     map.temporaryMarker = L.marker([toLat, toLng], {
                         icon: map.markerIcons['selected']
-                    });
+                    }).addTo(map.getMap());
+                    map.setView(toLat, toLng, 15);
                 }
                 
 
@@ -77,20 +84,25 @@
 
     @isset($rideRequests)
         @foreach ($rideRequests as $rideRequest)
+            @php
+                $ride = $rides[$rideRequest->ride_id] ?? null;
+                $vehicle = $ride ? ($vehicles[$ride->vehicle_id] ?? null) : null;
+            @endphp
+            @if($ride && $vehicle)
             <div
-                class="ride-request"
+                class="ride-request ride-request-item"
                 id="ride-request-{{$rideRequest->id}}"
                 data-ride-id="{{$rideRequest->ride_id}}"
-                data-vehicle-lat="{{$vehicles[$rides[$rideRequest->ride_id]->id]->latitude}}"
-                data-vehicle-lng="{{$vehicles[$rides[$rideRequest->ride_id]->id]->longitude}}"
-                data-vehicle-status="{{$vehicles[$rides[$rideRequest->ride_id]->id]->status}}"
+                data-vehicle-lat="{{$vehicle->latitude}}"
+                data-vehicle-lng="{{$vehicle->longitude}}"
+                data-vehicle-status="{{$vehicle->status}}"
                 data-to-lat="{{$rideRequest->to_latitude}}"
                 data-to-lng="{{$rideRequest->to_longitude}}"
             >
                 <p><strong><span id="ride-request-{{$rideRequest->id}}-destination">{{$rideRequest->ride_name}}</span></strong></p>
                 {{-- @dump($rideRequest)
                 @dump($rides) --}}
-                <p><strong>Ride: </strong><span id="ride-request-{{$rideRequest->id}}-ride">{{$rides[$rideRequest->ride_id]->ride_name}}</span></p>
+                <p><strong>Ride: </strong><span id="ride-request-{{$rideRequest->id}}-ride">{{$ride->ride_name}}</span></p>
                 <p><strong>Pickup Location: </strong><span id="ride-request-{{$rideRequest->id}}-time">{{$rideRequest->pickup_at}}</span></p>
                 <p><strong>Vehicle Distance: </strong><span id="ride-request-{{$rideRequest->id}}-vehicle-distance">Calculating...</span></p>
                 <p><strong>Time: </strong><span id="ride-request-{{$rideRequest->id}}-time">{{$rideRequest->time}}</span></p>
@@ -102,6 +114,7 @@
                 <script type="module">
                     import getDistance from '{{ Vite::asset("resources/js/math.js") }}';                
 
+                    @if($vehicle && $vehicle->latitude && $vehicle->longitude)
                     if(navigator.geolocation){
                         navigator.geolocation.watchPosition((position) => {
                             var latitude = position.coords.latitude;
@@ -109,11 +122,14 @@
 
                             var vehicleDistanceElement = document.getElementById("ride-request-" + {{$rideRequest->id}} + "-vehicle-distance");
 
-                            vehicleDistanceElement.innerHTML = getDistance([latitude, longitude], [{{$vehicles[$rides[$rideRequest->ride_id]->id]->latitude}}, {{$vehicles[$rides[$rideRequest->ride_id]->id]->longitude}}]);
+                            vehicleDistanceElement.innerHTML = getDistance([latitude, longitude], [{{$vehicle->latitude}}, {{$vehicle->longitude}}]);
                         }, (error) => {
                         console.log("Error: " + error);
                         });
                     }
+                    @else
+                    document.getElementById("ride-request-" + {{$rideRequest->id}} + "-vehicle-distance").innerHTML = "N/A";
+                    @endif
 
                     var itemDiv = document.getElementById('ride-request-' + {{$rideRequest->id}});
                     var cancelButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-cancel-btn');
@@ -139,7 +155,7 @@
                             itemDiv.style.marginBottom = '10px';
                             itemDiv.style.borderRadius = '5px';
                             cancelButton.style.display = 'none';
-                            deleteButton.style.display = 'none';
+                            deleteButton.style.display = 'inline-block';
                         } else if (status === 'rejected') {
                             statusSpan.innerHTML = "<span style='color: red;'>✗ Rejected</span>";
                             itemDiv.style.backgroundColor = '#f8d7da';
@@ -156,6 +172,8 @@
                             itemDiv.style.padding = '10px';
                             itemDiv.style.marginBottom = '10px';
                             itemDiv.style.borderRadius = '5px';
+                            cancelButton.style.display = 'none';
+                            deleteButton.style.display = 'inline-block';
                         } else if (status === 'pending') {
                             statusSpan.innerHTML = "<span style='color: orange;'>⏳ Pending</span>";
                             itemDiv.style.backgroundColor = '#fff3cd';
@@ -163,6 +181,7 @@
                             itemDiv.style.padding = '10px';
                             itemDiv.style.marginBottom = '10px';
                             itemDiv.style.borderRadius = '5px';
+                            deleteButton.style.display = 'none';
                         } else {
                             itemDiv.style.padding = '10px';
                             itemDiv.style.marginBottom = '10px';
@@ -247,6 +266,7 @@
                     }
                 </script>
             </div>
+            @endif
         @endforeach
     @else
         <p>Empty!</p>

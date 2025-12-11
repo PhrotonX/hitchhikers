@@ -10,6 +10,7 @@ use App\Http\Controllers\RideController;
 use App\Http\Controllers\RideRequestController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\ProfitLogsController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SavedRideController;
@@ -42,6 +43,10 @@ Route::patch('user/{user}/update', [UserController::class, 'update'])->middlewar
 Route::get('user/{user}/delete', [UserController::class, 'delete'])->middleware(['auth', 'verified']);
 Route::delete('user/{user}/destroy', [UserController::class, 'destroy'])->middleware(['auth', 'verified'])->name('user.destroy');
 
+Route::middleware(['auth'])->group(function(){
+    Route::post('profit/submit', [ProfitLogsController::class, 'store']);
+});
+
 Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('driver/enroll', [DriverController::class, 'create']);
     Route::post('driver/enroll/submit', [DriverController::class, 'store']);
@@ -56,6 +61,9 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::delete('vehicle/{vehicle}/delete', [VehicleController::class, 'destroy'])->name('vehicle.delete');
     // Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
     Route::patch('vehicle/{vehicle}/update-location', [VehicleController::class, 'updateLocation']);
+
+    Route::get('profit/', [ProfitLogsController::class, 'index']);
+    Route::get('profit/ride/{ride}', [ProfitLogsController::class, 'showFromRide']);
 
     // Saved Ride routes
     Route::get('saved-rides/', [SavedRideController::class, 'index']);
@@ -87,7 +95,11 @@ Route::middleware(['auth', 'verified'])->group(function(){
     // Ride routes
     Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');
     Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');
+    Route::get('ride/{ride}/edit', [RideController::class, 'edit'])->name('ride.edit');
     Route::patch('ride/{ride}/update-status', [RideController::class, 'updateStatus']);
+    Route::patch('ride/{ride}/update', [RideController::class, 'update'])->name('ride.update');
+    Route::get('ride/{ride}/delete', [RideController::class, 'delete'])->name('ride.delete');
+    Route::delete('ride/{ride}/destroy', [RideController::class, 'destroy'])->name('ride.destroy');
     Route::post('ride/{ride}/reviews/submit', [ReviewController::class, 'store']);
 
     // Ride request routes
@@ -117,8 +129,9 @@ Route::get('settings', function(){
 Route::get('ride/destinations', [RideDestinationController::class, 'index']);
 Route::get('ride/destinations/{ride}', [RideDestinationController::class, 'get']);
 Route::get('driver/{driver}/ride/', [RideController::class, 'index']);
-Route::get('ride/{ride}', [RideController::class, 'get']);
+Route::get('ride/{ride}', [RideController::class, 'show'])->name('ride.show');
 Route::get('ride/{ride}/reviews', [ReviewController::class, 'getReviews']);
+Route::get('api/ride/{ride}', [RideController::class, 'get']);
 
 Route::get('vehicle', [VehicleController::class, 'index'])->name('vehicle.index');
 Route::get('api/vehicle/{vehicle}', [VehicleController::class, 'get'])->name('vehicle.get');
