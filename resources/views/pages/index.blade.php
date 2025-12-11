@@ -618,6 +618,7 @@
         // Delay initialization until window load to ensure Leaflet and other assets are ready
         var page = new IndexPage('{{env("APP_URL", "")}}');
         window.addEventListener('load', function(){
+            try {
         var passengerRequest = null;
         @auth
             @if (!Auth::user()->isDriver())
@@ -629,8 +630,8 @@
 
         // Intialize variables
         var infobox = document.getElementById('infobox');
-        var btnDrivingMode = document.getElementById('btn-driving-mode');
-        var drivingModeOption = document.getElementById('select-driving-vehicle');
+            var btnDrivingMode = document.getElementById('btn-driving-mode') || null;
+            var drivingModeOption = document.getElementById('select-driving-vehicle') || null;
         var reviewBox = document.getElementById('review-box');
 
         var reviewForm = document.getElementById('review-form');
@@ -652,6 +653,9 @@
                     'is_driver': true
                 @endif
             @endauth
+            } catch (e) {
+                console.error('Initialization error:', e);
+            }
         });
 
         map.configureMarkerIcon('default', '{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
@@ -662,6 +666,7 @@
 
         // Existing map & UI behavior preserved below (unchanged logic)
         map.setOnVehicleMarkerClick((e, data) => {
+            if (!infobox) return; // Guard against missing infobox
             infobox.innerHTML =
                 '<div id="ride-popup"><button type="button" id="ride-popup-close-btn">Close</button><br>' + 
                 "<p><strong>"+data.vehicle_name+"</strong></p>" + 
@@ -678,22 +683,26 @@
             @endauth
 
             var rideList = document.getElementById('ride-list');
-            infobox.addEventListener('click', (e) => {
+            if (infobox && rideList) {
+                infobox.addEventListener('click', (e) => {
                 if (e.target && e.target.id === 'ride-popup-close-btn') {
                     infobox.innerHTML = "";
                     infobox.style.display = "none";
                     map.cachedMarkers.clearLayers();
-                    reviewBox.hidden = true;
+                    if (reviewBox) reviewBox.hidden = true;
                 }
-            });
+                });
+            }
 
-            reviewBox.hidden = false;
+            if (reviewBox) reviewBox.hidden = false;
 
             map.reverseGeocode(data.latitude, data.longitude).then((location) => {
-                document.getElementById('ride-location').innerHTML = location.display_name;
+                var rideLocation = document.getElementById('ride-location');
+                if (rideLocation) rideLocation.innerHTML = location.display_name;
             });
 
             map.retrieveRides(data.id)().then((data) => {
+                if (!rideList) return;
                 var count = Object.keys(data.rides).length;
                 rideList.innerHTML = "";
                 for(let i = -1; i < count; i++){
@@ -712,22 +721,24 @@
 
                 var viewReviewsBtn = document.getElementById('ride-view-review-btn');
 
-                rideList.addEventListener('change', () => {
+                if (rideList) rideList.addEventListener('change', () => {
                     let rideId = rideList.value;
                     if(rideList.value < 1){
-                        viewReviewsBtn.hidden = true;
+                        if (viewReviewsBtn) viewReviewsBtn.hidden = true;
                     }else{
                         @auth
                             @if (Auth::user()->isDriver())
-                                passengerRequest.destroyItems();
-                                passengerRequest.displayItems(rideId);
+                                if (passengerRequest) {
+                                    passengerRequest.destroyItems();
+                                    passengerRequest.displayItems(rideId);
+                                }
                             @endif
                         @endauth
 
-                        reviewForm.hidden = false;
-                        reviewFormSubmit.hidden = false;
-                        reviewFormEdit.hidden = true;
-                        viewReviewsBtn.hidden = false;
+                        if (reviewForm) reviewForm.hidden = false;
+                        if (reviewFormSubmit) reviewFormSubmit.hidden = false;
+                        if (reviewFormEdit) reviewFormEdit.hidden = true;
+                        if (viewReviewsBtn) viewReviewsBtn.hidden = false;
                     }
 
                     var btnMakeRideRequest = document.getElementById('btn-make-ride-request');
@@ -737,13 +748,14 @@
 
                     getRides(rideList.value); 
                 });
+            }
 
-                reviewFormSubmit.addEventListener('click', () => {
+                if (reviewFormSubmit) reviewFormSubmit.addEventListener('click', () => {
                     fetch('{{env("APP_URL", "")}}' + '/ride/' + rideList.value + '/reviews/submit', {
                         method: "POST",
                         body: JSON.stringify({
-                            description: document.getElementById('review-form-description').value,
-                            rating: parseInt(document.getElementById('review-form-rating').value)
+                            description: reviewFormDescription ? reviewFormDescription.value : "",
+                            rating: reviewFormRating ? parseInt(reviewFormRating.value) : 0
                         }),
                         headers: {
                             "Content-type": "application/json",
@@ -753,17 +765,18 @@
                     }).then((response) => {
                         return response.json();
                     }).then((data) => {
-                        document.getElementById('review-form-description').value = "";
+                        if (reviewFormDescription) reviewFormDescription.value = "";
                     }).catch((error) => {
-                        throw new Error(error);
+                        console.error("Review submit error:", error);
                     });
                 });
+                }
 
-                viewReviewsBtn.addEventListener('click', () => {
+                if (viewReviewsBtn) viewReviewsBtn.addEventListener('click', () => {
                     fetch('{{env("APP_URL", "")}}' + '/ride/' + rideList.value + '/reviews')
                     .then((response) => { return response.json(); })
                     .then((data) => {
-                        reviewList.hidden = false;
+                        if (reviewList) reviewList.hidden = false;
                         var reviewCount = Object.keys(data.reviews).length;
                         for(let i = 0; i < reviewCount; i++){
                             var reviewItem = document.createElement('div');
@@ -778,14 +791,16 @@
                                     editReviewBtn.setAttribute('id', reviewTagId);
                                     editReviewBtn.innerHTML = 'Edit';
                                     editReviewBtn.addEventListener('click', () => {
-                                        reviewForm.hidden = false;
-                                        reviewFormId.value = data.reviews[i].id;
-                                        reviewFormDescription.value = data.reviews[i].description;
-                                        reviewFormRating.value = data.reviews[i].rating;
-                                        reviewFormSubmit.hidden = true;
-                                        reviewFormEdit.value = data.reviews[i].rating;
-                                        reviewFormEdit.hidden = false;
-                                        reviewFormEdit.addEventListener('click', () => { page.onUpdateReview(data.reviews[i].id); });
+                                        if (reviewForm) reviewForm.hidden = false;
+                                        if (reviewFormId) reviewFormId.value = data.reviews[i].id;
+                                        if (reviewFormDescription) reviewFormDescription.value = data.reviews[i].description;
+                                        if (reviewFormRating) reviewFormRating.value = data.reviews[i].rating;
+                                        if (reviewFormSubmit) reviewFormSubmit.hidden = true;
+                                        if (reviewFormEdit) {
+                                            reviewFormEdit.value = data.reviews[i].rating;
+                                            reviewFormEdit.hidden = false;
+                                            reviewFormEdit.addEventListener('click', () => { if (page) page.onUpdateReview(data.reviews[i].id); });
+                                        }
                                     });
                                     reviewItem.appendChild(editReviewBtn);
 
@@ -799,14 +814,15 @@
 
                             reviewList.appendChild(reviewItem);
                         }
-                    }).catch((error) => { throw new Error(error); });
+                    }).catch((error) => { console.error("Review list error:", error); });
                 });
+            }
 
                 @auth
                     @if (!(Auth::user()->isDriver()))
-                        reviewList.hidden = false;
+                        if (reviewList) reviewList.hidden = false;
                     @else
-                        reviewList.hidden = true;
+                        if (reviewList) reviewList.hidden = true;
                     @endif
                 @endauth
             });
@@ -816,13 +832,16 @@
 
         @auth
             @if (Auth::user()->isDriver())
-                updateSelectedRideOption();
-                drivingModeOption.addEventListener('change', function(){ updateSelectedRideOption(); });
-                btnDrivingMode.addEventListener('click', function(){
+                if (drivingModeOption) updateSelectedRideOption();
+                if (drivingModeOption) {
+                    drivingModeOption.addEventListener('change', function(){ updateSelectedRideOption(); });
+                }
+                if (btnDrivingMode) {
+                    btnDrivingMode.addEventListener('click', function(){
                     var drivingMode = "inactive";                    
                     selectedDrivingModeOption = document.getElementById("ride-option" + "-" + drivingModeOption.value);
-                    if(status == "active"){ drivingMode = "inactive"; selectedDrivingModeOption.setAttribute('data-status', 'inactive'); }
-                    else { drivingMode = "active"; selectedDrivingModeOption.setAttribute('data-status', 'active'); }
+                    if(status == "active"){ drivingMode = "inactive"; if (selectedDrivingModeOption) selectedDrivingModeOption.setAttribute('data-status', 'inactive'); }
+                    else { drivingMode = "active"; if (selectedDrivingModeOption) selectedDrivingModeOption.setAttribute('data-status', 'active'); }
                     updateSelectedRideOption();
 
                     fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value+'/update-status', {
@@ -838,24 +857,26 @@
                             if(drivingMode == "active"){ map.startLiveTracking(vehicleData.vehicle.id); }
                             else{ map.stopLiveTracking(map.trackingId); }
                             map.setMarkerIcon("vehicle-" + vehicleData.vehicle.id, status + "_vehicle");
-                        }).catch((error) => { throw new Error(error); });
-                    }).catch((error) => { throw new Error(error); });
-                });
+                            }).catch((error) => { console.error("Vehicle status update error:", error); });
+                        }).catch((error) => { console.error("Ride status update error:", error); });
+                    });
+                }
             @endif
 
             function updateSelectedRideOption(){
+                if (!drivingModeOption) return;
                 var selectedDrivingModeOption = document.getElementById("ride-option" + "-" + drivingModeOption.value);
-                var infobox = document.getElementById("driving-mode-infobox");
-                status = selectedDrivingModeOption.getAttribute('data-status');
-                if(status == "active"){ btnDrivingMode.innerHTML = "Stop driving mode"; }
-                else{ btnDrivingMode.innerHTML = "Start driving mode"; }
+                var drivingInfobox = document.getElementById("driving-mode-infobox");
+                if (selectedDrivingModeOption) status = selectedDrivingModeOption.getAttribute('data-status');
+                if(status == "active" && btnDrivingMode){ btnDrivingMode.innerHTML = "Stop driving mode"; }
+                else if (btnDrivingMode){ btnDrivingMode.innerHTML = "Start driving mode"; }
                 getRides(drivingModeOption.value);
                 fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value).then((response) => { return response.json(); }).then((data) => {
                     fetch('{{env("APP_URL", "")}}' + '/api/vehicle/'+data.ride.vehicle_id).then((response) => { return response.json(); }).then((vehicleData) => {
-                        infobox.innerHTML = "<p>"+vehicleData.vehicle.vehicle_name+"</p>";
+                        if (drivingInfobox) drivingInfobox.innerHTML = "<p>"+vehicleData.vehicle.vehicle_name+"</p>";
                         map.getMap().setView([vehicleData.vehicle.latitude, vehicleData.vehicle.longitude], 16);
-                    }).catch((error) => { throw new Error(error); });
-                }).catch((error) => { throw new Error(error); });
+                    }).catch((error) => { console.error("Vehicle fetch error:", error); });
+                }).catch((error) => { console.error("Ride fetch error:", error); });
             }
         @endauth
 
