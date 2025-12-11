@@ -12,6 +12,7 @@ return [
     */
     'create_ride' => 'Create Ride',
     'edit_ride' => 'Edit Ride',
+    'delete_ride' => 'Delete Ride',
     'delete' => 'Delete',
     'destinations' => 'Destinations',
     'driving_program_enrollment_success' => 'You have sucessfully enrolled into the driving program!',
@@ -48,4 +49,9 @@ return [
     'fare_rate_placeholder' => 'Enter fare rate here...',
     'vehicle' => 'Vehicle',
     'vehicle_placeholder' => 'Enter vehicle here...',
+    'created_at' => 'Date Created',
+    'updated_at' => 'Date Updated',
+    'deleted_at' => 'Date Deleted',
+    'not_set' => 'Not Set',
+    'loading' => 'Loading',
 ];
