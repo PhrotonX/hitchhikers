@@ -3,6 +3,7 @@
  * Front-end API for the Web.
  */
 
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\RideDestinationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DriverController;
@@ -148,5 +149,40 @@ Route::get('reviews/{review}/replies', [ReplyController::class, 'getReplies']);
 Route::get('test', function(){
     return view('dist.index');
 });
+
+
+// Protected audit log routes (requires authentication)
+Route::middleware(['auth:sanctum'])->group(function () {
+    
+    // Get all audit logs with optional filters
+    // GET /api/audit-logs?user_id=1&table=rides&event=updated&from=2024-01-01&to=2024-12-31&per_page=50
+    Route::get('/audit-logs', [AuditLogController::class, 'index']);
+    
+    // Get a specific audit log
+    // GET /api/audit-logs/123
+    Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show']);
+    
+    // Get audit logs for the authenticated user
+    // GET /api/audit-logs/my-logs?limit=50
+    Route::get('/audit-logs/my-logs', [AuditLogController::class, 'myLogs']);
+    
+    // Get recent activity
+    // GET /api/audit-logs/recent-activity?limit=20
+    Route::get('/audit-logs/recent-activity', [AuditLogController::class, 'recentActivity']);
+    
+    // Get audit statistics
+    // GET /api/audit-logs/statistics
+    Route::get('/audit-logs/statistics', [AuditLogController::class, 'statistics']);
+    
+    // Get audit logs for a specific record
+    // GET /api/audit-logs/record/rides/123
+    Route::get('/audit-logs/record/{table}/{id}', [AuditLogController::class, 'showRecordLogs']);
+    
+    // Clean old audit logs
+    // POST /api/audit-logs/clean
+    // Body: {"days_to_keep": 90}
+    Route::post('/audit-logs/clean', [AuditLogController::class, 'cleanOldLogs']);
+});
+
 
 require __DIR__.'/auth.php';

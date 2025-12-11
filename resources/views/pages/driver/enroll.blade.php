@@ -40,10 +40,10 @@
         </select>
         
         <br>
-
+<!-- 
         <strong>Notice:</strong>
         <p>Please verify your driver account enrolling into driving program. Without verification,
-            the ability to make rides will be only available within 1 hour.</p>
+            the ability to make rides will be only available within 1 hour.</p> -->
         
         <button type="submit">{{__('string.submit')}}</button><br>
     </form>

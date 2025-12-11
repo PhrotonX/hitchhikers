@@ -79,7 +79,7 @@
             @auth
                 @if (!Auth::user()->isDriver())
                     <div id="ride-selector-wrapper">
-                        <h2>Available Vehicles</h2>
+                        <h2>Available Rides</h2>
                         <div id="ride-selector"></div>
                     </div>
 

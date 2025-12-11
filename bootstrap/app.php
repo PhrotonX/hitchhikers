@@ -18,6 +18,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+            'audit.log' => \App\Http\Middleware\AuditLogMiddleware::class,
+        ]);
+
+        // Optionally enable audit logging globally for all web routes
+        $middleware->web(append: [
+            \App\Http\Middleware\AuditLogMiddleware::class,
         ]);
 
         //

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -57,6 +59,19 @@ class PasswordResetLinkController extends Controller
             throw ValidationException::withMessages([
                 'email' => [__($status)],
             ]);
+        }
+        
+        // Log password reset request
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            $auditService = new AuditLogService();
+            $auditService->log(
+                'password_reset_requested',
+                'users',
+                $user->id,
+                null,
+                ['email' => $user->email]
+            );
         }
 
         return $status;

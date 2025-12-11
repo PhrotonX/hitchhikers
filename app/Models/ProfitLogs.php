@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ProfitLogs extends Model
 {
     /** @use HasFactory<\Database\Factories\ProfitLogsFactory> */
-    use HasFactory;
+    use HasFactory, Auditable;
 
     protected $table = "profit_logs";
 
