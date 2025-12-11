@@ -48,12 +48,25 @@
                 
                 <div class="destinations-list">
                     @foreach($destinations as $index => $destination)
-                        <div class="destination-item" data-lat="{{ $destination->latitude }}" data-lng="{{ $destination->longitude }}">
+                        <div class="destination-item" data-index="{{ $index }}" data-lat="{{ $destination->latitude }}" data-lng="{{ $destination->longitude }}" data-destination-id="{{ $destination->id }}">
                             <p>{{$index + 1}}. <strong><span class="destination-name">{{ __('string.loading') }}...</span></strong></p>
                             <p>{{ __('string.coordinates') }}: {{ $destination->latitude }}, {{ $destination->longitude }}</p>
                         </div>
                     @endforeach
                 </div>
+
+                <style>
+                    .destination-item {
+                        padding: 10px;
+                        margin: 5px 0;
+                        border-left: 3px solid transparent;
+                        transition: all 0.3s ease;
+                    }
+                    .destination-item.highlighted {
+                        background-color: #e3f2fd;
+                        border-left-color: #2196f3;
+                    }
+                </style>
 
                 <script type="module">
                     import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
@@ -71,6 +84,39 @@
                     
                     // Disable auto-pan to current location
                     map.panToCurrentPos = false;
+                    
+                    // Set up marker click handler to show address and highlight destination item
+                    map.setOnRideMarkerClick((e, destination) => {
+                        // Remove previous highlights
+                        document.querySelectorAll('.destination-item').forEach(item => {
+                            item.classList.remove('highlighted');
+                        });
+
+                        // Highlight the corresponding destination item
+                        const destItem = document.querySelector(`.destination-item[data-destination-id="${destination.id}"]`);
+                        if (destItem) {
+                            destItem.classList.add('highlighted');
+                            destItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
+
+                        // Fetch and display address above the marker
+                        fetch("{{env('NOMINATIM_URL', '')}}/reverse?lat=" + destination.latitude + "&lon=" + destination.longitude + '&format=json&zoom=18&addressdetails=1')
+                            .then(response => response.json())
+                            .then(data => {
+                                e.target.bindTooltip(data.display_name, {
+                                    permanent: true,
+                                    direction: 'top',
+                                    className: 'destination-tooltip'
+                                }).openTooltip();
+                            })
+                            .catch(error => {
+                                console.log("Error: " + error);
+                                e.target.bindTooltip('{{ __('string.location') }}', {
+                                    permanent: true,
+                                    direction: 'top'
+                                }).openTooltip();
+                            });
+                    });
                     
                     // Load ride markers with line and auto-fit bounds
                     map.retrieveRideMarkers({{ $ride->id }}, true, true)();

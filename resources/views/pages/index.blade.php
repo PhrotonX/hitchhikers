@@ -159,6 +159,35 @@
         map.configureMarkerIcon('active_vehicle', '{{Vite::asset("resources/img/blue_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('inactive_vehicle', '{{Vite::asset("resources/img/grey_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.detectLocation();
+        
+        // Set up ride marker click handler to show address tooltip
+        map.setOnRideMarkerClick((e, destination) => {
+            // Close any existing tooltips
+            map.cachedMarkers.eachLayer((layer) => {
+                if (layer.getTooltip()) {
+                    layer.closeTooltip();
+                    layer.unbindTooltip();
+                }
+            });
+
+            // Fetch and display address above the marker
+            fetch("{{env('NOMINATIM_URL', '')}}/reverse?lat=" + destination.latitude + "&lon=" + destination.longitude + '&format=json&zoom=18&addressdetails=1')
+                .then(response => response.json())
+                .then(data => {
+                    e.target.bindTooltip(data.display_name, {
+                        permanent: true,
+                        direction: 'top',
+                        className: 'destination-tooltip'
+                    }).openTooltip();
+                })
+                .catch(error => {
+                    console.log("Error: " + error);
+                    e.target.bindTooltip('Location', {
+                        permanent: true,
+                        direction: 'top'
+                    }).openTooltip();
+                });
+        });
         // Functionality for viewing vehicle information
         map.setOnVehicleMarkerClick((e, data) => {
 
