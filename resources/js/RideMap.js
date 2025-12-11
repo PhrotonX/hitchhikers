@@ -102,6 +102,12 @@ export default class RideMap extends MainMap{
                 //Populate the map with markers
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
+                    
+                    // Skip markers with null/invalid coordinates
+                    if (!data.results[i].latitude || !data.results[i].longitude) {
+                        console.log('Skipping ride destination with null coordinates:', data.results[i].id);
+                        continue;
+                    }
 
                     //Check if the marker already exists to avoid marker duplication.
                     if(!this.rideMarkers.hasLayer(this.markers["ride-" + data.results[i].id])){
@@ -184,6 +190,12 @@ export default class RideMap extends MainMap{
                 //Populate the map with markers
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
+                    
+                    // Skip markers with null/invalid coordinates
+                    if (!data.results[i].latitude || !data.results[i].longitude) {
+                        console.log('Skipping ride marker with null coordinates:', data.results[i].id);
+                        continue;
+                    }
 
                     //Check if the marker already exists to avoid marker duplication.
                     if(!this.cachedMarkers.hasLayer(this.markers["ride-" + data.results[i].id])){
@@ -298,6 +310,12 @@ export default class RideMap extends MainMap{
                 //Populate the map with markers
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
+                    
+                    // Skip vehicles with null/invalid coordinates
+                    if (!data.results[i].latitude || !data.results[i].longitude) {
+                        console.log('Skipping vehicle with null coordinates:', data.results[i].id);
+                        continue;
+                    }
 
                     if(!this.isDriver){
                         this.buildRideSelector(data, i);
