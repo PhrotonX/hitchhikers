@@ -11,6 +11,7 @@ return [
     |
     */
     'create_ride' => 'Create Ride',
+    'edit_ride' => 'Edit Ride',
     'delete' => 'Delete',
     'destinations' => 'Destinations',
     'driving_program_enrollment_success' => 'You have sucessfully enrolled into the driving program!',

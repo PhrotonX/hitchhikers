@@ -87,7 +87,9 @@ Route::middleware(['auth', 'verified'])->group(function(){
     // Ride routes
     Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');
     Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');
+    Route::get('ride/{ride}/edit', [RideController::class, 'edit'])->name('ride.edit');
     Route::patch('ride/{ride}/update-status', [RideController::class, 'updateStatus']);
+    Route::patch('ride/{ride}/update', [RideController::class, 'update'])->name('ride.update');
     Route::post('ride/{ride}/reviews/submit', [ReviewController::class, 'store']);
 
     // Ride request routes

@@ -39,7 +39,12 @@ class RidePolicy
      */
     public function update(User $user, Ride $ride): bool
     {
-        return $user->isDriver() && $ride->driver_id == $user->id;
+        if (!$user->isDriver()) {
+            return false;
+        }
+        
+        $driverAccount = $user->getDriverAccount();
+        return $driverAccount && $ride->driver_id == $driverAccount->id;
     }
 
     /**

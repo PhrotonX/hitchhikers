@@ -67,7 +67,7 @@ class RideController extends Controller
         Log::debug("RideController.oncreate(): Validating...");
 
         $validated = $request->validated();
-        $ride->driver_id = Auth::user()->id;
+        $ride->driver_id = Auth::user()->getDriverAccount()->id;
         $ride->ride_name = $validated['ride_name'];
         $ride->fare_rate = $validated['fare_rate'];
         $ride->vehicle_id = $validated['vehicle_id'];
@@ -114,7 +114,13 @@ class RideController extends Controller
      */
     public function edit(Ride $ride)
     {
-        //
+        $this->authorize('update', $ride);
+
+        return view('pages.ride.edit', [
+            'ride' => $ride,
+            'destinations' => $ride->getRideDestinations()->orderBy('order')->get(),
+            'driverVehicles' => Auth::user()->getVehicleDriver(),
+        ]);
     }
 
     /**
@@ -122,7 +128,45 @@ class RideController extends Controller
      */
     public function update(UpdateRideRequest $request, Ride $ride)
     {
+        Log::debug("RideController.update(): Request called");
         
+        Log::debug("RideController.update(): Authorizing...");
+
+        //@TODO: Must verify that the user is a driver and owns the selected vehicle.
+        $this->authorize('update', $ride);
+
+        Log::debug("RideController.update(): Authorized...");
+
+        Log::debug("RideController.update(): Validating...");
+
+        $validated = $request->validated();
+        $ride->ride_name = $validated['ride_name'];
+        $ride->fare_rate = $validated['fare_rate'];
+        $ride->vehicle_id = $validated['vehicle_id'];
+
+        Log::debug("RideController.update(): Saving...");
+
+        $ride->save();
+
+        Log::debug("RideController.update(): Saved...");
+
+        // Delete existing destinations
+        RideDestination::where('ride_id', $ride->id)->delete();
+
+        // Add new destinations
+        for($i = 0; $i < count($validated['order']); $i++){
+            $destinations = new RideDestination();
+            $destinations->ride_id = $ride->id;
+            $destinations->latitude = $validated['latitude'][$i];
+            $destinations->longitude = $validated['longitude'][$i];
+            $destinations->order = $validated['order'][$i];
+            $destinations->save();
+        }
+
+        return view('pages.rides.view', [
+            'ride' => $ride,
+            'status' => "Ride $ride->ride_name updated!",
+        ]);
     }
 
     public function updateStatus(UpdateRideStatus $request, Ride $ride)
