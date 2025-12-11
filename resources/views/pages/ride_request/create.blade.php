@@ -76,6 +76,13 @@
         map.configureMarkerIcon('selected', '{{Vite::asset("resources/img/selected_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.detectLocation();
 
+        // Display vehicle marker on the map
+        @if(isset($vehicle) && $vehicle->latitude && $vehicle->longitude)
+            const vehicleIconTag = '{{$vehicle->status}}' === 'active' ? 'active_vehicle' : 'inactive_vehicle';
+            map.addMarker('vehicle-{{$vehicle->id}}', {{$vehicle->latitude}}, {{$vehicle->longitude}}, vehicleIconTag);
+            map.setView({{$vehicle->latitude}}, {{$vehicle->longitude}}, 14);
+        @endif
+
         var page = new CreateRideRequestPage('{{env("APP_URL", "")}}', map, {{$ride->id}});
     </script>
     

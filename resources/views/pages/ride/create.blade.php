@@ -40,9 +40,9 @@
         <x-input-error :messages="$errors->get('fare_rate')"/>
 
         <x-input-label>{{__('string.vehicle')}}</x-input-label>
-        <select name="vehicle_id" title="{{__('string.vehicle')}}">
+        <select name="vehicle_id" id="vehicle-select" title="{{__('string.vehicle')}}">
             @foreach ($driverVehicles as $key => $value)
-                <option value="{{$value->vehicle->id}}">{{$value->vehicle->vehicle_name}}</option>
+                <option value="{{$value->vehicle->id}}" data-lat="{{$value->vehicle->latitude}}" data-lng="{{$value->vehicle->longitude}}" data-status="{{$value->vehicle->status}}">{{$value->vehicle->vehicle_name}}</option>
             @endforeach
         </select>
         <x-input-error :messages="$errors->get('vehicle_id')"/>
@@ -59,7 +59,34 @@
                 var map = new MainMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
                 map.configureMarkerIcon('default', '{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
                 map.configureMarkerIcon('currentPos', '{{Vite::asset("resources/img/current_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+                map.configureMarkerIcon('active_vehicle', '{{Vite::asset("resources/img/blue_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+                map.configureMarkerIcon('inactive_vehicle', '{{Vite::asset("resources/img/grey_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
                 map.enableClickToAddMultipleMarkers();
+                
+                // Handle vehicle selection change to display vehicle marker
+                const vehicleSelect = document.getElementById('vehicle-select');
+                
+                function updateVehicleMarker() {
+                    // Clear existing vehicle marker
+                    map.clearMarker('selected-vehicle');
+                    
+                    const selectedOption = vehicleSelect.options[vehicleSelect.selectedIndex];
+                    const lat = parseFloat(selectedOption.getAttribute('data-lat'));
+                    const lng = parseFloat(selectedOption.getAttribute('data-lng'));
+                    const status = selectedOption.getAttribute('data-status');
+                    
+                    if (lat && lng) {
+                        const iconTag = status === 'active' ? 'active_vehicle' : 'inactive_vehicle';
+                        map.addMarker('selected-vehicle', lat, lng, iconTag);
+                        map.setView(lat, lng, 14);
+                    }
+                }
+                
+                // Display initial vehicle marker
+                updateVehicleMarker();
+                
+                // Update marker when vehicle selection changes
+                vehicleSelect.addEventListener('change', updateVehicleMarker);
                 map.onMapClick(function(marker, e, data){
                     // const parser = new DOMParser();
                     // const xmlDoc = parser.parseFromString(data, 'text/xml');
