@@ -77,20 +77,25 @@
 
     @isset($rideRequests)
         @foreach ($rideRequests as $rideRequest)
+            @php
+                $ride = $rides[$rideRequest->ride_id] ?? null;
+                $vehicle = $ride ? ($vehicles[$ride->vehicle_id] ?? null) : null;
+            @endphp
+            @if($ride && $vehicle)
             <div
                 class="ride-request"
                 id="ride-request-{{$rideRequest->id}}"
                 data-ride-id="{{$rideRequest->ride_id}}"
-                data-vehicle-lat="{{$vehicles[$rides[$rideRequest->ride_id]->id]->latitude}}"
-                data-vehicle-lng="{{$vehicles[$rides[$rideRequest->ride_id]->id]->longitude}}"
-                data-vehicle-status="{{$vehicles[$rides[$rideRequest->ride_id]->id]->status}}"
+                data-vehicle-lat="{{$vehicle->latitude}}"
+                data-vehicle-lng="{{$vehicle->longitude}}"
+                data-vehicle-status="{{$vehicle->status}}"
                 data-to-lat="{{$rideRequest->to_latitude}}"
                 data-to-lng="{{$rideRequest->to_longitude}}"
             >
                 <p><strong><span id="ride-request-{{$rideRequest->id}}-destination">{{$rideRequest->ride_name}}</span></strong></p>
                 {{-- @dump($rideRequest)
                 @dump($rides) --}}
-                <p><strong>Ride: </strong><span id="ride-request-{{$rideRequest->id}}-ride">{{$rides[$rideRequest->ride_id]->ride_name}}</span></p>
+                <p><strong>Ride: </strong><span id="ride-request-{{$rideRequest->id}}-ride">{{$ride->ride_name}}</span></p>
                 <p><strong>Pickup Location: </strong><span id="ride-request-{{$rideRequest->id}}-time">{{$rideRequest->pickup_at}}</span></p>
                 <p><strong>Vehicle Distance: </strong><span id="ride-request-{{$rideRequest->id}}-vehicle-distance">Calculating...</span></p>
                 <p><strong>Time: </strong><span id="ride-request-{{$rideRequest->id}}-time">{{$rideRequest->time}}</span></p>
@@ -109,7 +114,7 @@
 
                             var vehicleDistanceElement = document.getElementById("ride-request-" + {{$rideRequest->id}} + "-vehicle-distance");
 
-                            vehicleDistanceElement.innerHTML = getDistance([latitude, longitude], [{{$vehicles[$rides[$rideRequest->ride_id]->id]->latitude}}, {{$vehicles[$rides[$rideRequest->ride_id]->id]->longitude}}]);
+                            vehicleDistanceElement.innerHTML = getDistance([latitude, longitude], [{{$vehicle->latitude}}, {{$vehicle->longitude}}]);
                         }, (error) => {
                         console.log("Error: " + error);
                         });
@@ -247,6 +252,7 @@
                     }
                 </script>
             </div>
+            @endif
         @endforeach
     @else
         <p>Empty!</p>

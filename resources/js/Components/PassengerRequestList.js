@@ -279,7 +279,7 @@ export default class PassengerRequestList extends Component{
             }
         })
         .catch((error) => {
-            throw new Error(error);
+            console.log('No ride requests found or error fetching requests:', error);
         });
     }
 

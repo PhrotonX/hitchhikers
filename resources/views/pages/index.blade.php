@@ -527,6 +527,10 @@
                 }
                 
                 getRides(drivingModeOption.value);
+                
+                // Display passenger requests for this ride
+                passengerRequest.destroyItems();
+                passengerRequest.displayItems(drivingModeOption.value);
 
                 // Zoom into the position of associated vehicle from a selected ride.
                 fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value)
