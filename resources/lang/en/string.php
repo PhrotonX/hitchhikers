@@ -54,4 +54,6 @@ return [
     'deleted_at' => 'Date Deleted',
     'not_set' => 'Not Set',
     'loading' => 'Loading',
+    'yes_delete' => 'Yes, Delete',
+    'warning' => 'Warning',
 ];

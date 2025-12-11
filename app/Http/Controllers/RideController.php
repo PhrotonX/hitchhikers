@@ -209,7 +209,7 @@ class RideController extends Controller
         // Delete the ride
         $ride->delete();
 
-        return redirect()->route('settings')
+        return redirect()->route('home')
             ->with('success', "Ride '$rideName' has been deleted successfully.");
     }
 }
