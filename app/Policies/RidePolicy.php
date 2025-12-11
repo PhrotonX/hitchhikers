@@ -52,7 +52,12 @@ class RidePolicy
      */
     public function delete(User $user, Ride $ride): bool
     {
-        return false;
+        if (!$user->isDriver()) {
+            return false;
+        }
+        
+        $driverAccount = $user->getDriverAccount();
+        return $driverAccount && $ride->driver_id == $driverAccount->id;
     }
 
     /**

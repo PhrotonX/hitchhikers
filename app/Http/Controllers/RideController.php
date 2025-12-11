@@ -48,10 +48,11 @@ class RideController extends Controller
      */    
     public function store(StoreRideRequest $request)
     {
-        Log::debug("RideController.oncreate(): Request called");
+        Log::debug("RideController.store(): Request called");
         $result = $this->onStore($request);
 
-        return view('pages.rides.view', $result);
+        return redirect()->route('ride.show', $result['ride']->id)
+            ->with('success', $result['status']);
     }
 
     protected function onStore(StoreRideRequest $request){
@@ -100,7 +101,10 @@ class RideController extends Controller
      */
     public function show(Ride $ride)
     {
-        //
+        return view('pages.ride.view', [
+            'ride' => $ride,
+            'destinations' => $ride->getRideDestinations()->orderBy('order')->get(),
+        ]);
     }
 
     public function get(Ride $ride){
@@ -163,10 +167,8 @@ class RideController extends Controller
             $destinations->save();
         }
 
-        return view('pages.rides.view', [
-            'ride' => $ride,
-            'status' => "Ride $ride->ride_name updated!",
-        ]);
+        return redirect()->route('ride.show', $ride->id)
+            ->with('success', "Ride $ride->ride_name updated!");
     }
 
     public function updateStatus(UpdateRideStatus $request, Ride $ride)
@@ -181,10 +183,33 @@ class RideController extends Controller
     }
 
     /**
+     * Show the delete confirmation page.
+     */
+    public function delete(Ride $ride)
+    {
+        $this->authorize('delete', $ride);
+
+        return view('pages.ride.delete', [
+            'ride' => $ride,
+        ]);
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Ride $ride)
     {
-        //
+        $this->authorize('delete', $ride);
+
+        $rideName = $ride->ride_name;
+        
+        // Delete associated destinations
+        RideDestination::where('ride_id', $ride->id)->delete();
+        
+        // Delete the ride
+        $ride->delete();
+
+        return redirect()->route('settings')
+            ->with('success', "Ride '$rideName' has been deleted successfully.");
     }
 }
