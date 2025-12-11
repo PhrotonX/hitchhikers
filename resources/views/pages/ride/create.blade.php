@@ -147,8 +147,8 @@
         </div>
 
         <div id="destination-list">
-            <h3>{{__('string.from')}}</h3>
-            <h3>{{__('string.to')}}</h3>
+            {{-- <h3>From</h3>
+            <h3>To</h3> --}}
         </div>
 
         @if ($errors)

@@ -205,13 +205,17 @@ export default class PassengerRequestList extends Component{
                         
                         console.log('Item clicked, rideMap:', this.rideMap);
                         console.log('From coordinates:', fromLatitude, fromLongitude);
+                        console.log('To coordinates:', toLatitude, toLongitude);
                         
-                        // Show pickup location marker on map
+                        // Show pickup and destination markers on map
                         if (this.rideMap) {
-                            console.log('Clearing marker...');
+                            console.log('Clearing markers...');
                             this.rideMap.clearMarker('selected');
-                            console.log('Adding marker...');
+                            this.rideMap.clearMarker('selected2');
+                            console.log('Adding pickup marker...');
                             this.rideMap.addMarker('selected', fromLatitude, fromLongitude, 'selected');
+                            console.log('Adding destination marker...');
+                            this.rideMap.addMarker('selected2', toLatitude, toLongitude, 'selected2');
                             console.log('Setting view...');
                             this.rideMap.setView(fromLatitude, fromLongitude, 15);
                             console.log('Marker operations complete');

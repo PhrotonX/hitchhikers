@@ -158,6 +158,7 @@
         map.configureMarkerIcon('active_vehicle', '{{Vite::asset("resources/img/blue_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('inactive_vehicle', '{{Vite::asset("resources/img/grey_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('selected', '{{Vite::asset("resources/img/selected_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.configureMarkerIcon('selected2', '{{Vite::asset("resources/img/selected_pin_2.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.detectLocation();
         
         // Set up ride marker click handler to show address tooltip
