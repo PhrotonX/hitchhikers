@@ -67,16 +67,26 @@ export default class PassengerRequestList extends Component{
             let count = Object.keys(data[0]).length;
 
             for(let i = 0; i < count; i++){
-                console.log(data[0][i]);
-                var item = document.createElement('div');
-                item.setAttribute('id', this.id + '-' + data[0][i].id + '-item');
+                // Wrap in IIFE to ensure proper closure for each iteration
+                ((requestData, index) => {
+                    console.log(requestData);
+                    
+                    // Capture ALL data for this iteration
+                    const requestId = requestData.id;
+                    const toLatitude = requestData.to_latitude;
+                    const toLongitude = requestData.to_longitude;
+                    const fromLatitude = requestData.from_latitude;
+                    const fromLongitude = requestData.from_longitude;
+                    const requestTime = requestData.time;
+                    const requestPrice = requestData.price;
+                    const requestProfit = requestData.profit;
+                    const currentStatus = requestData.status;
+                    
+                    var item = document.createElement('div');
+                    item.setAttribute('id', this.id + '-' + requestId + '-item');
+                    item.className = 'ride-request-item';
 
                     var itemTo = document.createElement('p');
-                    const requestId = data[0][i].id; // Capture the ID for closure
-                    const toLatitude = data[0][i].to_latitude;
-                    const toLongitude = data[0][i].to_longitude;
-                    const fromLatitude = data[0][i].from_latitude;
-                    const fromLongitude = data[0][i].from_longitude;
                     
                     itemTo.setAttribute('id', this.id + '-' + requestId + '-item-to');
                     itemTo.innerHTML = "To: Retrieving address...";
@@ -94,25 +104,25 @@ export default class PassengerRequestList extends Component{
                     item.appendChild(itemFrom);
 
                     var itemTime = document.createElement('p');
-                    itemTime.setAttribute('id', this.id + '-' + data[0][i].id + '-item-time');
-                    itemTime.innerHTML = "Time: " + data[0][i].time;
+                    itemTime.setAttribute('id', this.id + '-' + requestId + '-item-time');
+                    itemTime.innerHTML = "Time: " + requestTime;
                     item.appendChild(itemTime);
 
                     var itemProfit = document.createElement('p');
-                    itemProfit.setAttribute('id', this.id + '-' + data[0][i].id + '-item-profit');
-                    itemProfit.innerHTML = "Estimated Profit: PHP" + data[0][i].price;
+                    itemProfit.setAttribute('id', this.id + '-' + requestId + '-item-profit');
+                    itemProfit.innerHTML = "Estimated Profit: PHP" + requestPrice;
                     item.appendChild(itemProfit);
 
                     var itemStatus = document.createElement('p');
-                    itemStatus.setAttribute('id', this.id + '-' + data[0][i].id + '-item-status');
-                    itemStatus.innerHTML = "<strong>Status: </strong>" + data[0][i].status;
+                    itemStatus.setAttribute('id', this.id + '-' + requestId + '-item-status');
+                    itemStatus.innerHTML = "<strong>Status: </strong>" + currentStatus;
                     itemStatus.style.fontWeight = 'bold';
                     item.appendChild(itemStatus);
 
                     // Modal div for message input and action buttons
                     var modalDiv = document.createElement('div');
-                    modalDiv.setAttribute('id', this.id + '-' + data[0][i].id + '-item-modal');
-                    modalDiv.style.display = 'none';
+                    modalDiv.setAttribute('id', this.id + '-' + requestId + '-item-modal');
+                    modalDiv.className = 'ride-request-modal';
 
                     // var itemMessageLabel = document.createElement('label');
                     // itemMessageLabel.setAttribute('for', 'message');
@@ -127,40 +137,61 @@ export default class PassengerRequestList extends Component{
 
                     var btnAccept = document.createElement('button');
                     btnAccept.setAttribute('type', 'button');
-                    btnAccept.setAttribute('id', this.id + '-' + data[0][i].id + '-item-btn-accept');
+                    btnAccept.setAttribute('id', this.id + '-' + requestId + '-item-btn-accept');
+                    btnAccept.className = 'btn-accept';
                     btnAccept.innerHTML = "Accept";
                     modalDiv.appendChild(btnAccept);
 
                     var btnReject = document.createElement('button');
                     btnReject.setAttribute('type', 'button');
-                    btnReject.setAttribute('id', this.id + '-' + data[0][i].id + '-item-btn-reject');
+                    btnReject.setAttribute('id', this.id + '-' + requestId + '-item-btn-reject');
+                    btnReject.className = 'btn-reject';
                     btnReject.innerHTML = "Reject";
                     modalDiv.appendChild(btnReject);
 
                     item.appendChild(modalDiv);
 
+                    // Create delete button (visible for approved/rejected/cancelled, hidden for pending)
+                    var btnDelete = document.createElement('button');
+                    btnDelete.setAttribute('type', 'button');
+                    btnDelete.setAttribute('id', this.id + '-' + requestId + '-item-btn-delete');
+                    btnDelete.className = 'btn-delete';
+                    btnDelete.innerHTML = "Delete";
+                    item.appendChild(btnDelete);
+
                     // Apply styling based on current status
-                    const currentStatus = data[0][i].status;
                     console.log('Creating item with status:', currentStatus, 'ID:', requestId);
                     
                     if (currentStatus === 'approved') {
-                        itemStatus.innerHTML = "<strong>Status: </strong><span style='color: green;'>✓ Approved</span>";
-                        itemStatus.style.color = 'green';
-                        item.style.backgroundColor = '#d4edda';
-                        item.style.border = '2px solid #28a745';
-                        item.style.cursor = 'pointer'; // Changed from 'default' to allow clicks
-                        modalDiv.remove(); // Don't show buttons for already approved requests
-                    } else if (currentStatus === 'rejected') {
-                        itemStatus.innerHTML = "<strong>Status: </strong><span style='color: red;'>✗ Rejected</span>";
-                        itemStatus.style.color = 'red';
-                        item.style.backgroundColor = '#f8d7da';
-                        item.style.border = '2px solid #dc3545';
-                        item.style.cursor = 'pointer'; // Changed from 'default' to allow clicks
-                        modalDiv.remove(); // Don't show buttons for already rejected requests
-                    } else {
-                        itemStatus.innerHTML = "<strong>Status: </strong><span style='color: orange;'>⏳ Pending</span>";
-                        itemStatus.style.color = 'orange';
+                        itemStatus.innerHTML = "<strong>Status: </strong><span class='status-approved-text'>✓ Approved</span>";
+                        item.classList.add('status-approved');
                         item.style.cursor = 'pointer';
+                        // Keep modalDiv in DOM but ensure it stays hidden
+                        modalDiv.style.display = 'none';
+                        btnDelete.style.display = 'block'; // Show delete button
+                    } else if (currentStatus === 'rejected') {
+                        itemStatus.innerHTML = "<strong>Status: </strong><span class='status-rejected-text'>✗ Rejected</span>";
+                        item.classList.add('status-rejected');
+                        item.style.cursor = 'pointer';
+                        // Keep modalDiv in DOM but ensure it stays hidden
+                        modalDiv.style.display = 'none';
+                        btnDelete.style.display = 'block'; // Show delete button
+                    } else if (currentStatus === 'cancelled') {
+                        itemStatus.innerHTML = "<strong>Status: </strong><span class='status-cancelled-text'>✗ Cancelled</span>";
+                        item.classList.add('status-cancelled');
+                        item.style.cursor = 'pointer';
+                        // Keep modalDiv in DOM but ensure it stays hidden
+                        modalDiv.style.display = 'none';
+                        btnDelete.style.display = 'block'; // Show delete button
+                    } else if (currentStatus === 'pending') {
+                        itemStatus.innerHTML = "<strong>Status: </strong><span class='status-pending-text'>⏳ Pending</span>";
+                        item.classList.add('status-pending');
+                        item.style.cursor = 'pointer';
+                        btnDelete.style.display = 'none'; // Hide delete button for pending
+                    } else {
+                        // Default styling for unknown status
+                        item.style.cursor = 'pointer';
+                        btnDelete.style.display = 'none';
                     }
 
                     // Add click event listener to show pickup marker (for ALL statuses)
@@ -201,7 +232,6 @@ export default class PassengerRequestList extends Component{
                     // Add event listener for accept button (only if pending)
                     if (currentStatus === 'pending') {
                         btnAccept.addEventListener('click', () => {
-                            const requestId = data[0][i].id;
                             console.log('Accepting request:', requestId);
                         
                         // Disable buttons during request
@@ -228,19 +258,19 @@ export default class PassengerRequestList extends Component{
                             console.log('Request approved, submitting profit log...');
                             
                             // Log into profit log.
-                            const fromSpan = document.getElementById(this.id + '-' + data[0][i].id + '-item-from-span');
-                            const toSpan = document.getElementById(this.id + '-' + data[0][i].id + '-item-to-span');
+                            const fromSpan = document.getElementById(this.id + '-' + requestId + '-item-from-span');
+                            const toSpan = document.getElementById(this.id + '-' + requestId + '-item-to-span');
                             
                             const profitData = {
                                 ride_id: rideId,
-                                ride_request_id: data[0][i].id,
-                                from_latitude: data[0][i].from_latitude,
-                                from_longitude: data[0][i].from_longitude,
+                                ride_request_id: requestId,
+                                from_latitude: fromLatitude,
+                                from_longitude: fromLongitude,
                                 from_address: fromSpan ? fromSpan.innerText : 'Unknown',
-                                to_latitude: data[0][i].to_latitude,
-                                to_longitude: data[0][i].to_longitude,
+                                to_latitude: toLatitude,
+                                to_longitude: toLongitude,
                                 to_address: toSpan ? toSpan.innerText : 'Unknown',
-                                profit: data[0][i].price,
+                                profit: requestPrice,
                             };
                             
                             console.log('Profit data to submit:', profitData);
@@ -305,8 +335,6 @@ export default class PassengerRequestList extends Component{
 
                     // Add event listener for reject button
                     btnReject.addEventListener('click', () => {
-                        const requestId = data[0][i].id;
-                        
                         if (!confirm('Are you sure you want to reject this ride request?')) {
                             return;
                         }
@@ -348,6 +376,9 @@ export default class PassengerRequestList extends Component{
                             modalDiv.style.display = 'none';
                             item.style.cursor = 'default';
                             
+                            // Show delete button after rejection
+                            btnDelete.style.display = 'block';
+                            
                             // Show success message
                             alert('Request rejected. The passenger has been notified.');
                         })
@@ -361,7 +392,49 @@ export default class PassengerRequestList extends Component{
                         });
                     }
 
+                    // Add event listener for delete button (for all statuses)
+                    btnDelete.addEventListener('click', () => {
+                        if (!confirm('Are you sure you want to delete this ride request? This action cannot be undone.')) {
+                            return;
+                        }
+                        
+                        console.log('Deleting request:', requestId);
+                        btnDelete.disabled = true;
+                        
+                        fetch(this.appUrl + '/ride/requests/' + requestId + '/delete', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        })
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error('Failed to delete request');
+                            }
+                            return response.json();
+                        })
+                        .then((result) => {
+                            console.log('Request deleted:', result);
+                            
+                            // Animate removal
+                            item.style.transition = 'opacity 0.3s';
+                            item.style.opacity = '0';
+                            setTimeout(() => {
+                                item.remove();
+                            }, 300);
+                            
+                            alert('✓ Request deleted successfully.');
+                        })
+                        .catch((error) => {
+                            console.error('Error deleting request:', error);
+                            alert('Failed to delete request. Please try again.');
+                            btnDelete.disabled = false;
+                        });
+                    });
+
                 this.list.appendChild(item);
+                })(data[0][i], i); // Close IIFE and pass data
             }
         })
         .catch((error) => {

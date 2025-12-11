@@ -120,17 +120,35 @@ class RideRequestController extends Controller
      */
     public function updateStatus(UpdateRideRequestStatusRequest $request, int $rideRequest)
     {
-        $data = RideRequest::find($rideRequest);
+        if(Auth::user()->isDriver()){
+            $data = RideRequest::find($rideRequest);
 
-        $data->fill($request->validated());
-        $data->status_updated_at = $data->now();
-        $data->update();
+            $data->fill($request->validated());
+            $data->status_updated_at = $data->now();
+            $data->update();
 
-        //@TODO: Profit Log
+            //@TODO: Profit Log
+            $profitLog = new ProfitLogs();
 
-        return response()->json([
-            $data
-        ]);
+            $profitLog->from_latitude = $data->from_latitude;
+            $profitLog->from_longitude = $data->from_longitude;
+            $profitLog->to_latitude = $data->to_latitude;
+            $profitLog->to_longitude = $data->to_longitude;
+            $profitLog->profit = $data->price;
+            $profitLog->ride_id = $data->ride_id;
+            $profitLog->ride_request_id = $data->id;
+            $profitLog->driver_id = Auth::user()->getDriverAccount()->id;
+            $profitLog->save();
+
+            return response()->json([
+                $data
+            ]);
+        }else{
+            return response()->json([
+                'status' => 'Forbidden. Only drivers can update ride request status.'
+            ]);
+        }
+        
     }
 
     /**

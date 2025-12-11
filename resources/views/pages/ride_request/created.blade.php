@@ -3,7 +3,7 @@
 <x-map-head/>
 
 @push('head')
-    @vite('resources/js/RideMap.js');
+    @vite(['resources/js/RideMap.js', 'resources/css/ride_request/item.css']);
 @endpush
 
 @section('content')
@@ -90,7 +90,7 @@
             @endphp
             @if($ride && $vehicle)
             <div
-                class="ride-request"
+                class="ride-request ride-request-item"
                 id="ride-request-{{$rideRequest->id}}"
                 data-ride-id="{{$rideRequest->ride_id}}"
                 data-vehicle-lat="{{$vehicle->latitude}}"
@@ -155,7 +155,7 @@
                             itemDiv.style.marginBottom = '10px';
                             itemDiv.style.borderRadius = '5px';
                             cancelButton.style.display = 'none';
-                            deleteButton.style.display = 'none';
+                            deleteButton.style.display = 'inline-block';
                         } else if (status === 'rejected') {
                             statusSpan.innerHTML = "<span style='color: red;'>✗ Rejected</span>";
                             itemDiv.style.backgroundColor = '#f8d7da';
@@ -172,6 +172,8 @@
                             itemDiv.style.padding = '10px';
                             itemDiv.style.marginBottom = '10px';
                             itemDiv.style.borderRadius = '5px';
+                            cancelButton.style.display = 'none';
+                            deleteButton.style.display = 'inline-block';
                         } else if (status === 'pending') {
                             statusSpan.innerHTML = "<span style='color: orange;'>⏳ Pending</span>";
                             itemDiv.style.backgroundColor = '#fff3cd';
@@ -179,6 +181,7 @@
                             itemDiv.style.padding = '10px';
                             itemDiv.style.marginBottom = '10px';
                             itemDiv.style.borderRadius = '5px';
+                            deleteButton.style.display = 'none';
                         } else {
                             itemDiv.style.padding = '10px';
                             itemDiv.style.marginBottom = '10px';
