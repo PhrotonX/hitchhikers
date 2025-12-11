@@ -1,6 +1,7 @@
 @import url('ride.css');
 @import url('login.css');
-
+@import url('footer.css');
+@import url('header.css');
 
 :root {
     /* Light Mode Colors (Original) */
