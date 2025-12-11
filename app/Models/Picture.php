@@ -3,7 +3,7 @@
 namespace App\Models;
 use App\Models\File;
 use App\Models\FilePicture;
-use App\HasNullPicture;
+use App\Models\HasNullPicture;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\Auditable;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\User;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\PictureController;
 use App\JSON\PictureJSON;
@@ -31,20 +31,32 @@ class ProfilePictureController extends PictureController
         return $pictures;
     }
 
-    public function getPicturesJson($accountId){
+    public function getPicturesJson($user){
+        // Handle both User model and ID
+        $accountId = is_object($user) ? $user->id : $user;
+        
+        // Check authorization - users can only view their own pictures
+        if ((int)Auth::id() !== (int)$accountId) {
+            return response()->json([
+                'error' => 'Unauthorized'
+            ], 403);
+        }
+        
         $pictures = $this->getPictures($accountId);
 
         $json = null;
         foreach ($pictures as $key => $value) {
-            $json[$key] = new PictureJSON;
-            // Use the setPicture method which includes asset() function
-            $json[$key]->setPicture($value->picture);
-            // Override with profile-specific data
-            $json[$key]->picture_id = $value->pfp_id; // Use profile picture ID instead of picture ID
-            $json[$key]->src = asset($value->pfp_medium); // Use medium size profile picture with asset()
+            if ($value && $value->picture) {
+                $json[$key] = new PictureJSON;
+                // Use the setPicture method which includes asset() function
+                $json[$key]->setPicture($value->picture);
+                // Override with profile-specific data
+                $json[$key]->picture_id = $value->pfp_id; // Use profile picture ID instead of picture ID
+                $json[$key]->src = 'storage/' . $value->pfp_medium; // Use medium size profile picture (relative to public/)
+            }
         }
 
-        return response()->json($json);
+        return response()->json($json ?? []);
     }
 
     /**
@@ -138,9 +150,18 @@ class ProfilePictureController extends PictureController
 
                 //Make a new filepath with the size of image appended on the end of the file name.
                 $newFilePath = $picture->removeFileExtension($picture->picture_path) . $SIZES[$i] . '.' . $extension;
+                
+                // Get full filesystem path for saving
+                $fullNewPath = storage_path('app/public/' . $newFilePath);
+                
+                // Ensure directory exists
+                $directory = dirname($fullNewPath);
+                if (!file_exists($directory)) {
+                    mkdir($directory, 0755, true);
+                }
 
                 //Save the image with appropriate format and high quality.
-                $this->saveImageWithQuality($resizedImage[$i], $newFilePath, $extension);
+                $this->saveImageWithQuality($resizedImage[$i], $fullNewPath, $extension);
 
                 //Save the filepath of shrunken images to database.
                 switch($SIZES[$i]){
@@ -165,26 +186,30 @@ class ProfilePictureController extends PictureController
 
         // Checks if the file type is compatible for image resizing and then invokes the anonymous
         // function resize().
+        
+        // Get the full filesystem path for image processing
+        $fullPath = storage_path('app/public/' . $picture->picture_path);
+        
         switch($extension){
             case ProfilePicture::$EXTENSION_JPG;
             case ProfilePicture::$EXTENSION_JPEG;
             case ProfilePicture::$EXTENSION_JPEG;
             case ProfilePicture::$EXTENSION_JFIF:
-                $image = imagecreatefromjpeg($picture->picture_path);
+                $image = imagecreatefromjpeg($fullPath);
                 if ($image !== false) {
                     $resize();
                     imagedestroy($image); // Clean up memory
                 }
                 break;
             case ProfilePicture::$EXTENSION_PNG:
-                $image = imagecreatefrompng($picture->picture_path);
+                $image = imagecreatefrompng($fullPath);
                 if ($image !== false) {
                     $resize();
                     imagedestroy($image); // Clean up memory
                 }
                 break;
             case ProfilePicture::$EXTENSION_GIF:
-                $image = imagecreatefromgif($picture->picture_path);
+                $image = imagecreatefromgif($fullPath);
                 if ($image !== false) {
                     $resize();
                     imagedestroy($image); // Clean up memory
@@ -204,27 +229,38 @@ class ProfilePictureController extends PictureController
     
     /**
      * Has to be authenticated before use.
-     * 
+     * Enforces single profile picture policy by deleting old picture before uploading new one.
      */
-    public function store($file){
-        // echo("ProfilePictureController");
-        // dump($file[0]);
+    public function store($user = null){
+        $file = request()->file('profile_picture');
 
-        if($file){
-            //$this->delete(Auth::user()->profile_picture_id);
-            Log::debug("ProfilePictureController::store()");
+        if($file && $file->isValid()){
+            Log::debug("ProfilePictureController::store() - File received: " . $file->getClientOriginalName());
             $accountId = Auth::id();
+            
+            // Delete existing profile picture to maintain single picture policy
+            $user = Auth::user();
+            if ($user->profile_picture_id) {
+                try {
+                    $this->delete($user, $user->profile_picture_id);
+                    Log::debug("Deleted old profile picture: " . $user->profile_picture_id);
+                } catch (\Exception $e) {
+                    Log::warning("Failed to delete old profile picture: " . $e->getMessage());
+                    // Continue with upload even if deletion fails
+                }
+            }
 
             $this->directory .= $accountId . "/pfp";
             $this->type = 'profile_picture';
 
-            parent::store($file[0]);
+            parent::store($file);
 
             Log::debug("ProfilePictureController stored");
+            
+            return redirect()->back()->with('success', 'Profile picture uploaded successfully!');
         }
 
-        return null;
-        //return view here...
+        return redirect()->back()->with('error', 'No file was uploaded.');
     }
 
     /**
@@ -266,10 +302,21 @@ class ProfilePictureController extends PictureController
      * 
      * Only the authenticated uploader can delete their own profile pictures through this function.
      * 
-     * @param user_id The authenticated user ID
+     * @param user The user model instance
      * @param pfp_id The ID of the profile picture to be deleted.
      */
-    public function delete($user_id, $pfp_id){
+    public function delete($user, $pfp_id){
+        // Handle both User model and ID
+        $userId = is_object($user) ? $user->id : $user;
+        
+        // Check authorization
+        if ((int)Auth::id() !== (int)$userId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized - you can only delete your own pictures'
+            ], 403);
+        }
+        
         try {
             //Obtain the ProfilePicture datum.
             $profilePicture = ProfilePicture::where('pfp_id', $pfp_id)->first();

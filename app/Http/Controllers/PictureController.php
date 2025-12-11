@@ -10,9 +10,14 @@ abstract class PictureController extends Controller
 {
     public const STORAGE_DIRECTORY = 'storage/';
     public const IMAGE_DIRECTORY = 'img/';
-    protected $directory = 'img/';
+    protected $directory = '';
     //protected $errorImage = 'res/img/question_mark.png';
     protected $type = '';
+
+    public function __construct()
+    {
+        $this->directory = self::IMAGE_DIRECTORY;
+    }
 
     public function add(){
 
@@ -43,13 +48,16 @@ abstract class PictureController extends Controller
         //Handle image
         if($file){
             //Add filename and filepath into the image
-            $timestamp = date('YmdHIi') . '_';
+            $timestamp = date('YmdHis') . '_';
             $originalName = $file->getClientOriginalName();
             $filename = $timestamp . $originalName;
 
             //Move the image into the directory set initially.
             $storedPath = $file->storeAs($this->directory, $filename, 'public');
-            $filepath = self::STORAGE_DIRECTORY . $storedPath;
+            
+            // Don't add 'storage/' prefix - the file is in storage/app/public/
+            // and will be accessed via public/storage/ symlink
+            $filepath = $storedPath;
 
             //Put the filepath into the DB - use correct column name
             $data['picture_path'] = $filepath;
