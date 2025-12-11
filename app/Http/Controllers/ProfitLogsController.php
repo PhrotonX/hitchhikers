@@ -29,17 +29,26 @@ class ProfitLogsController extends Controller
      */
     public function store(StoreProfitLogsRequest $request)
     {
-        $this->authorize('create', ProfitLogs::class);
-        
-        $profitLog = new ProfitLogs();
+        try {
+            $this->authorize('create', ProfitLogs::class);
+            
+            $profitLog = new ProfitLogs();
 
-        $profitLog->fill($request->validated());
-        $profitLog->driver_id = Auth::user()->getDriverAccount()->id;
-        $profitLog->save();
+            $profitLog->fill($request->validated());
+            $profitLog->driver_id = Auth::user()->getDriverAccount()->id;
+            $profitLog->save();
 
-        return response()->json([
-            $profitLog,
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $profitLog,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
     }
 
     public function showFromRide(Ride $ride){

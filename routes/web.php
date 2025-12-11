@@ -43,6 +43,10 @@ Route::patch('user/{user}/update', [UserController::class, 'update'])->middlewar
 Route::get('user/{user}/delete', [UserController::class, 'delete'])->middleware(['auth', 'verified']);
 Route::delete('user/{user}/destroy', [UserController::class, 'destroy'])->middleware(['auth', 'verified'])->name('user.destroy');
 
+Route::middleware(['auth'])->group(function(){
+    Route::post('profit/submit', [ProfitLogsController::class, 'store']);
+});
+
 Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('driver/enroll', [DriverController::class, 'create']);
     Route::post('driver/enroll/submit', [DriverController::class, 'store']);
@@ -60,7 +64,6 @@ Route::middleware(['auth', 'verified'])->group(function(){
 
     Route::get('profit/', [ProfitLogsController::class, 'index']);
     Route::get('profit/ride/{ride}', [ProfitLogsController::class, 'showFromRide']);
-    Route::post('profit/submit', [ProfitLogsController::class, 'store']);
 
     // Saved Ride routes
     Route::get('saved-rides/', [SavedRideController::class, 'index']);

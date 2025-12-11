@@ -225,32 +225,57 @@ export default class PassengerRequestList extends Component{
                             return response.json();
                         })
                         .then((result) => {
+                            console.log('Request approved, submitting profit log...');
+                            
                             // Log into profit log.
                             const fromSpan = document.getElementById(this.id + '-' + data[0][i].id + '-item-from-span');
                             const toSpan = document.getElementById(this.id + '-' + data[0][i].id + '-item-to-span');
                             
-                            fetch(this.appUrl + '/profit/submit', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                                },
-                                body: JSON.stringify({
-                                    ride_id: rideId,
-                                    ride_request_id: data[0][i].id,
-                                    from_latitude: data[0][i].from_latitude,
-                                    from_longitude: data[0][i].from_longitude,
-                                    from_address: fromSpan ? fromSpan.innerText : 'Unknown',
-                                    to_latitude: data[0][i].to_latitude,
-                                    to_longitude: data[0][i].to_longitude,
-                                    to_address: toSpan ? toSpan.innerText : 'Unknown',
-                                    profit: data[0][i].profit,
-                                })
-                            }).then((response) => {
-                                if(!response.ok){
-                                    throw new Error('Failed to submit profit data!');
-                                }
-                            });
+                            const profitData = {
+                                ride_id: rideId,
+                                ride_request_id: data[0][i].id,
+                                from_latitude: data[0][i].from_latitude,
+                                from_longitude: data[0][i].from_longitude,
+                                from_address: fromSpan ? fromSpan.innerText : 'Unknown',
+                                to_latitude: data[0][i].to_latitude,
+                                to_longitude: data[0][i].to_longitude,
+                                to_address: toSpan ? toSpan.innerText : 'Unknown',
+                                profit: data[0][i].price,
+                            };
+                            
+                            console.log('Profit data to submit:', profitData);
+                            
+                            // fetch(this.appUrl + '/profit/submit', {
+                            //     method: 'POST',
+                            //     headers: {
+                            //         'Content-Type': 'application/json',
+                            //         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            //     },
+                            //     body: JSON.stringify(profitData)
+                            // })
+                            // .then((response) => {
+                            //     console.log('Profit submission response status:', response.status);
+                            //     return response.text().then(text => {
+                            //         console.log('Response text:', text);
+                            //         if(!response.ok){
+                            //             console.error('Profit submission failed:', text);
+                            //             throw new Error('Failed to submit profit data: ' + text);
+                            //         }
+                            //         try {
+                            //             return JSON.parse(text);
+                            //         } catch(e) {
+                            //             console.error('Failed to parse JSON:', e);
+                            //             console.error('Response was:', text);
+                            //             throw new Error('Invalid JSON response: ' + text.substring(0, 100));
+                            //         }
+                            //     });
+                            // })
+                            // .then((profitResult) => {
+                            //     console.log('Profit log saved successfully:', profitResult);
+                            // })
+                            // .catch((error) => {
+                            //     console.error('Error submitting profit:', error);
+                            // });
 
                             console.log('Request accepted:', result);
                             

@@ -10,6 +10,8 @@ class ProfitLogs extends Model
     /** @use HasFactory<\Database\Factories\ProfitLogsFactory> */
     use HasFactory;
 
+    protected $table = "profit_logs";
+
     protected $fillable = [
         'driver_id',
         'ride_id',

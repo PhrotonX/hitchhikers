@@ -9,10 +9,10 @@ class StoreProfitLogsRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
-    {
-        return false;
-    }
+    // public function authorize(): bool
+    // {
+    //     return true;
+    // }
 
     /**
      * Get the validation rules that apply to the request.
@@ -27,10 +27,10 @@ class StoreProfitLogsRequest extends FormRequest
             'ride_request_id' => ['required', 'numeric', 'exists:ride_requests,id'],
             'from_latitude' => ['nullable', 'decimal:10,7'],
             'from_longitude' => ['nullable', 'decimal:10,7'],
-            'from_address' => ['nullable', 'decimal:10,7'],
+            'from_address' => ['nullable', 'string'],
             'to_latitude' => ['nullable', 'decimal:10,7'],
             'to_longitude' => ['nullable', 'decimal:10,7'],
-            'to_address' => ['nullable', 'decimal:10,7'],
+            'to_address' => ['nullable', 'string'],
             'profit' => ['required', 'decimal:10,2'],
         ];
     }

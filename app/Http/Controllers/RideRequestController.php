@@ -126,6 +126,8 @@ class RideRequestController extends Controller
         $data->status_updated_at = $data->now();
         $data->update();
 
+        //@TODO: Profit Log
+
         return response()->json([
             $data
         ]);
