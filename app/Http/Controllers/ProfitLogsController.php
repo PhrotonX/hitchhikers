@@ -5,15 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProfitLogsRequest;
 use App\Http\Requests\UpdateProfitLogsRequest;
 use App\Models\ProfitLogs;
+use App\Models\Ride;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
 
 class ProfitLogsController extends Controller
 {
+    use AuthorizesRequests;
+    
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $this->authorize('viewAny');
+        return view('pages.profit.index', [
+            ProfitLogs::where('driver_id', Auth::user()->getDriverAccount()->id),
+        ]);
     }
 
     /**
@@ -21,13 +29,25 @@ class ProfitLogsController extends Controller
      */
     public function store(StoreProfitLogsRequest $request)
     {
+        $this->authorize('create', ProfitLogs::class);
+        
         $profitLog = new ProfitLogs();
 
         $profitLog->fill($request->validated());
+        $profitLog->driver_id = Auth::user()->getDriverAccount()->id;
         $profitLog->save();
 
         return response()->json([
             $profitLog,
+        ]);
+    }
+
+    public function showFromRide(Ride $ride){
+        $this->authorize('viewAny');
+
+        return view('pages.profit.ride', [
+            ProfitLogs::where('driver_id', Auth::user()->getDriverAccount()->id),
+            $ride
         ]);
     }
 
@@ -42,8 +62,8 @@ class ProfitLogsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(ProfitLogs $profitLogs)
-    {
-        //
-    }
+    // public function destroy(ProfitLogs $profitLogs)
+    // {
+    //     //
+    // }
 }

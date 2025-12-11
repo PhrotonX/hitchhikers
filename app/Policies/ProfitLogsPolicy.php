@@ -13,7 +13,7 @@ class ProfitLogsPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isDriver();
     }
 
     /**
@@ -21,7 +21,7 @@ class ProfitLogsPolicy
      */
     public function view(User $user, ProfitLogs $profitLogs): bool
     {
-        return false;
+        return $user->isDriver() && $profitLogs->driver_id == $user->getDriverAccount()->id;
     }
 
     /**
@@ -29,7 +29,7 @@ class ProfitLogsPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->isDriver();
     }
 
     /**

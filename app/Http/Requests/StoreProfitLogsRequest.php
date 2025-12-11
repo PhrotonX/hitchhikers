@@ -22,7 +22,7 @@ class StoreProfitLogsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'driver_id' => ['required', 'numeric', 'exists:drivers,id'],
+            // 'driver_id' => ['required', 'numeric', 'exists:drivers,id'],
             'ride_id' => ['required', 'numeric', 'exists:rides,id'],
             'ride_request_id' => ['required', 'numeric', 'exists:ride_requests,id'],
             'from_latitude' => ['nullable', 'decimal:10,7'],

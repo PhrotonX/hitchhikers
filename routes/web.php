@@ -10,6 +10,7 @@ use App\Http\Controllers\RideController;
 use App\Http\Controllers\RideRequestController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\ProfitLogsController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SavedRideController;
@@ -56,6 +57,10 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::delete('vehicle/{vehicle}/delete', [VehicleController::class, 'destroy'])->name('vehicle.delete');
     // Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
     Route::patch('vehicle/{vehicle}/update-location', [VehicleController::class, 'updateLocation']);
+
+    Route::get('profit/', [ProfitLogsController::class, 'index']);
+    Route::get('profit/ride/{ride}', [ProfitLogsController::class, 'showFromRide']);
+    Route::post('profit/submit', [ProfitLogsController::class, 'store']);
 
     // Saved Ride routes
     Route::get('saved-rides/', [SavedRideController::class, 'index']);
