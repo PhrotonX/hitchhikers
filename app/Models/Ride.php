@@ -22,6 +22,11 @@ class Ride extends Model
         'deleted_at'
     ];
 
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class, 'driver_id');
+    }
+
     public function getRideDestinations(){
         return RideDestination::where('ride_id', $this->id);
     }
