@@ -4,13 +4,14 @@ namespace App\Models;
 
 use App\Models\Ride;
 use App\Models\RideDestination;
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Ride extends Model
 {
     /** @use HasFactory<\Database\Factories\RideFactory> */
-    use HasFactory;
+    use HasFactory, Auditable;
 
     protected $fillable = [
         'ride_name',
