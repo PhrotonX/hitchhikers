@@ -100,7 +100,7 @@ export default class PassengerRequestList extends Component{
 
                     var itemProfit = document.createElement('p');
                     itemProfit.setAttribute('id', this.id + '-' + data[0][i].id + '-item-profit');
-                    itemProfit.innerHTML = "Estimated Profit: " + data[0][i].profit;
+                    itemProfit.innerHTML = "Estimated Profit: PHP" + data[0][i].price;
                     item.appendChild(itemProfit);
 
                     var itemStatus = document.createElement('p');

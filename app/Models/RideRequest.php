@@ -23,6 +23,5 @@ class RideRequest extends Model{
         'status_updated_at',
         'status',
         'price',
-        'profit',
     ];
 }
