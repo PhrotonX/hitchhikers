@@ -26,9 +26,11 @@ class RideRequestController extends Controller
 
     public function create($rideId){
         $ride = Ride::find($rideId);
+        $vehicle = Vehicle::find($ride->vehicle_id);
 
         return view('pages.ride_request.create', [
             'ride' => $ride,
+            'vehicle' => $vehicle,
         ]);
     }
 
