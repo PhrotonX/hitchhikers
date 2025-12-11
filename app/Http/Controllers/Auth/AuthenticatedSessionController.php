@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\AuditLogService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -52,6 +53,10 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+        
+        // Log successful login
+        $auditService = new AuditLogService();
+        $auditService->logLogin(Auth::id());
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -72,10 +77,18 @@ class AuthenticatedSessionController extends Controller
      * Destroy an authenticated session.
      */
     public function onDestroy(Request $request){
+        $userId = Auth::id();
+        
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
+        
+        // Log logout
+        if ($userId) {
+            $auditService = new AuditLogService();
+            $auditService->logLogout($userId);
+        }
     }
 }

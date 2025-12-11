@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\DataContext;
+use App\Services\AuditLogService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 // A custom ORM or Object-Relational Mapping that avoids Laravel Eloquent and to use PHP PDO Database
@@ -92,6 +94,22 @@ class Model implements \JsonSerializable{
 
         $results = $dataContext->getPdo()->prepare($query);
         $exec = $results->execute();
+        
+        // Audit log the deletion
+        if ($exec && Auth::check()) {
+            try {
+                $auditService = new AuditLogService();
+                $auditService->log(
+                    'deleted',
+                    static::$table,
+                    $this->attributes['id'] ?? null,
+                    $this->attributes,
+                    []
+                );
+            } catch (\Exception $e) {
+                Log::error("Audit logging failed in Model.delete(): " . $e->getMessage());
+            }
+        }
 
         return $exec;
     }
@@ -128,6 +146,16 @@ class Model implements \JsonSerializable{
             $this->attributes['updated_at'] = $this->now();
         }
 
+        // Store old values for audit log
+        $oldRecord = null;
+        if (Auth::check() && isset($this->attributes['id'])) {
+            try {
+                $oldRecord = static::find($this->attributes['id']);
+            } catch (\Exception $e) {
+                Log::error("Failed to fetch old record for audit: " . $e->getMessage());
+            }
+        }
+
         $dataContext = new DataContext();
 
         // Add quotation marks to all values.
@@ -153,6 +181,22 @@ class Model implements \JsonSerializable{
 
         // Execute the query.
         $exec = $results->execute();
+        
+        // Audit log the update
+        if ($exec && Auth::check() && $oldRecord) {
+            try {
+                $auditService = new AuditLogService();
+                $auditService->log(
+                    'updated',
+                    static::$table,
+                    $this->attributes['id'] ?? null,
+                    $oldRecord->attributes ?? [],
+                    $this->attributes
+                );
+            } catch (\Exception $e) {
+                Log::error("Audit logging failed in Model.onEdit(): " . $e->getMessage());
+            }
+        }
 
         if($exec){
             return static::where(static::$primary, $dataContext->getPdo()->lastInsertId());
@@ -207,6 +251,23 @@ class Model implements \JsonSerializable{
 
         // Execute the query.
         $exec = $results->execute($parameters);
+        
+        // Audit log the creation
+        if ($exec && Auth::check()) {
+            try {
+                $insertedId = $dataContext->getPdo()->lastInsertId();
+                $auditService = new AuditLogService();
+                $auditService->log(
+                    'created',
+                    static::$table,
+                    $insertedId,
+                    [],
+                    $this->attributes
+                );
+            } catch (\Exception $e) {
+                Log::error("Audit logging failed in Model.onInsert(): " . $e->getMessage());
+            }
+        }
 
         if($exec){
             return static::where(static::$primary, $dataContext->getPdo()->lastInsertId());

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\VehicleDriver;
 use App\Models\Ride;
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 class Driver extends Model
 {
     /** @use HasFactory<\Database\Factories\DriverFactory> */
-    use HasFactory;
+    use HasFactory, Auditable;
 
     protected $fillable = [
         'driver_account_name',

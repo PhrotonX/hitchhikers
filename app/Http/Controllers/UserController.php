@@ -6,8 +6,10 @@ use App\Models\User;
 use App\Models\VehicleDriver;
 use App\Http\Requests\DeleteUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Services\AuditLogService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -61,9 +63,11 @@ class UserController extends Controller
         $user = Auth::user();
 
         $validated = $request->validated();
-
+        
+        $passwordChanged = false;
         if ($request->filled('password')) {
             $user->password = Hash::make($validated['password']);
+            $passwordChanged = true;
         }
 
         $user->fill($validated);
@@ -73,6 +77,12 @@ class UserController extends Controller
         }
 
         $user->save();
+        
+        // Log password change if it occurred
+        if ($passwordChanged) {
+            $auditService = new AuditLogService();
+            $auditService->logPasswordChange($user->id);
+        }
     }
 
     public function delete(Request $request){
@@ -80,6 +90,19 @@ class UserController extends Controller
     }
 
     public function destroy(DeleteUserRequest $request, User $user){
+        $userId = $user->id;
+        $userEmail = $user->email;
+        
+        // Log account deletion before deleting
+        $auditService = new AuditLogService();
+        $auditService->log(
+            'account_deleted',
+            'users',
+            $userId,
+            ['account_status' => $user->account_status],
+            ['account_status' => 'deleted', 'email' => $userEmail]
+        );
+        
         auth()->logout();
 
         $user->delete();
