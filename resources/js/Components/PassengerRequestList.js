@@ -141,19 +141,21 @@ export default class PassengerRequestList extends Component{
 
                     // Apply styling based on current status
                     const currentStatus = data[0][i].status;
+                    console.log('Creating item with status:', currentStatus, 'ID:', requestId);
+                    
                     if (currentStatus === 'approved') {
                         itemStatus.innerHTML = "<strong>Status: </strong><span style='color: green;'>✓ Approved</span>";
                         itemStatus.style.color = 'green';
                         item.style.backgroundColor = '#d4edda';
                         item.style.border = '2px solid #28a745';
-                        item.style.cursor = 'default';
+                        item.style.cursor = 'pointer'; // Changed from 'default' to allow clicks
                         modalDiv.remove(); // Don't show buttons for already approved requests
                     } else if (currentStatus === 'rejected') {
                         itemStatus.innerHTML = "<strong>Status: </strong><span style='color: red;'>✗ Rejected</span>";
                         itemStatus.style.color = 'red';
                         item.style.backgroundColor = '#f8d7da';
                         item.style.border = '2px solid #dc3545';
-                        item.style.cursor = 'default';
+                        item.style.cursor = 'pointer'; // Changed from 'default' to allow clicks
                         modalDiv.remove(); // Don't show buttons for already rejected requests
                     } else {
                         itemStatus.innerHTML = "<strong>Status: </strong><span style='color: orange;'>⏳ Pending</span>";
@@ -161,29 +163,40 @@ export default class PassengerRequestList extends Component{
                         item.style.cursor = 'pointer';
                     }
 
-                    // Add click event listener to toggle modal visibility (only for pending)
-                    if (currentStatus === 'pending') {
-                        item.addEventListener('click', (e) => {
-                            // Prevent toggle when clicking buttons or input
-                            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') {
-                                return;
-                            }
-                            
-                            // Show pickup location marker on map
-                            if (this.rideMap) {
-                                this.rideMap.clearMarker('selected');
-                                this.rideMap.addMarker(fromLatitude, fromLongitude, 'selected');
-                                this.rideMap.setView(fromLatitude, fromLongitude, 15);
-                            }
-                            
-                            // Toggle modal
+                    // Add click event listener to show pickup marker (for ALL statuses)
+                    item.addEventListener('click', (e) => {
+                        console.log('Item clicked! Status:', currentStatus, 'Target:', e.target.tagName);
+                        
+                        // Prevent action when clicking buttons or input
+                        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') {
+                            return;
+                        }
+                        
+                        console.log('Item clicked, rideMap:', this.rideMap);
+                        console.log('From coordinates:', fromLatitude, fromLongitude);
+                        
+                        // Show pickup location marker on map
+                        if (this.rideMap) {
+                            console.log('Clearing marker...');
+                            this.rideMap.clearMarker('selected');
+                            console.log('Adding marker...');
+                            this.rideMap.addMarker('selected', fromLatitude, fromLongitude, 'selected');
+                            console.log('Setting view...');
+                            this.rideMap.setView(fromLatitude, fromLongitude, 15);
+                            console.log('Marker operations complete');
+                        } else {
+                            console.log('No rideMap available');
+                        }
+                        
+                        // Toggle modal (only for pending)
+                        if (currentStatus === 'pending') {
                             if (modalDiv.style.display === 'none') {
                                 modalDiv.style.display = 'block';
                             } else {
                                 modalDiv.style.display = 'none';
                             }
-                        });
-                    }
+                        }
+                    });
 
                     // Add event listener for accept button (only if pending)
                     if (currentStatus === 'pending') {

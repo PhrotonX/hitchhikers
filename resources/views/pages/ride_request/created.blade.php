@@ -47,6 +47,12 @@
                 map.cachedMarkers.clearLayers();
                 map.vehicleMarkers.clearLayers();
 
+                // Remove temporary marker if it exists
+                if(map.temporaryMarker){
+                    map.getMap().removeLayer(map.temporaryMarker);
+                    map.temporaryMarker = null;
+                }
+
                 // Remove lines from the map.
                 map.getMap().eachLayer((layer) => {
                     if(layer instanceof L.Polyline){
@@ -65,7 +71,8 @@
                 if(toLat && toLng){
                     map.temporaryMarker = L.marker([toLat, toLng], {
                         icon: map.markerIcons['selected']
-                    });
+                    }).addTo(map.getMap());
+                    map.setView(toLat, toLng, 15);
                 }
                 
 
