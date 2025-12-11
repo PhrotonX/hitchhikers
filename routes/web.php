@@ -16,6 +16,7 @@ use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SavedRideController;
 use App\Http\Controllers\SavedRideFolderController;
+use App\Http\Controllers\ProfilePictureController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -43,6 +44,13 @@ Route::get('user/{user}/edit', [UserController::class, 'edit'])->middleware(['au
 Route::patch('user/{user}/update', [UserController::class, 'update'])->middleware(['auth', 'verified']);
 Route::get('user/{user}/delete', [UserController::class, 'delete'])->middleware(['auth', 'verified']);
 Route::delete('user/{user}/destroy', [UserController::class, 'destroy'])->middleware(['auth', 'verified'])->name('user.destroy');
+
+// Profile picture routes
+Route::get('user/{user}/profile-pictures', [UserController::class, 'showProfilePictures'])->middleware(['auth', 'verified'])->name('user.profile-pictures');
+Route::get('user/{user}/profile-pictures/json', [ProfilePictureController::class, 'getPicturesJson'])->middleware(['auth', 'verified']);
+Route::post('user/{user}/profile-picture/upload', [ProfilePictureController::class, 'store'])->middleware(['auth', 'verified']);
+Route::patch('user/{user}/profile-picture/set-primary', [UserController::class, 'setPrimaryProfilePicture'])->middleware(['auth', 'verified']);
+Route::delete('user/{user}/profile-picture/{pfp}/delete', [ProfilePictureController::class, 'delete'])->middleware(['auth', 'verified']);
 
 Route::middleware(['auth'])->group(function(){
     Route::post('profit/submit', [ProfitLogsController::class, 'store']);

@@ -39,6 +39,7 @@ services:
       - .env
     volumes:
     # - .:/var/www
+      - ./public:/var/www/public
       - ./app:/var/www/app
       - ./routes:/var/www/routes
       - ./resources:/var/www/resources

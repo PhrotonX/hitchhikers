@@ -5,7 +5,8 @@
 
     @auth
         @if ($user->id == Auth::user()->id)
-            <a href="/settings">Settings</a>
+            <a href="/settings">Settings</a> |
+            <a href="/user/{{$user->id}}/profile-pictures">Manage Profile Pictures</a>
         @endif
     @endauth
 
