@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ride;
 use App\Models\RideRequest;
+use App\Models\ProfitLogs;
 use App\Models\Vehicle;
 use App\Http\Requests\StoreRideRequestRequest;
 use App\Http\Requests\UpdateRideRequestRequest;
