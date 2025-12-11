@@ -107,6 +107,7 @@
                 <script type="module">
                     import getDistance from '{{ Vite::asset("resources/js/math.js") }}';                
 
+                    @if($vehicle && $vehicle->latitude && $vehicle->longitude)
                     if(navigator.geolocation){
                         navigator.geolocation.watchPosition((position) => {
                             var latitude = position.coords.latitude;
@@ -119,6 +120,9 @@
                         console.log("Error: " + error);
                         });
                     }
+                    @else
+                    document.getElementById("ride-request-" + {{$rideRequest->id}} + "-vehicle-distance").innerHTML = "N/A";
+                    @endif
 
                     var itemDiv = document.getElementById('ride-request-' + {{$rideRequest->id}});
                     var cancelButton = document.getElementById('ride-request-' + {{$rideRequest->id}} + '-cancel-btn');

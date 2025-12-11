@@ -122,8 +122,6 @@
                 page.loadAuthObjects({
                     'saved_rides': 'saved-ride-list',
                 });
-            @else
-                passengerRequest = new PassengerRequestList('passenger-request', '{{env("APP_URL", "")}}', '{{env("NOMINATIM_URL", "")}}', {{Auth::user()->getDriverAccount()->id}});
             @endif
         @endauth
 
@@ -159,6 +157,7 @@
         map.configureMarkerIcon('currentPos', '{{Vite::asset("resources/img/current_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('active_vehicle', '{{Vite::asset("resources/img/blue_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.configureMarkerIcon('inactive_vehicle', '{{Vite::asset("resources/img/grey_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+        map.configureMarkerIcon('selected', '{{Vite::asset("resources/img/selected_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
         map.detectLocation();
         
         // Set up ride marker click handler to show address tooltip
@@ -421,6 +420,8 @@
         
         @auth
             @if (Auth::user()->isDriver())
+                // Initialize PassengerRequestList with map reference
+                passengerRequest = new PassengerRequestList('passenger-request', '{{env("APP_URL", "")}}', '{{env("NOMINATIM_URL", "")}}', {{Auth::user()->getDriverAccount()->id}}, map);
 
                 // Make the driving mode button always update its toggle value after loading the page.
                 updateSelectedRideOption();

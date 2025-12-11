@@ -1,10 +1,11 @@
 import Component from '../../js/Components/Component.js';
 
 export default class PassengerRequestList extends Component{
-    constructor(id, appUrl, nominatimUrl, driverId){
+    constructor(id, appUrl, nominatimUrl, driverId, rideMap = null){
         super(id, appUrl);
 
         this.nominatimUrl = nominatimUrl;
+        this.rideMap = rideMap;
 
         this.list = null;
         this.driverId = driverId;
@@ -63,7 +64,7 @@ export default class PassengerRequestList extends Component{
             return response.json();
         }).then((data) => {
             console.log(data);
-            let count = Object.keys(data).length;
+            let count = Object.keys(data[0]).length;
 
             for(let i = 0; i < count; i++){
                 console.log(data[0][i]);
@@ -71,18 +72,24 @@ export default class PassengerRequestList extends Component{
                 item.setAttribute('id', this.id + '-' + data[0][i].id + '-item');
 
                     var itemTo = document.createElement('p');
-                    itemTo.setAttribute('id', this.id + '-' + data[0][i].id + '-item-to');
+                    const requestId = data[0][i].id; // Capture the ID for closure
+                    const toLatitude = data[0][i].to_latitude;
+                    const toLongitude = data[0][i].to_longitude;
+                    const fromLatitude = data[0][i].from_latitude;
+                    const fromLongitude = data[0][i].from_longitude;
+                    
+                    itemTo.setAttribute('id', this.id + '-' + requestId + '-item-to');
                     itemTo.innerHTML = "To: Retrieving address...";
-                    this.reverseGeocode(data[0][i].to_latitude, data[0][i].to_longitude).then((result) => {
-                        itemTo.innerHTML = "To: " + result.display_name;
+                    this.reverseGeocode(toLatitude, toLongitude).then((result) => {
+                        itemTo.innerHTML = 'To: <span id="'+this.id + '-' + requestId + '-item-to-span'+'">' + result.display_name + "</span>";
                     });
                     item.appendChild(itemTo);
 
                     var itemFrom = document.createElement('p');
-                    itemFrom.setAttribute('id', this.id + '-' + data[0][i].id + '-item-from');
+                    itemFrom.setAttribute('id', this.id + '-' + requestId + '-item-from');
                     itemFrom.innerHTML = "From: Retrieving address...";
-                    this.reverseGeocode(data[0][i].from_latitude, data[0][i].from_longitude).then((result) => {
-                        itemFrom.innerHTML = "To: " + result.display_name;
+                    this.reverseGeocode(fromLatitude, fromLongitude).then((result) => {
+                        itemFrom.innerHTML = 'From: <span id="'+this.id + '-' + requestId + '-item-from-span'+'">' + result.display_name + "</span>";
                     });
                     item.appendChild(itemFrom);
 
@@ -90,6 +97,11 @@ export default class PassengerRequestList extends Component{
                     itemTime.setAttribute('id', this.id + '-' + data[0][i].id + '-item-time');
                     itemTime.innerHTML = "Time: " + data[0][i].time;
                     item.appendChild(itemTime);
+
+                    var itemProfit = document.createElement('p');
+                    itemProfit.setAttribute('id', this.id + '-' + data[0][i].id + '-item-profit');
+                    itemProfit.innerHTML = "Estimated Profit: " + data[0][i].profit;
+                    item.appendChild(itemProfit);
 
                     var itemStatus = document.createElement('p');
                     itemStatus.setAttribute('id', this.id + '-' + data[0][i].id + '-item-status');
@@ -156,6 +168,15 @@ export default class PassengerRequestList extends Component{
                             if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') {
                                 return;
                             }
+                            
+                            // Show pickup location marker on map
+                            if (this.rideMap) {
+                                this.rideMap.clearMarker('selected');
+                                this.rideMap.addMarker(fromLatitude, fromLongitude, 'selected');
+                                this.rideMap.setView(fromLatitude, fromLongitude, 15);
+                            }
+                            
+                            // Toggle modal
                             if (modalDiv.style.display === 'none') {
                                 modalDiv.style.display = 'block';
                             } else {
@@ -191,6 +212,33 @@ export default class PassengerRequestList extends Component{
                             return response.json();
                         })
                         .then((result) => {
+                            // Log into profit log.
+                            const fromSpan = document.getElementById(this.id + '-' + data[0][i].id + '-item-from-span');
+                            const toSpan = document.getElementById(this.id + '-' + data[0][i].id + '-item-to-span');
+                            
+                            fetch(this.appUrl + '/profit/submit', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                },
+                                body: JSON.stringify({
+                                    ride_id: rideId,
+                                    ride_request_id: data[0][i].id,
+                                    from_latitude: data[0][i].from_latitude,
+                                    from_longitude: data[0][i].from_longitude,
+                                    from_address: fromSpan ? fromSpan.innerText : 'Unknown',
+                                    to_latitude: data[0][i].to_latitude,
+                                    to_longitude: data[0][i].to_longitude,
+                                    to_address: toSpan ? toSpan.innerText : 'Unknown',
+                                    profit: data[0][i].profit,
+                                })
+                            }).then((response) => {
+                                if(!response.ok){
+                                    throw new Error('Failed to submit profit data!');
+                                }
+                            });
+
                             console.log('Request accepted:', result);
                             
                             // Update status display
