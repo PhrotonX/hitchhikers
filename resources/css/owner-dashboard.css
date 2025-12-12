@@ -1,0 +1,406 @@
+.owner-dashboard {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+    font-size: 2rem;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-header p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    transition: transform 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
+.stat-card .stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.stat-card.users .stat-icon {
+    background: rgba(59, 95, 207, 0.1);
+    color: var(--primary);
+}
+
+.stat-card.rides .stat-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--secondary);
+}
+
+.stat-card.drivers .stat-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--accent);
+}
+
+.stat-card.logs .stat-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+
+.stat-card h3 {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.stat-card .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+}
+
+.stat-card .stat-change {
+    font-size: 0.875rem;
+    color: var(--secondary);
+}
+
+.stat-card .stat-change.negative {
+    color: var(--error);
+}
+
+.content-section {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.audit-table thead {
+    background: var(--background);
+}
+
+.audit-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-dark);
+    border-bottom: 2px solid var(--border);
+}
+
+.audit-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-light);
+}
+
+.audit-table tbody tr:hover {
+    background: var(--background-hover);
+}
+
+.event-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.event-badge.created {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--secondary);
+}
+
+.event-badge.updated {
+    background: rgba(59, 95, 207, 0.1);
+    color: var(--primary);
+}
+
+.event-badge.deleted {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+
+.chart-container {
+    height: 300px;
+    margin-top: 1rem;
+}
+
+.no-data {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-light);
+}
+
+.user-management-grid {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.user-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--background);
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.user-item:hover {
+    background: var(--background-hover);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.permission-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.permission-badge.owner {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--accent);
+}
+
+.permission-badge.staff {
+    background: rgba(59, 95, 207, 0.1);
+    color: var(--primary);
+}
+
+.permission-badge.moderator {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--secondary);
+}
+
+.permission-badge.member {
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--text-light);
+}
+
+body.dark-mode .stat-card,
+body.dark-mode .content-section {
+    background-color: #1a243d;
+    border: 1px solid #334155;
+}
+
+body.dark-mode .stat-card h3,
+body.dark-mode .section-header h2 {
+    color: white;
+}
+
+body.dark-mode .stat-card .stat-value {
+    color: white;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--text-dark);
+    font-size: 1.5rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--text-dark);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.user-search-result {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.user-search-result:hover {
+    background: var(--bg-light);
+}
+
+.user-search-result:last-child {
+    border-bottom: none;
+}
+
+body.dark-mode .modal-content {
+    background-color: #1a243d;
+    border: 1px solid #334155;
+}
+
+body.dark-mode .modal-header {
+    border-bottom-color: #334155;
+}
+
+body.dark-mode .modal-header h3 {
+    color: white;
+}
+
+body.dark-mode .user-search-result {
+    border-bottom-color: #334155;
+}
+
+body.dark-mode .user-search-result:hover {
+    background: #0f172a;
+}
+
+/* Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.pagination li {
+    margin: 0;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.pagination a:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.pagination .active span {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.pagination .disabled span {
+    color: var(--text-light);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+body.dark-mode .pagination a,
+body.dark-mode .pagination span {
+    border-color: #334155;
+    color: white;
+}
+
+body.dark-mode .pagination a:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+}

@@ -1,7 +1,21 @@
 @extends('layouts.app')
+
+@push('head')
+    @vite(['resources/css/driver-dashboard.css']);
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+@endpush
+
 @section('content')
-    <h1>{{__('string.create_vehicle')}}</h1>
-    <form action="/vehicle/create/submit" method="POST">
+<div class="main-layout">
+    <x-sidebar-nav />
+
+    <main class="main-content">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">{{__('string.create_vehicle')}}</h2>
+            </div>
+            <div class="card-body">
+                <form action="/vehicle/create/submit" method="POST">
         @csrf
         <x-input-label>{{__('string.plate_number')}}</x-input-label>
         <x-text-input
@@ -123,4 +137,8 @@
         document.getElementById('vehicle-longitude').value = 120.9842;
     }
 </script>
+            </div>
+        </div>
+    </main>
+</div>
 @endpush

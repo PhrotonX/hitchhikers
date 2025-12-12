@@ -1,0 +1,212 @@
+/* --- New Driver Sidebar Navigation --- */
+.driver-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: -10px; /* Fill the sidebar padding */
+}
+.driver-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--text-light);
+    transition: all 0.2s ease-in-out;
+}
+.driver-nav-link i {
+    width: 20px; /* Aligns icons */
+}
+.driver-nav-link:hover {
+    background-color: var(--background-hover);
+    color: var(--primary);
+}
+.driver-nav-link.active {
+    background-color: var(--primary-light);
+    color: white;
+    border-right: 4px solid var(--accent);
+}
+body.dark-mode .driver-nav-link:hover {
+    color: var(--accent);
+}
+body.dark-mode .driver-nav-link.active {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* --- Dashboard Grid Layout --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 2/3 column for map, 1/3 for info */
+    gap: 30px;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr; /* Stack columns on tablets/mobile */
+    }
+}
+
+/* --- Generic Card Style --- */
+.card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 30px;
+}
+body.dark-mode .card {
+    background-color: #1a243d; /* Matches toolbar dark bg */
+    border: 1px solid #334155;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+body.dark-mode .card-title {
+    color: white;
+}
+
+/* --- Map & Active Ride Card --- */
+.map-container {
+    width: 100%;
+    height: 400px;
+    background-color: #e0e0e0; /* Placeholder color */
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+.active-ride-details ul {
+    list-style: none;
+    padding: 0;
+}
+.active-ride-details li {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.active-ride-details li i {
+    color: var(--primary);
+}
+.active-ride-details strong {
+    color: var(--text-dark);
+}
+body.dark-mode .active-ride-details strong {
+    color: white;
+}
+.card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* --- Ride Request Feed --- */
+.ride-request-feed {
+    max-height: 400px; /* Makes the list scrollable */
+    overflow-y: auto;
+    padding-right: 10px;
+}
+.ride-request-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: box-shadow 0.2s;
+}
+.ride-request-card:hover {
+    box-shadow: var(--shadow-hover);
+}
+.ride-passenger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+body.dark-mode .ride-passenger {
+    color: white;
+}
+.ride-locations {
+    list-style: none;
+    padding: 10px 0 0 35px; /* Indent under passenger icon */
+    font-size: 0.9rem;
+}
+.ride-locations li {
+    position: relative;
+    padding-left: 20px;
+    color: var(--text-light);
+    margin-bottom: 5px;
+}
+.ride-locations li i {
+    position: absolute;
+    left: 0;
+    top: 4px;
+    color: var(--primary);
+}
+.ride-locations li.dropoff i {
+    color: var(--secondary);
+}
+.ride-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* --- Driver Overview (Copied from previous step) --- */
+.driver-profile-header { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.driver-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border); }
+.driver-name { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+.status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; margin-top: 5px; }
+.status-badge.approved { background-color: #d1fae5; color: #065f46; }
+.status-badge.pending { background-color: #feF3c7; color: #92400e; }
+.status-badge.rejected { background-color: #fee2e2; color: #991b1b; }
+.driver-details-list { list-style: none; padding: 0; margin-top: 15px; }
+.driver-details-list li { font-size: 1rem; color: var(--text-light); padding: 5px 0; }
+.driver-details-list strong { color: var(--text-dark); }
+body.dark-mode .driver-name, body.dark-mode .driver-details-list strong { color: white; }
+body.dark-mode .driver-photo { border-color: #334155; }
+
+/* --- Button Styles --- */
+.btn {
+    padding: 12px 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+.btn-primary { background-color: var(--primary); color: white; }
+.btn-primary:hover { background-color: var(--primary-light); }
+.btn-secondary { background-color: var(--border); color: var(--text-dark); }
+.btn-secondary:hover { background-color: #d1d5db; }
+.btn-success { background-color: var(--secondary); color: white; }
+.btn-success:hover { background-color: #059669; }
+.btn-danger { background-color: var(--error); color: white; }
+.btn-danger:hover { background-color: #dc2626; }

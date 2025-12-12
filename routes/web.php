@@ -7,6 +7,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\RideDestinationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\RideRequestController;
 use App\Http\Controllers\MessagesController;
@@ -20,7 +21,15 @@ use App\Http\Controllers\ProfilePictureController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('pages.index');
+    // Show landing page for guests, dashboard for authenticated users
+    if (Auth::check()) {
+        // Redirect owners to owner dashboard
+        if (Auth::user()->isPrivileged('owner')) {
+            return redirect()->route('owner.dashboard');
+        }
+        return view('pages.index');
+    }
+    return view('pages.landing');
 })->name('home');
 
 Route::get('login', function(){
@@ -62,6 +71,22 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::delete('driver/{driver}/leave', [DriverController::class, 'destroy']);
     Route::get('driver/{driver}/edit', [DriverController::class, 'edit']);
     Route::patch('driver/{driver}/update', [DriverController::class, 'update']);
+    
+    // Driver Dashboard Routes
+    Route::get('driver/dashboard', function() {
+        return redirect()->route('home');
+    })->name('driver.dashboard');
+    Route::get('driver/earnings', [DriverController::class, 'earnings'])->name('driver.earnings');
+    Route::get('driver/rides', [DriverController::class, 'rides'])->name('driver.rides');
+    
+    // Owner Dashboard Routes (permission check done in controller)
+    Route::get('owner/dashboard', [OwnerController::class, 'dashboard'])->name('owner.dashboard');
+    Route::get('owner/users', [OwnerController::class, 'users'])->name('owner.users');
+    Route::get('owner/audit-logs', [OwnerController::class, 'auditLogs'])->name('owner.audit-logs');
+    Route::get('owner/search-users', [OwnerController::class, 'searchUsers'])->name('owner.search-users');
+    Route::patch('owner/users/{user}/permission', [OwnerController::class, 'updateUserPermission'])->name('owner.users.permission');
+    Route::get('owner/statistics', [OwnerController::class, 'statistics'])->name('owner.statistics');
+    
     Route::get('vehicle/create', [VehicleController::class, 'create'])->name('vehicle.create');
     Route::post('vehicle/create/submit', [VehicleController::class, 'store'])->name('vehicle.submit');
     Route::get('vehicle/{vehicle}/edit', [VehicleController::class, 'edit'])->name('vehicle.edit');

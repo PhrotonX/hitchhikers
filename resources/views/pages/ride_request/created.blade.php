@@ -3,14 +3,23 @@
 <x-map-head/>
 
 @push('head')
-    @vite(['resources/js/RideMap.js', 'resources/css/ride_request/item.css']);
+    @vite(['resources/js/RideMap.js', 'resources/css/ride_request/item.css', 'resources/css/driver-dashboard.css']);
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 @endpush
 
 @section('content')
-    <h1>Ride Requests</h1>
-    <p>Click a ride request to preview it on a map.</p>
+<div class="main-layout">
+    <x-sidebar-nav />
 
-    <div id="map"></div>
+    <main class="main-content">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">My Ride Requests</h2>
+            </div>
+            <div class="card-body">
+                <p style="color: var(--text-light); margin-bottom: 20px;">Click a ride request to preview it on a map.</p>
+
+                <div id="map" style="height: 400px; border-radius: 12px; margin-bottom: 20px;"></div>
 
     <script type="module">
         import RideMap from '{{ Vite::asset("resources/js/RideMap.js") }}';
@@ -269,11 +278,12 @@
             @endif
         @endforeach
     @else
-        <p>Empty!</p>
+        <p style="color: var(--text-light); text-align: center; padding: 40px;">No ride requests yet. Create one to get started!</p>
     @endisset
-    
-    
-    
+            </div>
+        </div>
+    </main>
+</div>
 @endsection
 
 @push('scripts')

@@ -4,6 +4,7 @@
 @push('head')
     @vite(['resources/css/index.css'])
     @vite(['resources/css/ride_request/item.css'])
+    @vite(['resources/css/driver-dashboard.css'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css?family=Poppins" rel="stylesheet">
 @endpush
@@ -12,7 +13,51 @@
     <!-- MAIN LAYOUT -->
     <div class="main-layout container">
         <aside class="mlay-side">
-            <!-- Left side placeholder (keeps layout consistent) -->
+            @auth
+                @if (Auth::user()->isPrivileged('owner'))
+                    {{-- Owner Navigation --}}
+                    <nav class="driver-nav">
+                        <a href="{{ route('owner.dashboard') }}" class="driver-nav-link">
+                            <i class="fa-solid fa-chart-line"></i> Statistics
+                        </a>
+                        <a href="#" class="driver-nav-link">
+                            <i class="fa-solid fa-clipboard-list"></i> Audit Logs
+                        </a>
+                        <a href="#" class="driver-nav-link">
+                            <i class="fa-solid fa-users"></i> Users
+                        </a>
+                        <a href="{{ route('user.view', Auth::user()) }}" class="driver-nav-link">
+                            <i class="fa-solid fa-user-gear"></i> Profile
+                        </a>
+                    </nav>
+                @elseif (Auth::user()->isDriver())
+                    {{-- Driver Navigation --}}
+                    <nav class="driver-nav">
+                        <a href="{{ route('driver.dashboard') }}" class="driver-nav-link active">
+                            <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+                        </a>
+                        <a href="{{ route('driver.earnings') }}" class="driver-nav-link">
+                            <i class="fa-solid fa-dollar-sign"></i> Earnings
+                        </a>
+                        <a href="{{ route('user.view', Auth::user()) }}" class="driver-nav-link">
+                            <i class="fa-solid fa-user-gear"></i> Profile
+                        </a>
+                    </nav>
+                @else
+                    {{-- Passenger Navigation --}}
+                    <nav class="driver-nav">
+                        <a href="{{ route('home') }}" class="driver-nav-link active">
+                            <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+                        </a>
+                        <a href="/ride/requests/created" class="driver-nav-link">
+                            <i class="fa-solid fa-car"></i> My Ride Requests
+                        </a>
+                        <a href="{{ route('user.view', Auth::user()) }}" class="driver-nav-link">
+                            <i class="fa-solid fa-user-gear"></i> Profile
+                        </a>
+                    </nav>
+                @endif
+            @endauth
         </aside>
 
         <main class="main-content">
@@ -618,6 +663,57 @@
                 function getRides(rideId){ 
                     map.retrieveRideMarkers(rideId, true, true)(); 
                 }
+
+                // LIVE UPDATES - Carefully implemented to avoid breaking functionality
+                let liveUpdatesPaused = false;
+                
+                // Live update for vehicles (only if no infobox is open)
+                setInterval(() => {
+                    if (liveUpdatesPaused) return;
+                    
+                    const infobox = document.getElementById('infobox');
+                    const isInfoboxOpen = infobox && infobox.style.display !== 'none' && infobox.innerHTML.trim() !== '';
+                    
+                    // Only refresh vehicles if infobox is NOT open
+                    if (!isInfoboxOpen) {
+                        console.log('Live update: Refreshing vehicle markers');
+                        map.onRefresh();
+                    } else {
+                        console.log('Live update: Skipped (infobox is open)');
+                    }
+                }, 30000); // Every 30 seconds
+
+                // Live update for passenger requests (driving mode only)
+                @auth
+                    @if(Auth::user()->getDriverAccount() && Auth::user()->isDriver())
+                        setInterval(() => {
+                            if (liveUpdatesPaused) return;
+                            
+                            const passengerRequestContainer = document.getElementById('passenger-request-container');
+                            if (!passengerRequestContainer) return;
+                            
+                            // Fetch updated passenger requests
+                            fetch('/ride/requests/created')
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log('Live update: Passenger requests refreshed');
+                                    // Update the passenger request list without reloading page
+                                    // Implementation depends on the structure of your passenger request list
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching passenger requests:', error);
+                                });
+                        }, 15000); // Every 15 seconds for more critical updates
+                    @endif
+                @endauth
+
+                // Pause live updates when user is interacting with UI
+                document.addEventListener('click', () => {
+                    liveUpdatesPaused = true;
+                    setTimeout(() => {
+                        liveUpdatesPaused = false;
+                    }, 5000); // Resume after 5 seconds of no interaction
+                });
 
             } catch (e) {
                 console.error('Initialization error:', e);

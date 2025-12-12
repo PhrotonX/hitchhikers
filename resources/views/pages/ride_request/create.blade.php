@@ -3,54 +3,166 @@
 <x-map-head/>
 
 @push('head')
+    @vite(['resources/css/driver-dashboard.css'])
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     @vite('resources/js/RideMap.js');
 @endpush
 
 @section('content')
-    <h1>Make a Ride Request</h1>
-    <div id="map"></div>
+<div class="main-layout container">
+    <aside class="mlay-side">
+        @auth
+            @if (Auth::user()->isPrivileged('owner'))
+                <nav class="driver-nav">
+                    <a href="{{ route('owner.dashboard') }}" class="driver-nav-link">
+                        <i class="fa-solid fa-chart-line"></i> Statistics
+                    </a>
+                    <a href="#" class="driver-nav-link">
+                        <i class="fa-solid fa-clipboard-list"></i> Audit Logs
+                    </a>
+                    <a href="#" class="driver-nav-link">
+                        <i class="fa-solid fa-users"></i> Users
+                    </a>
+                    <a href="{{ route('user.view', Auth::user()) }}" class="driver-nav-link">
+                        <i class="fa-solid fa-user-gear"></i> Profile
+                    </a>
+                </nav>
+            @elseif (Auth::user()->isDriver())
+                <nav class="driver-nav">
+                    <a href="{{ route('driver.dashboard') }}" class="driver-nav-link">
+                        <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="{{ route('driver.earnings') }}" class="driver-nav-link">
+                        <i class="fa-solid fa-dollar-sign"></i> Earnings
+                    </a>
+                    <a href="{{ route('user.view', Auth::user()) }}" class="driver-nav-link">
+                        <i class="fa-solid fa-user-gear"></i> Profile
+                    </a>
+                </nav>
+            @else
+                <nav class="driver-nav">
+                    <a href="{{ route('home') }}" class="driver-nav-link">
+                        <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="/ride/requests/created" class="driver-nav-link active">
+                        <i class="fa-solid fa-car"></i> My Ride Requests
+                    </a>
+                    <a href="{{ route('user.view', Auth::user()) }}" class="driver-nav-link">
+                        <i class="fa-solid fa-user-gear"></i> Profile
+                    </a>
+                </nav>
+            @endif
+        @endauth
+    </aside>
 
-    <button id="ride-request-back">Back</button>
+    <main class="main-content">
+        <div class="page-header">
+            <h1><i class="fas fa-map-marker-alt"></i> Make a Ride Request</h1>
+            <button id="ride-request-back" class="btn btn-secondary" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
 
-    <form action="/ride/requests/create/submit" method="POST">
-        @csrf
-        <p><strong><span id="ride-request-destination">{{$ride->ride_name}}</span></strong></p>
-        <p><strong>Description: </strong><span id="ride-request-description">{{$ride->description}}</span></p>
-        <!-- <p><strong>Currently on: </strong><span id="ride-request-location"></span></p> -->
-        
-        <p>Click on the map to choose your ride destination.</p>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-route"></i> Ride Information</h2>
+            </div>
+            <div class="card-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <strong><i class="fas fa-car-side"></i> Ride Name:</strong>
+                        <p id="ride-request-destination" style="margin: 5px 0 0 0; font-size: 16px;">{{$ride->ride_name}}</p>
+                    </div>
+                    <div>
+                        <strong><i class="fas fa-info-circle"></i> Description:</strong>
+                        <p id="ride-request-description" style="margin: 5px 0 0 0; font-size: 16px;">{{$ride->description}}</p>
+                    </div>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <p style="margin: 0; color: #1e3a8a;"><i class="fas fa-location-dot"></i> <strong>Click on the map below to choose your pickup location</strong></p>
+                </div>
+            </div>
+        </div>
 
-        <p>From your location: <span id="ride-request-from-label">Retrieving location...</span></p>
-        <p>To location: <span id="ride-request-to-label">N/A</span></p>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-map"></i> Select Pickup Location</h2>
+            </div>
+            <div class="card-body">
+                <div id="map" style="height: 400px; border-radius: 8px; border: 2px solid #e5e7eb;"></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <strong><i class="fas fa-location-crosshairs"></i> From (Your Location):</strong>
+                        <p id="ride-request-from-label" style="margin: 8px 0 0 0; color: #666;">Retrieving location...</p>
+                    </div>
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                        <strong><i class="fas fa-map-pin"></i> To (Pickup Location):</strong>
+                        <p id="ride-request-to-label" style="margin: 8px 0 0 0; color: #666;">Click on map to select</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <input type="number" name="ride_id" id="ride-request-ride-id" value="{{$ride->id}}" hidden value="{{old('ride_id')}}">
-        <input type="number" name="destination_id" id="ride-request-destination-id" hidden value="{{old('destination_id')}}">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-edit"></i> Request Details</h2>
+            </div>
+            <div class="card-body">
+                <form action="/ride/requests/create/submit" method="POST">
+                    @csrf
+                    
+                    <input type="number" name="ride_id" id="ride-request-ride-id" value="{{$ride->id}}" hidden>
+                    <input type="number" name="destination_id" id="ride-request-destination-id" hidden value="{{old('destination_id')}}">
+                    <input type="text" name="from_latitude" id="ride-request-from-latitude" hidden value="{{old('from_latitude')}}">
+                    <input type="text" name="from_longitude" id="ride-request-from-longitude" hidden value="{{old('from_longitude')}}">
+                    <input type="text" name="to_latitude" id="ride-request-to-latitude" hidden value="{{old('to_latitude')}}">
+                    <input type="text" name="to_longitude" id="ride-request-to-longitude" hidden value="{{old('to_longitude')}}">
+                    <input type="text" name="price" id="ride-request-price" hidden value="{{old('price')}}">
 
-        <input type="text" name="from_latitude" id="ride-request-from-latitude" hidden value="{{old('from_latitude')}}">
-        <input type="text" name="from_longitude" id="ride-request-from-longitude" hidden value="{{old('from_longitude')}}">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;"><i class="fas fa-map-marker"></i> Pickup Location / Address *</label>
+                        <input type="text" name="pickup_at" id="ride-request-pickup-at" required value="{{old('pickup_at')}}" 
+                               style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px;"
+                               placeholder="Enter pickup address">
+                    </div>
 
-        <input type="text" name="to_latitude" id="ride-request-to-latitude" hidden value="{{old('to_latitude')}}">
-        <input type="text" name="to_longitude" id="ride-request-to-longitude" hidden value="{{old('to_longitude')}}">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;"><i class="fas fa-money-bill-wave"></i> Estimated Price: ₱<span id="price-value">0.00</span></label>
+                        <p style="color: #666; font-size: 14px; margin: 0;">Price calculated based on distance and fare rate</p>
+                    </div>
 
-        <label for="pickup_at">To location / Pickup At:</label>
-        <input type="text" name="pickup_at" id="ride-request-pickup-at" required value="{{old('pickup_at')}}"></input>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;"><i class="fas fa-clock"></i> Pickup Time *</label>
+                        <input type="time" name="time" id="ride-request-time" required value="{{old('time')}}"
+                               style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px;">
+                    </div>
 
-        <label for="price">Price: &#x20B1;<span id="price-value"></span></label>
-        <input type="text" name="price" id="ride-request-price" hidden value="{{old('price')}}">
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;"><i class="fas fa-message"></i> Message (Optional)</label>
+                        <textarea name="message" id="ride-request-message" rows="4"
+                                  style="width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 16px; resize: vertical;"
+                                  placeholder="Add any additional notes for the driver...">{{old('message')}}</textarea>
+                    </div>
 
-        <label for="time">Pickup Time:</label>
-        <input type="time" name="time" id="ride-request-time" required value="{{old('time')}}"></input>
+                    @if ($errors->any())
+                        <div style="background: #fee2e2; border: 1px solid #ef4444; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                            <strong style="color: #991b1b;"><i class="fas fa-exclamation-circle"></i> Errors:</strong>
+                            <ul style="margin: 8px 0 0 20px; color: #991b1b;">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-        <label for="message">Message (Optional):</label>
-        <textarea name="message" id="ride-request-message" value="{{old('message')}}"></textarea>
-
-        @if ($errors)
-            <p>{{$errors}}</p>
-        @endif
-        <button type="submit">
-            <p>{{__('string.submit')}}</p>
-        </button>
-    </form>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 18px;">
+                        <i class="fas fa-paper-plane"></i> {{__('string.submit')}} Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
 
     <script>
         window.fare_rate = {{ $ride->fare_rate ?? 0 }};

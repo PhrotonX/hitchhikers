@@ -1,25 +1,19 @@
 <header class="main-header">
     <div class="header-logo">
-        <img src="{{Vite::asset("resources/img/Hitchhike Logo.png")}}" alt="Logo"> <!-- Hitch Hike Logo -->
+        <img src="{{Vite::asset("resources/img/Hitchhike Logo.png")}}" alt="Logo">
         <span>Hitchhike</span>
     </div>
 
     <nav class="header-nav">
         <span class="separator">|</span> 
-        <a href="/">Home</a> <!-- Route to Dashboard -->
-        <a href="/about">About</a> <!-- Route to About -->
+        <a href="/">Home</a>
+        <a href="/about">About</a>
         @auth
-            <a href="/logout">Logout</a> <!-- Route to Log In -->
+            <a href="/logout">Logout</a>
         @else
-            <a href="/login">Login</a> <!-- Route to Log In -->
-        @endauth
-        
-        @auth
-            @if (!Auth::user()->isDriver())
-                <a href="/ride/requests/created">My Ride Requests</a>
-            @endif
+            <a href="/login">Login</a>
         @endauth
     </nav>
 
-    <a href="/register" class="header-btn">Get Started</a> <!-- Route to SignUp -->
+    <!-- <a href="/register" class="header-btn">Get Started</a> -->
 </header>

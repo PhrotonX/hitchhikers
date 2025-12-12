@@ -113,6 +113,11 @@ export default class PassengerRequestList extends Component{
                     itemProfit.innerHTML = "Estimated Profit: PHP" + requestPrice;
                     item.appendChild(itemProfit);
 
+                    var itemMessage = document.createElement('p');
+                    itemMessage.setAttribute('id', this.id + '-' + requestId + '-item-message');
+                    itemMessage.innerHTML = "Message: PHP" + requestData.message;
+                    item.appendChild(itemMessage);
+
                     var itemStatus = document.createElement('p');
                     itemStatus.setAttribute('id', this.id + '-' + requestId + '-item-status');
                     itemStatus.innerHTML = "<strong>Status: </strong>" + currentStatus;
