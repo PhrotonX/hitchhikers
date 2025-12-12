@@ -27,9 +27,8 @@
 
     <nav class="header-nav">
         <a href="{{ route('home') }}">Home</a>
-        <a href="{{ route('home') }}#book">Book a Ride</a>
+        <a href="#services">Services</a>
         <a href="#about">About Us</a>
-        <a href="{{ url('about') }}">Contact</a>
     </nav>
 
     <div class="header-auth">
@@ -65,8 +64,8 @@
     <img src="{{Vite::asset('resources/img/Background Img.png')}}" class="section1-img reveal fade-right" alt="Hitchhike Hero">
 </section>
 
-{{-- SECTION 2 - FEATURES --}}
-<section class="section2">
+{{-- SECTION 2 (FEATURES) --}}
+<section class="section2" id="services">
     <div class="section2-header reveal fade-up">
         <h1>What Makes Hitchhike Different</h1>
         <p class="section2-subtitle">
@@ -243,8 +242,9 @@
                 <ul class="footer-links">
                     <li><a href="{{ route('home') }}">Book a Ride</a></li>
                     <li><a href="{{ route('ride.create') }}">Offer a Ride</a></li>
-                    <li><a href="#how-it-works">How it works</a></li>
+                    <li><a href="#">How it works</a></li>
                     <li><a href="#">Safety</a></li>
+                    <li><a href="#">Pricing</a></li>
                 </ul>
             </div>
 
@@ -254,6 +254,7 @@
                     <li><a href="#">Help Center</a></li>
                     <li><a href="{{ url('about') }}">Contact Us</a></li>
                     <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Community Guidelines</a></li>
                 </ul>
             </div>
 
