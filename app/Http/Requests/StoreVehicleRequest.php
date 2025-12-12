@@ -32,7 +32,8 @@ class StoreVehicleRequest extends FormRequest
             'coordinates' => ['nullable'],
             'color' => ['required', 'string'],
             'type' => ['required', 'string', 'max:255'],
-
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];
     }
 }
