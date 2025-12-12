@@ -7,13 +7,6 @@
     <nav class="header-nav">
         <span class="separator">|</span> 
         <a href="/">Home</a>
-        @auth
-            @if (Auth::user()->isPrivileged('owner'))
-                <a href="{{ route('owner.dashboard') }}">Owner Dashboard</a>
-            @elseif (Auth::user()->isDriver())
-                <a href="{{ route('driver.dashboard') }}">Driver Dashboard</a>
-            @endif
-        @endauth
         <a href="/about">About</a>
         @auth
             <a href="/logout">Logout</a>

@@ -14,14 +14,11 @@
             <a href="{{ route('driver.dashboard') }}" class="driver-nav-link">
                 <i class="fa-solid fa-tachometer-alt"></i> Dashboard
             </a>
-            <a href="{{ route('driver.rides') }}" class="driver-nav-link">
-                <i class="fa-solid fa-car"></i> Ride Management
-            </a>
             <a href="{{ route('driver.earnings') }}" class="driver-nav-link active">
                 <i class="fa-solid fa-dollar-sign"></i> Earnings
             </a>
             <a href="{{ route('user.view', $user) }}" class="driver-nav-link">
-                <i class="fa-solid fa-user-gear"></i> My Profile
+                <i class="fa-solid fa-user-gear"></i> Profile
             </a>
         </nav>
     </aside>
