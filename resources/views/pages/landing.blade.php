@@ -39,7 +39,7 @@
                 <button type="submit" class="signup-btn" style="background: transparent; color: var(--primary); border: 2px solid var(--primary);">Log Out</button>
             </form>
         @else
-            <a href="{{ url('login') }}" class="login-btn">Log In</a>
+            <a href="{{ url('login') }}" class="login-btn" style="background:none;">Log In</a>
             <a href="{{ url('register') }}" class="signup-btn">Sign Up</a>
         @endauth
     </div>

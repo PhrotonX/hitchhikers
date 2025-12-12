@@ -15,5 +15,5 @@
         @endauth
     </nav>
 
-    <a href="/register" class="header-btn">Get Started</a>
+    <!-- <a href="/register" class="header-btn">Get Started</a> -->
 </header>
