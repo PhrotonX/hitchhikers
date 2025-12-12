@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Management - Hitchhike</title>
+
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* --- New Driver Sidebar Navigation --- */
+        /* (Copied from dashboard, in case you don't move to style.css yet) */
+        .driver-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin: -10px;
+        }
+        .driver-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            color: var(--text-light);
+            transition: all 0.2s ease-in-out;
+        }
+        .driver-nav-link i { width: 20px; }
+        .driver-nav-link:hover {
+            background-color: var(--background-hover);
+            color: var(--primary);
+        }
+        .driver-nav-link.active {
+            background-color: var(--primary-light);
+            color: white;
+            border-right: 4px solid var(--accent);
+        }
+        body.dark-mode .driver-nav-link:hover { color: var(--accent); }
+        body.dark-mode .driver-nav-link.active { background-color: var(--primary); }
+
+        /* --- Page Layout --- */
+        .ride-management-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 30px;
+            align-items: flex-start; /* Aligns columns to the top */
+        }
+        
+        /* Responsive layout for smaller screens */
+        @media (max-width: 1024px) {
+            .ride-management-layout {
+                grid-template-columns: 1fr; /* Stack columns on tablets/mobile */
+            }
+        }
+
+        /* --- Generic Card Style --- */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        body.dark-mode .card {
+            background-color: #1a243d;
+            border: 1px solid #334155;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin: 0;
+        }
+        body.dark-mode .card-title { color: white; }
+
+        /* --- Button Styles --- */
+        .btn {
+            padding: 12px 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            width: 100%; /* Make buttons full-width in their containers */
+        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-light); }
+        .btn-secondary { background-color: var(--border); color: var(--text-dark); }
+        .btn-secondary:hover { background-color: #d1d5db; }
+        .btn-success { background-color: var(--secondary); color: white; }
+        .btn-success:hover { background-color: #059669; }
+        .btn-danger { background-color: var(--error); color: white; }
+        .btn-danger:hover { background-color: #dc2626; }
+
+        /* --- Active Ride Card --- */
+        .map-container {
+            width: 100%;
+            height: 250px;
+            background-color: #e0e0e0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        .ride-details-list {
+            list-style: none;
+            padding: 0;
+        }
+        .ride-details-list li {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ride-details-list li i {
+            color: var(--primary);
+            width: 20px;
+            text-align: center;
+        }
+        .ride-details-list strong {
+            color: var(--text-dark);
+        }
+        body.dark-mode .ride-details-list strong { color: white; }
+        .card-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        /* "No Active Ride" Placeholder */
+        .placeholder-card {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-light);
+            border: 2px dashed var(--border);
+        }
+        body.dark-mode .placeholder-card {
+            border-color: #334155;
+        }
+
+        /* --- Ride Request Feed --- */
+        .ride-request-feed {
+            max-height: 800px; /* Makes the list scrollable */
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .ride-request-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: box-shadow 0.2s;
+        }
+        .ride-request-card:hover { box-shadow: var(--shadow-hover); }
+        .ride-passenger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        body.dark-mode .ride-passenger { color: white; }
+        .ride-locations {
+            list-style: none;
+            padding: 10px 0 0 35px; /* Indent under passenger icon */
+            font-size: 0.9rem;
+        }
+        .ride-locations li {
+            position: relative;
+            padding-left: 20px;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+        .ride-locations li i {
+            position: absolute;
+            left: 0;
+            top: 4px;
+            color: var(--primary);
+        }
+        .ride-locations li.dropoff i { color: var(--secondary); }
+        .ride-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* --- Cancellation Modal (Hidden by default) --- */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex; /* Show when active */
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        body.dark-mode .modal-content {
+            background-color: #1a243d;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+        }
+        body.dark-mode .modal-content h3 { color: white; }
+        .modal-content label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+        body.dark-mode .modal-content label { color: var(--text-light); }
+        .modal-content textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            resize: vertical;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    
+    <header class="toolbar">
+        <div class="container toolbar-content">
+            <a href="index.html" class="logo">
+                <img src="hitchhike logo.png" alt="Hitchhike Logo" class="logo-img">
+                <span class="logo-text">Hitchhike</span>
+            </a>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Driver Dashboard">
+            </div>
+            <div class="nav-links"></div>
+            <div class="user-actions">
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fa-solid fa-toggle-off"></i>
+                </button>
+                <div class="notif">
+                    <div class="notif-icon" id="notif-icon">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="notif-badge" id="notif-badge">3</span>
+                    </div>
+                </div>
+                <div class="notif-list" id="notif-list">
+                    <label class="notif-label">Notifications</label>
+                    <ul>
+                        <li><a href="#">New Ride Request!</a></li>
+                        <li><a href="#">Your License expires in 7 days.</a></li>
+                        <li><a href="#">Weekly Earnings Summary is ready.</a></li>
+                    </ul>
+                    <div class="view-all">
+                        <a href="#" class="viewAll-link">View All </a>
+                    </div>
+                </div>
+                <div class="user-icon" id="user-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            </div>
+            <div class="sidebar" id="sidebar-menu">
+                <div class="sidebar-top">
+                    <div class="profile">
+                        <h3 id="user-name">Driver Name Here</h3>
+                        <a href="driver_profile.html" class="edit-profile">Edit profile ></a>    
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <a href="#" class="sidebar-menu-links">Settings</a>
+                    <div class="logout-icon">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <a href="#" class="logout-link">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </header>
+
+
+    <div class="main-layout">
+
+        <aside class="mlay-side">
+            <nav class="driver-nav">
+                <a href="driver_dashboard.html" class="driver-nav-link">
+                    <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="driver_rides.html" class="driver-nav-link active">
+                    <i class="fa-solid fa-car"></i> Ride Management
+                </a>
+                <a href="driver_earnings.html" class="driver-nav-link">
+                    <i class="fa-solid fa-dollar-sign"></i> Earnings
+                </a>
+                <a href="driver-profile.html" class="driver-nav-link">
+                    <i class="fa-solid fa-user-gear"></i> My Profile
+                </a>
+                <a href="driver_notifications.html" class="driver-nav-link">
+                    <i class="fa-solid fa-bell"></i> Notifications
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            
+            <div class="ride-management-layout">
+
+                <div class="ride-col-left">
+                    
+                    <div class="card" id="active-ride-card" style="display: none;"> <div class="card-header">
+                            <h2 class="card-title">Active Ride</h2>
+                        </div> 
+                        <div class="card-body">
+                            <div class="map-container" id="map-canvas">
+                                Map of Active Route
+                            </div>
+                            
+                            <ul class="ride-details-list">
+                                <li>
+                                    <i class="fa-solid fa-user-circle"></i>
+                                    <strong>Passenger:</strong> <span id="active-ride-passenger">Johann M.</span>
+                                </li>
+                                <li class="pickup">
+                                    <i class="fa-solid fa-map-pin"></i>
+                                    <strong>Pick-up:</strong> <span id="active-ride-pickup">SM City Pampanga</span>
+                                </li>
+                                <li class="dropoff">
+                                    <i class="fa-solid fa-flag-checkered"></i>
+                                    <strong>Drop-off:</strong> <span id="active-ride-dropoff">San Fernando Intersection</span>
+                                </li>
+                            </ul>
+
+                            <div class="card-actions" id="start-ride-buttons">
+                                <button class="btn btn-success" id="start-ride-btn"><i class="fa-solid fa-play"></i> Start Ride</button>
+                                <button class="btn btn-danger" id="cancel-ride-btn-modal"><i class="fa-solid fa-ban"></i> Cancel</button>
+                            </div>
+
+                            <div class="card-actions" id="end-ride-buttons" style="display: none;">
+                                <button class="btn btn-primary" id="complete-ride-btn"><i class="fa-solid fa-check"></i> Complete Ride</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card placeholder-card" id="no-active-ride-card">
+                        <i class="fa-solid fa-car-side" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <h2 class="card-title">No Active Ride</h2>
+                        <p>Accept a ride from the "Available Rides" list to get started.</p>
+                    </div>
+
+                </div>
+
+                <div class="ride-col-right">
+                    <div class="card" id="ride-requests-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Available Ride Requests</h2>
+                        </div>
+                        <div class="card-body ride-request-feed" id="ride-request-feed">
+                            
+                            <div class="ride-request-card">
+                                <div class="ride-passenger">
+                                    <i class="fa-solid fa-user-circle"></i>
+                                    Josef P. (5.0 <i class="fa-solid fa-star" style="color: #F59E0B; font-size: 0.8rem;"></i>)
+                                </div>
+                                <ul class="ride-locations">
+                                    <li class="pickup"><i class="fa-solid fa-map-pin"></i> <span>SM City Pampanga</span></li>
+                                    <li class="dropoff"><i class="fa-solid fa-flag-checkered"></i> <span>San Fernando Intersection</span></li>
+                                </ul>
+                                <div class="ride-actions">
+                                    <button class="btn btn-success">Accept (Est. ₱150)</button>
+                                    <button class="btn btn-secondary">Decline</button>
+                                </div>
+                            </div>
+                            
+                            <div class="ride-request-card">
+                                <div class="ride-passenger">
+                                    <i class="fa-solid fa-user-circle"></i>
+                                    Another Passenger (4.8 <i class="fa-solid fa-star" style="color: #F59E0B; font-size: 0.8rem;"></i>)
+                                </div>
+                                <ul class="ride-locations">
+                                    <li class="pickup"><i class="fa-solid fa-map-pin"></i> <span>Longer Pick-up Location Name</span></li>
+                                    <li class="dropoff"><i class="fa-solid fa-flag-checkered"></i> <span>A Different Drop-off</span></li>
+                                </ul>
+                                <div class="ride-actions">
+                                    <button class="btn btn-success">Accept (Est. ₱220)</button>
+                                    <button class="btn btn-secondary">Decline</button>
+                                </div>
+                            </div>
+
+                            <div class="ride-request-card">
+                                <div class="ride-passenger">
+                                    <i class="fa-solid fa-user-circle"></i>
+                                    Third Passenger (4.9 <i class="fa-solid fa-star" style="color: #F59E0B; font-size: 0.8rem;"></i>)
+                                </div>
+                                <ul class="ride-locations">
+                                    <li class="pickup"><i class="fa-solid fa-map-pin"></i> <span>Nearby Cafe</span></li>
+                                    <li class="dropoff"><i class="fa-solid fa-flag-checkered"></i> <span>City Hall</span></li>
+                                </ul>
+                                <div class="ride-actions">
+                                    <button class="btn btn-success">Accept (Est. ₱100)</button>
+                                    <button class="btn btn-secondary">Decline</button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Hitchhike</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Product</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Book a Ride</a></li>
+                        <li><a href="#">Offer a Ride</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Stay Updated</h3>
+                     <p>Follow us on social media</p>
+                     <div class="social-list">
+                         <a href="#" class="social-link"><i class="fa-brands fa-facebook-f"></i>Facebook</a>
+                         <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i>Instagram</a>
+                         <a href="#" class="social-link"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+                     </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Hitchhike.  | <a href="#"> Privacy Policy </a> | <a href="#"> Terms and Conditions </a></p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal-overlay" id="cancel-ride-modal">
+        <div class="modal-content">
+            <h3>Cancel Ride</h3>
+            <p>Please select a reason for cancellation:</p>
+            
+            <div class="form-group">
+                <label for="cancel-reason">Reason:</label>
+                <textarea id="cancel-reason" placeholder="e.g., Passenger not here, unsafe pickup, etc..."></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-danger" id="cancel-confirm-btn">Confirm Cancellation</button>
+                <button class="btn btn-secondary" id="cancel-modal-close-btn">Go Back</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="script.js"></script>
+    
+    <script>
+        // Simple script to make the modal buttons work.
+        // You'll integrate this with your main app logic.
+        const openModalBtn = document.getElementById('cancel-ride-btn-modal');
+        const closeModalBtn = document.getElementById('cancel-modal-close-btn');
+        const modalOverlay = document.getElementById('cancel-ride-modal');
+
+        if (openModalBtn && closeModalBtn && modalOverlay) {
+            openModalBtn.addEventListener('click', () => {
+                modalOverlay.classList.add('active');
+            });
+            
+            closeModalBtn.addEventListener('click', () => {
+                modalOverlay.classList.remove('active');
+            });
+        }
+    </script>
+
+</body>
+</html>

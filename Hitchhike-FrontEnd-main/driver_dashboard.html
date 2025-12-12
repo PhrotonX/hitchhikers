@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard - Hitchhike</title>
+
+    <!-- FONT & ICON LINKS -->
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- CSS LINK (Points UP one folder to your main style.css) -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- 
+      NEW STYLES: For the Driver Dashboard.
+      You can copy/paste this entire <style> block into your main style.css file.
+    -->
+    <style>
+        /* --- New Driver Sidebar Navigation --- */
+        .driver-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin: -10px; /* Fill the sidebar padding */
+        }
+        .driver-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            color: var(--text-light);
+            transition: all 0.2s ease-in-out;
+        }
+        .driver-nav-link i {
+            width: 20px; /* Aligns icons */
+        }
+        .driver-nav-link:hover {
+            background-color: var(--background-hover);
+            color: var(--primary);
+        }
+        .driver-nav-link.active {
+            background-color: var(--primary-light);
+            color: white;
+            border-right: 4px solid var(--accent);
+        }
+        body.dark-mode .driver-nav-link:hover {
+            color: var(--accent);
+        }
+        body.dark-mode .driver-nav-link.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* --- Dashboard Grid Layout --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* 2/3 column for map, 1/3 for info */
+            gap: 30px;
+        }
+        
+        /* Responsive layout for smaller screens */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr; /* Stack columns on tablets/mobile */
+            }
+        }
+
+        /* --- Generic Card Style --- */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        body.dark-mode .card {
+            background-color: #1a243d; /* Matches toolbar dark bg */
+            border: 1px solid #334155;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin: 0;
+        }
+        body.dark-mode .card-title {
+            color: white;
+        }
+
+        /* --- Map & Active Ride Card --- */
+        .map-container {
+            width: 100%;
+            height: 400px;
+            background-color: #e0e0e0; /* Placeholder color */
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        .active-ride-details ul {
+            list-style: none;
+            padding: 0;
+        }
+        .active-ride-details li {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .active-ride-details li i {
+            color: var(--primary);
+        }
+        .active-ride-details strong {
+            color: var(--text-dark);
+        }
+        body.dark-mode .active-ride-details strong {
+            color: white;
+        }
+        .card-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        /* --- Ride Request Feed --- */
+        .ride-request-feed {
+            max-height: 400px; /* Makes the list scrollable */
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .ride-request-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: box-shadow 0.2s;
+        }
+        .ride-request-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .ride-passenger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        body.dark-mode .ride-passenger {
+            color: white;
+        }
+        .ride-locations {
+            list-style: none;
+            padding: 10px 0 0 35px; /* Indent under passenger icon */
+            font-size: 0.9rem;
+        }
+        .ride-locations li {
+            position: relative;
+            padding-left: 20px;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+        .ride-locations li i {
+            position: absolute;
+            left: 0;
+            top: 4px;
+            color: var(--primary);
+        }
+        .ride-locations li.dropoff i {
+            color: var(--secondary);
+        }
+        .ride-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* --- Driver Overview (Copied from previous step) --- */
+        .driver-profile-header { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .driver-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border); }
+        .driver-name { font-size: 1.8rem; font-weight: 700; color: var(--text-dark); margin: 0; }
+        .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.9rem; margin-top: 5px; }
+        .status-badge.approved { background-color: #d1fae5; color: #065f46; }
+        .status-badge.pending { background-color: #feF3c7; color: #92400e; }
+        .status-badge.rejected { background-color: #fee2e2; color: #991b1b; }
+        .driver-details-list { list-style: none; padding: 0; margin-top: 15px; }
+        .driver-details-list li { font-size: 1rem; color: var(--text-light); padding: 5px 0; }
+        .driver-details-list strong { color: var(--text-dark); }
+        body.dark-mode .driver-name, body.dark-mode .driver-details-list strong { color: white; }
+        body.dark-mode .driver-photo { border-color: #334155; }
+
+        /* --- Button Styles --- */
+        .btn {
+            padding: 12px 15px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-light); }
+        .btn-secondary { background-color: var(--border); color: var(--text-dark); }
+        .btn-secondary:hover { background-color: #d1d5db; }
+        .btn-success { background-color: var(--secondary); color: white; }
+        .btn-success:hover { background-color: #059669; }
+        .btn-danger { background-color: var(--error); color: white; }
+        .btn-danger:hover { background-color: #dc2626; }
+    </style>
+
+</head>
+<body>
+    
+    <!--HEADER (Paths updated for subfolder) -->
+    <header class="toolbar">
+        <div class="container toolbar-content">
+            <a href="index.html" class="logo">
+                <img src="Images/hitchhike logo.png" alt="Hitchhike Logo" class="logo-img">
+                <span class="logo-text">Hitchhike</span>
+            </a>
+            <!-- Minimal search bar for driver -->
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Driver Dashboard">
+            </div>
+            <!-- Nav links hidden, user-actions are more important -->
+            <div class="nav-links"></div>
+            
+            <div class="user-actions">
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fa-solid fa-toggle-off"></i>
+                </button>
+                <div class="notif">
+                    <div class="notif-icon" id="notif-icon">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="notif-badge" id="notif-badge">3</span> <!-- Example badge -->
+                    </div>
+                </div>
+                <div class="notif-list" id="notif-list">
+                    <label class="notif-label">Notifications</label>
+                    <ul>
+                        <li><a href="#">New Ride Request!</a></li>
+                        <li><a href="#">Your License expires in 7 days.</a></li>
+                        <li><a href="#">Weekly Earnings Summary is ready.</a></li>
+                    </ul>
+                    <div class="view-all">
+                        <a href="#" class="viewAll-link">View All </a>
+                    </div>
+                </div>
+                <div class="user-icon" id="user-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            </div>
+            <!--SIDEBAR SECTION (Uses header's sidebar)-->
+            <div class="sidebar" id="sidebar-menu">
+                <div class="sidebar-top">
+                    <div class="profile">
+                        <h3 id="user-name">Driver Name Here</h3>
+                        <a href="profile.html" class="edit-profile">Edit profile ></a>    
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <a href="#" class="sidebar-menu-links">Settings</a>
+                    <div class="logout-icon">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <a href="#" class="logout-link">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </header>
+
+
+    <!--MAIN LAYOUT-->
+    <div class="main-layout">
+
+        <!--MAIN SIDE SECTION (Driver Navigation)-->
+        <aside class="mlay-side">
+            <nav class="driver-nav">
+                <a href="driver_dashboard.html" class="driver-nav-link active">
+                    <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="driver_rides.html" class="driver-nav-link">
+                    <i class="fa-solid fa-car"></i> Ride Management
+                </a>
+                <a href="driver_earnings.html" class="driver-nav-link">
+                    <i class="fa-solid fa-dollar-sign"></i> Earnings
+                </a>
+                <a href="driver-profile.html" class="driver-nav-link">
+                    <i class="fa-solid fa-user-gear"></i> My Profile
+                </a>
+                <a href="driver_notifications.html" class="driver-nav-link">
+                    <i class="fa-solid fa-bell"></i> Notifications
+                </a>
+            </nav>
+        </aside>
+
+        <!--MAIN CONTENT SECTION (Driver Dashboard) -->
+        <main class="main-content">
+            
+            <div class="dashboard-grid">
+
+                <!-- Left Column -->
+                <div class="dashboard-col-left">
+                    
+                    <!-- MAP & NAVIGATION -->
+                    <div class="card" id="active-ride-card">
+                        <div class="card-header">
+                            <h2 class="card-title" id="active-ride-title">Offline - Waiting for Rides</h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- Map Placeholder -->
+                            <div class="map-container" id="map-canvas">
+                                Map Canvas
+                            </div>
+                            
+                            <!-- Active Ride Details (Hidden by default, shown by JS) -->
+                            <div class="active-ride-details" id="active-ride-details" style="display: none;">
+                                <ul>
+                                    <li>
+                                        <i class="fa-solid fa-user-circle"></i>
+                                        <strong>Passenger:</strong> <span id="active-ride-passenger">Johann M.</span>
+                                    </li>
+                                    <li class="pickup">
+                                        <i class="fa-solid fa-map-pin"></i>
+                                        <strong>Pick-up:</strong> <span id="active-ride-pickup">SM City Pampanga</span>
+                                    </li>
+                                    <li class="dropoff">
+                                        <i class="fa-solid fa-flag-checkered"></i>
+                                        <strong>Drop-off:</strong> <span id="active-ride-dropoff">San Fernando Intersection</span>
+                                    </li>
+                                </ul>
+
+                                <div class="card-actions">
+                                    <button class="btn btn-success" id="start-ride-btn"><i class="fa-solid fa-play"></i> Start Ride</button>
+                                    <button class="btn btn-danger" id="cancel-ride-btn"><i class="fa-solid fa-ban"></i> Cancel</button>
+                                    <button class="btn btn-primary" id="complete-ride-btn" style="display: none;"><i class="fa-solid fa-check"></i> Complete Ride</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column -->
+                <div class="dashboard-col-right">
+
+                    <!-- DRIVER OVERVIEW -->
+                    <div class="card" id="driver-overview-card">
+                        <div class="driver-profile-header">
+                            <img src="Images/Driver Icon.png" alt="Driver Photo" class="driver-photo" id="driver-photo">
+                            <div class="driver-info">
+                                <h3 class="driver-name" id="driver-name">Driver Name</h3>
+                                <span class="status-badge approved" id="status-badge">
+                                    <i class="fa-solid fa-check"></i> Approved
+                                </span>
+                            </div>
+                        </div>
+                        <ul class="driver-details-list">
+                            <li><strong>Vehicle:</strong> <span id="vehicle-info">Toyota Vios (2022)</span></li>
+                            <li><strong>Rating:</strong> <span id="driver-rating"><i class="fa-solid fa-star" style="color: #F59E0B;"></i> 4.9</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- RIDE MANAGEMENT (Available Requests) -->
+                    <div class="card" id="ride-requests-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Available Rides</h2>
+                        </div>
+                        <div class="card-body ride-request-feed" id="ride-request-feed">
+                            
+                            <!-- Example Ride Request Card (JS will build these) -->
+                            <div class="ride-request-card">
+                                <div class="ride-passenger">
+                                    <i class="fa-solid fa-user-circle"></i>
+                                    Passenger Name
+                                </div>
+                                <ul class="ride-locations">
+                                    <li class="pickup"><i class="fa-solid fa-map-pin"></i> <span>Pick-up Location</span></li>
+                                    <li class="dropoff"><i class="fa-solid fa-flag-checkered"></i> <span>Drop-off Location</span></li>
+                                </ul>
+                                <div class="ride-actions">
+                                    <button class="btn btn-success">Accept</button>
+                                    <button class="btn btn-secondary">Decline</button>
+                                </div>
+                            </div>
+                            <!-- End Example Card -->
+
+                            <div class="ride-request-card">
+                                <div class="ride-passenger">
+                                    <i class="fa-solid fa-user-circle"></i>
+                                    Another Passenger
+                                </div>
+                                <ul class="ride-locations">
+                                    <li class="pickup"><i class="fa-solid fa-map-pin"></i> <span>Longer Pick-up Location Name</span></li>
+                                    <li class="dropoff"><i class="fa-solid fa-flag-checkered"></i> <span>A Different Drop-off</span></li>
+                                </ul>
+                                <div class="ride-actions">
+                                    <button class="btn btn-success">Accept</button>
+                                    <button class="btn btn-secondary">Decline</button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+
+    <!--FOOTER-->
+    <footer class="footer">
+        <div class="container">
+            <!-- Footer content copied from index.html -->
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Hitchhike</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Product</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Book a Ride</a></li>
+                        <li><a href="#">Offer a Ride</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Stay Updated</h3>
+                     <p>Follow us on social media</p>
+                     <div class="social-list">
+                         <a href="#" class="social-link"><i class="fa-brands fa-facebook-f"></i>Facebook</a>
+                         <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i>Instagram</a>
+                         <a href="#" class="social-link"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+                     </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Hitchhike.  | <a href="#"> Privacy Policy </a> | <a href="#"> Terms and Conditions </a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPT LINK (Points UP one folder to your main script.js) -->
+    <script src="script.js"></script>
+    
+    <!-- 
+      PAGE-SPECIFIC SCRIPT:
+      You would add a new <script> tag here (or link a new file)
+      to handle all the data-fetching for this page.
+    -->
+
+</body>
+</html>

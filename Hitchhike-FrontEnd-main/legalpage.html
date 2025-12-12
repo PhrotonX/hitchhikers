@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HitchHike - Legal Pages</title>
+
+<link rel="stylesheet" href="https://raw.githubusercontent.com/JInigo275/Hitchhike-FrontEnd/9cfc8b1a10d99fe3c4d13e488958994b407755e7/style.css" />
+<style>
+
+  .legal-nav {
+    display: flex;
+    gap: 1em;
+    margin-bottom: 1.5em;
+  }
+  .legal-nav button {
+    padding: 0.5em 1.2em;
+    cursor: pointer;
+  }
+  .legal-nav button.primary-btn {
+    background-color: #3498db;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+  }
+  .legal-nav button.primary-btn.active {
+    background-color: #2980b9;
+  }
+  section.legal-section {
+    display: none;
+  }
+  section.legal-section.active {
+    display: block;
+  }
+  section.legal-section article {
+    max-width: 700px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>HitchHike - Legal Pages</h1>
+</header>
+
+<main>
+  <nav class="legal-nav">
+    <button class="btn primary-btn active" data-target="terms">Terms &amp; Conditions</button>
+    <button class="btn primary-btn" data-target="privacy">Privacy Policy</button>
+    <button class="btn primary-btn" data-target="datausage">Data Usage &amp; Storage Policy</button>
+  </nav>
+
+  <section id="terms" class="legal-section active section" tabindex="0">
+    <h2>Terms &amp; Conditions</h2>
+    <article>
+      <p>Welcome to HitchHike! By using our service, you agree to the following terms and conditions:</p>
+      <ul>
+        <li>Users must be responsible and accurate when entering trip information.</li>
+        <li>Fare payments must be made fairly as calculated by the system to respect drivers.</li>
+        <li>All disputes will be handled according to local laws and HitchHike policies.</li>
+        <li>We reserve the right to update these terms at any time.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section id="privacy" class="legal-section section" tabindex="0">
+    <h2>Privacy Policy</h2>
+    <article>
+      <p>HitchHike respects your privacy. This policy outlines how we collect, use, and protect your data:</p>
+      <ul>
+        <li>We collect only the necessary information to provide the service (name, location, payment details).</li>
+        <li>Personal data is stored securely and not shared with third parties without your consent.</li>
+        <li>We may use aggregated data for improving our services and features.</li>
+        <li>Cookies and local storage may be used to save preferences and session data.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section id="datausage" class="legal-section section" tabindex="0">
+    <h2>Data Usage &amp; Storage Policy</h2>
+    <article>
+      <p>Your data integrity and security are important to us. Summary of our data usage and storage:</p>
+      <ul>
+        <li>Trip and transaction data is stored securely for audit and dispute resolution.</li>
+        <li>Payment data is processed via secure third-party providers; HitchHike does not store full payment credentials.</li>
+        <li>Data retention policies comply with applicable laws and will be periodically reviewed.</li>
+        <li>You may request access or deletion of your data per legal guidelines.</li>
+      </ul>
+    </article>
+  </section>
+</main>
+
+<script>
+  const buttons = document.querySelectorAll('nav.legal-nav button');
+  const sections = document.querySelectorAll('section.legal-section');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+
+      buttons.forEach(b => b.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+
+      btn.classList.add('active');
+      const targetId = btn.getAttribute('data-target');
+      document.getElementById(targetId).classList.add('active');
+      document.getElementById(targetId).focus();
+    });
+  });
+</script>
+
+</body>
+</html>

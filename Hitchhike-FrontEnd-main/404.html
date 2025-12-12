@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 Page Not Found - Hitchhike</title>
+    
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        :root {
+            --primary-blue: #007bff;
+            --light-blue-bg: #f4f8ff;
+            --white: #ffffff;
+            --text-dark: #333;
+            --text-light: #555;
+            --border-blue: #bfe0ff;
+        }
+        .error-page-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 60vh; 
+            padding: 40px 20px;
+            box-sizing: border-box; 
+        }
+        .bg-light-blue { background-color: var(--light-blue-bg); }
+        .bg-white { background-color: var(--white); }
+        .error-page-container .error-code {
+            font-size: 6rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin: 0;
+        }
+        .error-page-container .error-title {
+            font-size: 2rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-top: 10px;
+        }
+        .error-page-container .error-message {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-top: 15px;
+            max-width: 400px;
+        }
+        .btn-primary {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 24px;
+            background-color: var(--primary-blue);
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover { background-color: #0056b3; }
+        .maintenance-icon {
+            font-size: 4rem;
+            color: var(--primary-blue);
+            display: block;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="toolbar">
+        <div class="container toolbar-content">
+            <a href="/" class="logo">
+                <img src="Hitchhike Logo.png" alt="Hitchhike Logo" class="logo-img">
+                <span class="logo-text">Hitchhike</span>
+            </a>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Where are you going?">
+                <button class="search-button">Find Rides</button>
+            </div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="#">My Trips</a>
+                <a href="#">Help</a>
+            </div>
+            <div class="user-actions">
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fa-solid fa-toggle-off"></i>
+                </button>
+                <div class="notif">
+                    <div class="notif-icon" id="notif-icon">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="notif-badge" id="notif-badge">0</span>
+                    </div>
+                </div>
+                <div class="notif-list" id="notif-list">
+                    <label class="notif-label">Notifications</label>
+                    <ul>
+                        <li><a href="#">New Message</a></li>
+                        <li><a href="#">Reminder: </a></li>
+                        <li><a href="#">Trip Accepted</a></li>
+                    </ul>
+                    <div class="view-all">
+                        <a href="#" class="viewAll-link">View All </a>
+                    </div>
+                </div>
+                <div class="user-icon" id="user-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+            </div>
+            <div class="sidebar" id="sidebar-menu">
+                <div class="sidebar-top">
+                    <div class="profile">
+                        <h3 id="user-name">User Name</h3>
+                        <a href="#Profile" class="edit-profile">Edit profile  >  </a>    
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <a href="#Dashboard" class="sidebar-menu-links">Dashboard</a>
+                    <a href="#Messages" class="sidebar-menu-links">Messages</a> 
+                    <a href="#History" class="sidebar-menu-links">History</a>     
+                </div>
+                <div class="sidebar-section">
+                    <a href="#" class="sidebar-menu-links">Settings</a>
+                    <div class="logout-icon">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <a href="#" class="logout-link">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </header>
+
+    
+    <div class="error-page-container bg-light-blue">
+        <div class="error-code">404</div>
+        <h1 class="error-title">Page Not Found</h1>
+        <p class="error-message">
+            Sorry, we couldn't find the page you were looking for. 
+            It might have been moved, deleted, or maybe you just mistyped the URL.
+        </p>
+        <a href="/" class="btn-primary">Go to Homepage</a>
+    </div>
+
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Hitchhike</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Product</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Book a Ride</a></li>
+                        <li><a href="#">Offer a Ride</a></li>
+                        <li><a href="#">How it works</a></li>
+                        <li><a href="#">Safety</a></li>
+                        <li><a href="#">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Community Guidelines</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Stay Updated</h3>
+                     <p>Follow us on social media</p>
+                     <div class="social-list">
+                         <a href="#" class="social-link"><i class="fa-brands fa-facebook-f"></i>Facebook</a>
+                         <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i>Instagram</a>
+                         <a href="#" class="social-link"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Hitchhike.  | <a href="#"> Privacy Policy </a> | <a href="#"> Terms and Conditions </a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
