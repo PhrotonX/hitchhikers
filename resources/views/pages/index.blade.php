@@ -21,18 +21,27 @@
                 <p>Find rides, connect with drivers, and travel affordably.</p>
             </section> -->
 
+            <!-- Search Bar -->
+            <section class="search-section" style="margin-top:16px">
+                <div class="search-container">
+                    <input type="text" id="ride-search-input" placeholder="Search destinations..." />
+                    <button type="button" id="ride-search-btn">Search</button>
+                </div>
+                <div id="search-results" style="display: none;"></div>
+            </section>
+
             <!-- Map area from existing app (preserved) -->
             <section style="margin-top:16px">
                 <div id="map"></div>
             </section>
 
-            <section class="mid-section" style="margin-top:16px">
+            <!-- <section class="mid-section" style="margin-top:16px">
                 <h3>Mid Section</h3>
             </section>
 
             <section class="bottom-section" style="margin-top:16px">
                 <h3>Bottom Section</h3>
-            </section>
+            </section> -->
 
             <!-- Backend-driven UI blocks (reviews, driving mode, requests) preserved below -->
             @auth
@@ -149,6 +158,90 @@
                 map.configureMarkerIcon('selected', '{{Vite::asset("resources/img/selected_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
                 map.configureMarkerIcon('selected2', '{{Vite::asset("resources/img/selected_pin_2.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
                 map.detectLocation();
+
+                // Search functionality
+                var searchInput = document.getElementById('ride-search-input');
+                var searchBtn = document.getElementById('ride-search-btn');
+                var searchResults = document.getElementById('search-results');
+
+                function performSearch() {
+                    var query = searchInput.value.trim();
+                    if (!query) {
+                        searchResults.style.display = 'none';
+                        return;
+                    }
+
+                    fetch('{{env("APP_URL", "")}}' + '/ride/search?ride_address=' + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(data => {
+                            searchResults.innerHTML = '';
+                            
+                            if (Object.keys(data.vehicles).length === 0) {
+                                searchResults.innerHTML = '<p>No results found</p>';
+                                searchResults.style.display = 'block';
+                                return;
+                            }
+
+                            var resultsHtml = '<h3>Search Results</h3>';
+                            
+                            Object.values(data.vehicles).forEach(vehicle => {
+                                var vehicleRides = Object.values(data.rides).filter(r => r.vehicle_id === vehicle.id);
+                                var rideNames = vehicleRides.map(r => r.ride_name).join(', ');
+                                
+                                resultsHtml += `
+                                    <div class="search-result-item" data-vehicle-id="${vehicle.id}" style="cursor: pointer; padding: 10px; border: 1px solid #ccc; margin: 5px 0;">
+                                        <strong>${vehicle.vehicle_name}</strong><br>
+                                        <span>Rides: ${rideNames}</span><br>
+                                        <span>Status: ${vehicle.status}</span>
+                                    </div>
+                                `;
+                            });
+                            
+                            searchResults.innerHTML = resultsHtml;
+                            searchResults.style.display = 'block';
+
+                            // Add click handlers to search results
+                            document.querySelectorAll('.search-result-item').forEach(item => {
+                                item.addEventListener('click', function() {
+                                    var vehicleId = this.getAttribute('data-vehicle-id');
+                                    var vehicle = data.vehicles[vehicleId];
+                                    
+                                    // Simulate vehicle marker click
+                                    if (vehicle) {
+                                        // Clear search
+                                        searchInput.value = '';
+                                        searchResults.style.display = 'none';
+                                        
+                                        // Pan to vehicle location
+                                        map.getMap().setView([vehicle.latitude, vehicle.longitude], 15);
+                                        
+                                        // Trigger the vehicle marker click handler
+                                        var vehicleMarkerClickHandler = map.getOnVehicleMarkerClick();
+                                        if (vehicleMarkerClickHandler) {
+                                            vehicleMarkerClickHandler({ target: null }, vehicle);
+                                        }
+                                    }
+                                });
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Search error:', error);
+                            searchResults.innerHTML = '<p>Error performing search</p>';
+                            searchResults.style.display = 'block';
+                        });
+                }
+
+                if (searchBtn) {
+                    searchBtn.addEventListener('click', performSearch);
+                }
+                
+                if (searchInput) {
+                    searchInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            performSearch();
+                        }
+                    });
+                }
                 
                 // Set up ride marker click handler to show address tooltip
                 map.setOnRideMarkerClick((e, destination) => {
@@ -245,15 +338,6 @@
                                 if (viewReviewsBtn) viewReviewsBtn.hidden = true;
                                 if (viewDetailsBtn) viewDetailsBtn.style.display = 'none';
                             }else{
-                                @auth
-                                    @if (Auth::user()->isDriver())
-                                        if (passengerRequest) {
-                                            passengerRequest.destroyItems();
-                                            passengerRequest.displayItems(rideId);
-                                        }
-                                    @endif
-                                @endauth
-
                                 if (reviewForm) reviewForm.hidden = false;
                                 if (reviewFormSubmit) reviewFormSubmit.hidden = false;
                                 if (reviewFormEdit) reviewFormEdit.hidden = true;

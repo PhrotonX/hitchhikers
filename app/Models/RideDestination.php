@@ -18,5 +18,6 @@ class RideDestination extends Model
         'latitude',
         'order',
         'ride_id',
+        'ride_address',
     ];
 }

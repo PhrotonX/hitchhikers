@@ -23,6 +23,8 @@ export default class RideMap extends MainMap{
         this.cachedMarkers = L.markerClusterGroup();
         this.rideMarkers = L.markerClusterGroup();
         this.vehicleMarkers = L.markerClusterGroup();
+        this.polylines = L.layerGroup(); // Track polylines for clearing
+        this.routingControls = []; // Track routing controls for proper removal
         //@TODO: Use proper event listener values and parameters.
         // this.map.on('', () => {
             //@TODO: Remove markers.
@@ -41,6 +43,7 @@ export default class RideMap extends MainMap{
         this.map.addLayer(this.cachedMarkers);
         this.map.addLayer(this.rideMarkers);
         this.map.addLayer(this.vehicleMarkers);
+        this.map.addLayer(this.polylines);
     }
 
     clearRideSelectorList(){
@@ -72,6 +75,10 @@ export default class RideMap extends MainMap{
 
     setOnVehicleMarkerClick(callback){
         this.onVehicleMarkerClick = callback;
+    }
+
+    getOnVehicleMarkerClick(){
+        return this.onVehicleMarkerClick;
     }
 
     /**
@@ -186,6 +193,15 @@ export default class RideMap extends MainMap{
             }).then((data) => {
                 //Clear the cached ride map markers.
                 this.cachedMarkers.clearLayers();
+                
+                //Clear previous polylines.
+                this.polylines.clearLayers();
+                
+                //Clear previous routing controls.
+                this.routingControls.forEach(control => {
+                    this.map.removeControl(control);
+                });
+                this.routingControls = [];
 
                 //Populate the map with markers
                 var count = Object.keys(data.results).length;
@@ -219,11 +235,35 @@ export default class RideMap extends MainMap{
                     }
                 }
 
-                // Draw the line on the map.
-                if(hasLine){
-                    var polyline = L.polyline(latlngs, {
-                        color: 'blue'
-                    }).addTo(this.map);
+                // Draw the line on the map following roads.
+                if(hasLine && latlngs.length > 1){
+                    // Convert latlngs to waypoints for routing
+                    const waypoints = latlngs.map(coord => L.latLng(coord[0], coord[1]));
+                    
+                    // Create routing control with custom options
+                    const routingControl = L.Routing.control({
+                        waypoints: waypoints,
+                        routeWhileDragging: false,
+                        addWaypoints: false,
+                        draggableWaypoints: false,
+                        fitSelectedRoutes: false,
+                        showAlternatives: false,
+                        lineOptions: {
+                            styles: [{color: 'blue', opacity: 0.7, weight: 5}],
+                            extendToWaypoints: true,
+                            missingRouteTolerance: 0
+                        },
+                        createMarker: function() { return null; }, // Don't create markers at waypoints
+                        router: L.Routing.osrmv1({
+                            serviceUrl: 'https://router.project-osrm.org/route/v1'
+                        })
+                    });
+                    
+                    // Add the routing control to the map
+                    routingControl.addTo(this.map);
+                    
+                    // Track the routing control for later removal
+                    this.routingControls.push(routingControl);
                 }
 
                 // Fit bounds to show all markers and lines
