@@ -3,68 +3,118 @@
 <x-map-head/>
 
 @section('content')
-    <div class="ride-view-container">
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
+<x-sidebar-nav />
+<div class="main-content">
+    @if(session('success'))
+        <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 15px; margin-bottom: 20px; color: #155724;">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+        </div>
+    @endif
+
+    <div class="page-header">
+        <h1><i class="fas fa-route"></i> {{ $ride->ride_name }}</h1>
+        <div style="margin-top: 10px;">
+            <button onclick="history.back()" class="btn btn-secondary" style="margin-right: 10px;">
+                <i class="fas fa-arrow-left"></i> {{ __('string.back') }}
+            </button>
+            @can('update', $ride)
+                <a href="{{ route('ride.edit', $ride->id) }}" class="btn btn-primary" style="margin-right: 10px;">
+                    <i class="fas fa-edit"></i> {{ __('string.edit_ride') }}
+                </a>
+            @endcan
+            @can('delete', $ride)
+                <a href="{{ route('ride.delete', $ride->id) }}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> {{ __('string.delete_ride') }}
+                </a>
+            @endcan
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-info-circle"></i> {{ __('ride.ride_details') }}</h2>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                <div>
+                    <strong><i class="fas fa-circle-info"></i> {{ __('ride.status') }}:</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 16px;">
+                        @if($ride->status == 'active')
+                            <span style="color: #28a745;"><i class="fas fa-check-circle"></i> {{ $ride->status }}</span>
+                        @else
+                            <span>{{ $ride->status ?: __('string.not_set') }}</span>
+                        @endif
+                    </p>
+                </div>
+                <div>
+                    <strong><i class="fas fa-money-bill-wave"></i> {{ __('ride.fare_rate') }}:</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 16px;">₱{{ number_format($ride->fare_rate, 2) }}</p>
+                </div>
+                @if(isset($ride->minimum_fare))
+                    <div>
+                        <strong><i class="fas fa-coins"></i> {{ __('ride.minimum_fare') }}:</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 16px;">₱{{ number_format($ride->minimum_fare, 2) }}</p>
+                    </div>
+                @endif
+                <div>
+                    <strong><i class="fas fa-calendar-plus"></i> {{ __('string.created_at') }}:</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 16px;">{{ $ride->created_at->format('M d, Y h:i A') }}</p>
+                </div>
+                <div>
+                    <strong><i class="fas fa-calendar-check"></i> {{ __('string.updated_at') }}:</strong>
+                    <p style="margin: 5px 0 0 0; font-size: 16px;">{{ $ride->updated_at->format('M d, Y h:i A') }}</p>
+                </div>
             </div>
-        @endif
-
-        <button onclick="history.back()">{{ __('string.back') }}</button>
-        
-        <h1>{{ $ride->ride_name }}</h1>
-
-        <div class="ride-details">
-            <h2>{{ __('ride.ride_details') }}</h2>
-            <p><strong>{{ __('ride.status') }}:</strong> {{ $ride->status ?: __('string.not_set') }}</p>
-            <p><strong>{{ __('ride.fare_rate') }}:</strong> {{ $ride->fare_rate }}</p>
-            @if(isset($ride->minimum_fare))
-                <p><strong>{{ __('ride.minimum_fare') }}:</strong> {{ $ride->minimum_fare }}</p>
-            @endif
-            {{-- <p><strong>{{ __('string.rating') }}:</strong> {{ $ride->rating ?? __('string.no_rating') }}</p> --}}
-            <p><strong>{{ __('string.created_at') }}:</strong> {{ $ride->created_at->format('M d, Y h:i A') }}</p>
-            <p><strong>{{ __('string.updated_at') }}:</strong> {{ $ride->updated_at->format('M d, Y h:i A') }}</p>
         </div>
+    </div>
 
-        <hr>
-
-        <div class="driver-details">
-            <h2>{{ __('driver.driver') }}</h2>
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-user-tie"></i> {{ __('driver.driver') }}</h2>
+        </div>
+        <div class="card-body">
             @if($ride->driver)
-                <p><strong>{{ __('driver.driver_name') }}:</strong> {{ $ride->driver->driver_account_name }}</p>
-                <p><strong>{{ __('driver.company') }}:</strong> {{ $ride->driver->company ?: __('string.independent') }}</p>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                    <div>
+                        <strong><i class="fas fa-id-card"></i> {{ __('driver.driver_name') }}:</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 16px;">{{ $ride->driver->driver_account_name }}</p>
+                    </div>
+                    <div>
+                        <strong><i class="fas fa-building"></i> {{ __('driver.company') }}:</strong>
+                        <p style="margin: 5px 0 0 0; font-size: 16px;">{{ $ride->driver->company ?: __('string.independent') }}</p>
+                    </div>
+                </div>
             @else
-                <p>{{ __('driver.driver_not_found') }}</p>
+                <p style="color: #666;"><i class="fas fa-exclamation-circle"></i> {{ __('driver.driver_not_found') }}</p>
             @endif
         </div>
+    </div>
 
-        <hr>
-
-        <div class="destinations-section">
-            <h2>{{ __('string.destinations') }}</h2>
-            
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-map-marked-alt"></i> {{ __('string.destinations') }}</h2>
+        </div>
+        <div class="card-body">
             @if($destinations && $destinations->count() > 0)
-                <div id="map" style="height: 400px; width: 100%; margin-bottom: 20px;"></div>
+                <div id="map" style="height: 400px; width: 100%; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ddd;"></div>
                 
                 <div class="destinations-list">
                     @foreach($destinations as $index => $destination)
-                        <div class="destination-item" data-index="{{ $index }}" data-lat="{{ $destination->latitude }}" data-lng="{{ $destination->longitude }}" data-destination-id="{{ $destination->id }}">
-                            <p>{{$index + 1}}. <strong><span class="destination-name">{{ __('string.loading') }}...</span></strong></p>
-                            <p>{{ __('string.coordinates') }}: {{ $destination->latitude }}, {{ $destination->longitude }}</p>
+                        <div class="destination-item" data-index="{{ $index }}" data-lat="{{ $destination->latitude }}" data-lng="{{ $destination->longitude }}" data-destination-id="{{ $destination->id }}" style="padding: 15px; margin: 10px 0; border-left: 4px solid transparent; background: #f8f9fa; border-radius: 6px; transition: all 0.3s ease;">
+                            <p style="margin: 0 0 8px 0; font-weight: bold; font-size: 16px;">
+                                <i class="fas fa-map-pin" style="color: #dc3545;"></i> {{$index + 1}}. <span class="destination-name">{{ __('string.loading') }}...</span>
+                            </p>
+                            <p style="margin: 0; color: #666; font-size: 14px;">
+                                <i class="fas fa-location-dot"></i> {{ __('string.coordinates') }}: {{ $destination->latitude }}, {{ $destination->longitude }}
+                            </p>
                         </div>
                     @endforeach
                 </div>
 
                 <style>
-                    .destination-item {
-                        padding: 10px;
-                        margin: 5px 0;
-                        border-left: 3px solid transparent;
-                        transition: all 0.3s ease;
-                    }
                     .destination-item.highlighted {
-                        background-color: #e3f2fd;
-                        border-left-color: #2196f3;
+                        background-color: #e3f2fd !important;
+                        border-left-color: #2196f3 !important;
                     }
                 </style>
 
@@ -139,20 +189,9 @@
                     });
                 </script>
             @else
-                <p>{{ __('string.no_destinations') }}</p>
+                <p style="color: #666;"><i class="fas fa-info-circle"></i> {{ __('string.no_destinations') }}</p>
             @endif
         </div>
-
-        <hr>
-
-        <div class="ride-actions">
-            @can('update', $ride)
-                <a href="{{ route('ride.edit', $ride->id) }}" class="btn btn-primary">{{ __('string.edit_ride') }}</a>
-            @endcan
-            
-            @can('delete', $ride)
-                <a href="{{ route('ride.delete', $ride->id) }}" class="btn btn-danger">{{ __('string.delete_ride') }}</a>
-            @endcan
-        </div>
     </div>
+</div>
 @endsection
