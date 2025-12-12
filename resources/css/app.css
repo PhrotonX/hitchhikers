@@ -2,14 +2,6 @@
 @import url('login.css');
 @import url('footer.css');
 @import url('header.css');
-@import url('driver-dashboard.css');
-@import url('driver_earnings.css');
-@import url('driver_rides.css');
-@import url('owner-dashboard.css');
-@import url('landingpage.css');
-@import url('404.css');
-@import url('500.css');
-@import url('success.css');
 
 :root {
     /* Light Mode Colors (Original) */
