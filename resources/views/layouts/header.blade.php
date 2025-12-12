@@ -13,12 +13,6 @@
         @else
             <a href="/login">Login</a>
         @endauth
-        
-        @auth
-            @if (!Auth::user()->isDriver() && !Auth::user()->isPrivileged('owner'))
-                <a href="/ride/requests/created">My Ride Requests</a>
-            @endif
-        @endauth
     </nav>
 
     <a href="/register" class="header-btn">Get Started</a>
