@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 // use App\Http\Requests\UpdateDestinationRequest;
 use App\Models\Ride;
 use App\Models\RideDestination;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 
 class RideDestinationController extends Controller

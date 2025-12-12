@@ -74,6 +74,10 @@ export default class RideMap extends MainMap{
         this.onVehicleMarkerClick = callback;
     }
 
+    getOnVehicleMarkerClick(){
+        return this.onVehicleMarkerClick;
+    }
+
     /**
      * Retrieves all map markers within a map boundary.
      * 
