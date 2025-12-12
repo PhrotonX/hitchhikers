@@ -5,6 +5,11 @@
     {{-- For smaller screens, the user settings should be displayed similarly to a typical settings app
     in phones. Still, must be loaded through JavaScript API. --}}
     @auth
+        <nav style="margin-bottom: 20px;">
+            <a href="/user/{{Auth::user()->id}}">&larr; Back to Profile</a> |
+            <a href="/user/{{Auth::user()->id}}/profile-pictures">Manage Profile Picture</a> |
+            <a href="/user/{{Auth::user()->id}}/edit">Edit Account</a>
+        </nav>
         <a href="/user/{{Auth::user()->id}}/edit">Edit Account</a>
         @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
             <div>

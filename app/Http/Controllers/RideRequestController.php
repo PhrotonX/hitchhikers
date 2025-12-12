@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Ride;
 use App\Models\RideRequest;
+use App\Models\ProfitLogs;
 use App\Models\Vehicle;
 use App\Http\Requests\StoreRideRequestRequest;
 use App\Http\Requests\UpdateRideRequestRequest;
@@ -25,9 +26,11 @@ class RideRequestController extends Controller
 
     public function create($rideId){
         $ride = Ride::find($rideId);
+        $vehicle = Vehicle::find($ride->vehicle_id);
 
         return view('pages.ride_request.create', [
             'ride' => $ride,
+            'vehicle' => $vehicle,
         ]);
     }
 
@@ -120,15 +123,35 @@ class RideRequestController extends Controller
      */
     public function updateStatus(UpdateRideRequestStatusRequest $request, int $rideRequest)
     {
-        $data = RideRequest::find($rideRequest);
+        if(Auth::user()->isDriver()){
+            $data = RideRequest::find($rideRequest);
 
-        $data->fill($request->validated());
-        $data->status_updated_at = $data->now();
-        $data->update();
+            $data->fill($request->validated());
+            $data->status_updated_at = $data->now();
+            $data->update();
 
-        return response()->json([
-            $data
-        ]);
+            //@TODO: Profit Log
+            $profitLog = new ProfitLogs();
+
+            $profitLog->from_latitude = $data->from_latitude;
+            $profitLog->from_longitude = $data->from_longitude;
+            $profitLog->to_latitude = $data->to_latitude;
+            $profitLog->to_longitude = $data->to_longitude;
+            $profitLog->profit = $data->price;
+            $profitLog->ride_id = $data->ride_id;
+            $profitLog->ride_request_id = $data->id;
+            $profitLog->driver_id = Auth::user()->getDriverAccount()->id;
+            $profitLog->save();
+
+            return response()->json([
+                $data
+            ]);
+        }else{
+            return response()->json([
+                'status' => 'Forbidden. Only drivers can update ride request status.'
+            ]);
+        }
+        
     }
 
     /**

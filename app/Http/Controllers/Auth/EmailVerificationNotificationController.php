@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\AuditLogService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -40,5 +41,15 @@ class EmailVerificationNotificationController extends Controller
         }
 
         $request->user()->sendEmailVerificationNotification();
+        
+        // Log email verification notification sent
+        $auditService = new AuditLogService();
+        $auditService->log(
+            'email_verification_sent',
+            'users',
+            $request->user()->id,
+            null,
+            ['email' => $request->user()->email]
+        );
     }
 }

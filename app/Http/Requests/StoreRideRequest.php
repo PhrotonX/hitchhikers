@@ -28,6 +28,7 @@ class StoreRideRequest extends FormRequest
         return [
             'ride_name' => ['required', 'string', 'max:255'],
             'status' => ['nullable'],
+            'minimum_fare' => ['required', 'decimal:0,4'],
             'fare_rate' => ['required', 'decimal:0,4'],
             'vehicle_id' => ['required', 'numeric'],
             'rating' => ['nullable'],
@@ -37,6 +38,8 @@ class StoreRideRequest extends FormRequest
             'longitude.*' => ['required', 'numeric'],
             'latitude.*' => ['required', 'numeric'],
             'order.*' => ['required', 'numeric'],
+            'ride_address' => ['required', 'array', 'min:1'],
+            'ride_address.*' => ['required', 'string']
         ];
     }
 }

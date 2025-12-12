@@ -23,6 +23,8 @@ export default class RideMap extends MainMap{
         this.cachedMarkers = L.markerClusterGroup();
         this.rideMarkers = L.markerClusterGroup();
         this.vehicleMarkers = L.markerClusterGroup();
+        this.polylines = L.layerGroup(); // Track polylines for clearing
+        this.routingControls = []; // Track routing controls for proper removal
         //@TODO: Use proper event listener values and parameters.
         // this.map.on('', () => {
             //@TODO: Remove markers.
@@ -41,6 +43,7 @@ export default class RideMap extends MainMap{
         this.map.addLayer(this.cachedMarkers);
         this.map.addLayer(this.rideMarkers);
         this.map.addLayer(this.vehicleMarkers);
+        this.map.addLayer(this.polylines);
     }
 
     clearRideSelectorList(){
@@ -74,6 +77,10 @@ export default class RideMap extends MainMap{
         this.onVehicleMarkerClick = callback;
     }
 
+    getOnVehicleMarkerClick(){
+        return this.onVehicleMarkerClick;
+    }
+
     /**
      * Retrieves all map markers within a map boundary.
      * 
@@ -102,6 +109,12 @@ export default class RideMap extends MainMap{
                 //Populate the map with markers
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
+                    
+                    // Skip markers with null/invalid coordinates
+                    if (!data.results[i].latitude || !data.results[i].longitude) {
+                        console.log('Skipping ride destination with null coordinates:', data.results[i].id);
+                        continue;
+                    }
 
                     //Check if the marker already exists to avoid marker duplication.
                     if(!this.rideMarkers.hasLayer(this.markers["ride-" + data.results[i].id])){
@@ -180,10 +193,25 @@ export default class RideMap extends MainMap{
             }).then((data) => {
                 //Clear the cached ride map markers.
                 this.cachedMarkers.clearLayers();
+                
+                //Clear previous polylines.
+                this.polylines.clearLayers();
+                
+                //Clear previous routing controls.
+                this.routingControls.forEach(control => {
+                    this.map.removeControl(control);
+                });
+                this.routingControls = [];
 
                 //Populate the map with markers
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
+                    
+                    // Skip markers with null/invalid coordinates
+                    if (!data.results[i].latitude || !data.results[i].longitude) {
+                        console.log('Skipping ride marker with null coordinates:', data.results[i].id);
+                        continue;
+                    }
 
                     //Check if the marker already exists to avoid marker duplication.
                     if(!this.cachedMarkers.hasLayer(this.markers["ride-" + data.results[i].id])){
@@ -207,11 +235,35 @@ export default class RideMap extends MainMap{
                     }
                 }
 
-                // Draw the line on the map.
-                if(hasLine){
-                    var polyline = L.polyline(latlngs, {
-                        color: 'blue'
-                    }).addTo(this.map);
+                // Draw the line on the map following roads.
+                if(hasLine && latlngs.length > 1){
+                    // Convert latlngs to waypoints for routing
+                    const waypoints = latlngs.map(coord => L.latLng(coord[0], coord[1]));
+                    
+                    // Create routing control with custom options
+                    const routingControl = L.Routing.control({
+                        waypoints: waypoints,
+                        routeWhileDragging: false,
+                        addWaypoints: false,
+                        draggableWaypoints: false,
+                        fitSelectedRoutes: false,
+                        showAlternatives: false,
+                        lineOptions: {
+                            styles: [{color: 'blue', opacity: 0.7, weight: 5}],
+                            extendToWaypoints: true,
+                            missingRouteTolerance: 0
+                        },
+                        createMarker: function() { return null; }, // Don't create markers at waypoints
+                        router: L.Routing.osrmv1({
+                            serviceUrl: 'https://router.project-osrm.org/route/v1'
+                        })
+                    });
+                    
+                    // Add the routing control to the map
+                    routingControl.addTo(this.map);
+                    
+                    // Track the routing control for later removal
+                    this.routingControls.push(routingControl);
                 }
 
                 // Fit bounds to show all markers and lines
@@ -272,8 +324,11 @@ export default class RideMap extends MainMap{
                     const rideItem = e.target.closest('.ride-selector-list-item');
                     if(rideItem && this.onVehicleMarkerClick){
                         const vehicleId = rideItem.getAttribute('data-vehicle-id');
+                        const rideId = rideItem.getAttribute('data-ride-id');
                         const vehicleData = this.rideSelectorList._vehicleData[vehicleId];
                         if(vehicleData){
+                            // Pass the ride ID for auto-selection in the infobox
+                            vehicleData.autoSelectRideId = rideId;
                             this.onVehicleMarkerClick(e, vehicleData);
                             this.setView(vehicleData.latitude, vehicleData.longitude);
                         }
@@ -298,6 +353,12 @@ export default class RideMap extends MainMap{
                 //Populate the map with markers
                 var count = Object.keys(data.results).length;
                 for(let i = 0; i < count; i++){
+                    
+                    // Skip vehicles with null/invalid coordinates
+                    if (!data.results[i].latitude || !data.results[i].longitude) {
+                        console.log('Skipping vehicle with null coordinates:', data.results[i].id);
+                        continue;
+                    }
 
                     if(!this.isDriver){
                         this.buildRideSelector(data, i);
@@ -352,6 +413,12 @@ export default class RideMap extends MainMap{
                     
         // Store vehicle data for click handler
         this.rideSelectorList._vehicleData[vehicle_id] = data.results[i];
+        
+        // Store ride data for each vehicle
+        if(!this.rideSelectorList._rideData){
+            this.rideSelectorList._rideData = {};
+        }
+        this.rideSelectorList._rideData[vehicle_id] = data.rides[vehicle_id];
 
         var rideCount = Object.keys(data.rides[vehicle_id]).length;
         for(let j = 0; j < rideCount; j++){
@@ -362,6 +429,7 @@ export default class RideMap extends MainMap{
             var rideSelectorListItem = document.createElement('div');
             rideSelectorListItem.setAttribute('class', 'ride-selector-list-item');
             rideSelectorListItem.setAttribute('data-vehicle-id', vehicle_id);
+            rideSelectorListItem.setAttribute('data-ride-id', data.rides[vehicle_id][j].id);
 
                 // console.log(data.rides[vehicle_id]);
                 var rideSelectorListItemTitle = document.createElement('p');
@@ -369,16 +437,21 @@ export default class RideMap extends MainMap{
                 rideSelectorListItemTitle.innerHTML = data.rides[vehicle_id][j].ride_name;
                 rideSelectorListItem.appendChild(rideSelectorListItemTitle);
 
-                var rideSelectorListItemDescription = document.createElement('p');
-                rideSelectorListItemDescription.setAttribute('class', 'description');
-                rideSelectorListItemDescription.innerHTML = "Description: " + data.rides[vehicle_id][j].description;
-                rideSelectorListItem.appendChild(rideSelectorListItemDescription);
-
+                // Removed description paragraph as requested
+                
                 var rideSelectorListItemOn = document.createElement('p');
                 rideSelectorListItemOn.innerHTML = "Currently on: Obtaining location..." ;
-                this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
-                    rideSelectorListItemOn.innerHTML = "Currently on: " + result.display_name;
-                });
+                
+                // Use closure to capture the correct element reference for each iteration
+                ((locationElement) => {
+                    this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
+                        locationElement.innerHTML = "Currently on: " + result.display_name;
+                    }).catch((error) => {
+                        console.error("Reverse geocode error:", error);
+                        locationElement.innerHTML = "Currently on: Location unavailable";
+                    });
+                })(rideSelectorListItemOn);
+                
                 rideSelectorListItem.appendChild(rideSelectorListItemOn);
 
                 // var rideSelectorListItemFrom = document.createElement('p');
@@ -401,19 +474,27 @@ export default class RideMap extends MainMap{
     }
 
     /**
-     * Tracks the 
+     * Tracks the vehicle location in real-time
      * @param {*} vehicle_id 
      */
     startLiveTracking(vehicle_id){
         this.vehicleId = vehicle_id;
         //Get current location
         if(navigator.geolocation){
+            // Use high accuracy and minimal caching for better tracking
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0  // Don't use cached position
+            };
+            
             this.trackingId = navigator.geolocation.watchPosition((position) => {
                 var latitude = position.coords.latitude;
                 var longitude = position.coords.longitude;
 
                 console.log("Live Marker: Latitude: " + latitude);
                 console.log("Live Marker: Longitude: " + longitude);
+                console.log("Accuracy: " + position.coords.accuracy + " meters");
 
                 //@TODO: Change the map marker color from gray to blue.
 
@@ -439,18 +520,57 @@ export default class RideMap extends MainMap{
                 }).then((response) => {
                     return response.json();
                 }).then((data) => {
-                    console.log(data);
+                    console.log("Location updated:", data);
                 }).catch((error) => {
-                    throw new Error(error);
+                    console.error("Location update error:", error);
                 });
                 //=========================================
 
             }, (error) => {
-            console.log("Error: " + error);
-        });
+                console.error("Geolocation error code: " + error.code);
+                console.error("Geolocation error message: " + error.message);
+                
+                // For testing: if geolocation fails, you can uncomment this to simulate movement
+                // this.simulateMovement();
+            }, options);
         }else{
             alert("Geolocation is turned off or not supported by this device");
         }
+    }
+    
+    /**
+     * Simulate small movements for testing purposes when real GPS is unavailable
+     * Uncomment the call in startLiveTracking error handler to use
+     */
+    simulateMovement() {
+        let lat = 14.5995; // Default Manila coordinates
+        let lng = 120.9842;
+        
+        this.trackingId = setInterval(() => {
+            // Add small random changes to simulate movement
+            lat += (Math.random() - 0.5) * 0.001;
+            lng += (Math.random() - 0.5) * 0.001;
+            
+            console.log("Simulated position:", lat, lng);
+            
+            this.map.setView([lat, lng], 16);
+            this.markers.currentPos.setLatLng([lat, lng]);
+            
+            fetch(this.webUrl + '/vehicle/'+this.vehicleId+'/update-location', {
+                method: "PATCH",
+                body: JSON.stringify({
+                    latitude: lat,
+                    longitude: lng,
+                }),
+                headers: {
+                    "Content-type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
+                },
+            }).then(response => response.json())
+            .then(data => console.log("Simulated location updated:", data))
+            .catch(error => console.error("Simulation update error:", error));
+        }, 5000); // Update every 5 seconds
     }
 
     stopLiveTracking(tag){

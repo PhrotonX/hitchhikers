@@ -4,6 +4,7 @@
  */
 
 // @phpstan-ignore-next-line
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\RideDestinationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DriverController;
@@ -11,10 +12,12 @@ use App\Http\Controllers\RideController;
 use App\Http\Controllers\RideRequestController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\ProfitLogsController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SavedRideController;
 use App\Http\Controllers\SavedRideFolderController;
+use App\Http\Controllers\ProfilePictureController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -43,6 +46,17 @@ Route::get('user/{user}/edit', [UserController::class, 'edit'])->middleware(['au
 Route::patch('user/{user}/update', [UserController::class, 'update'])->middleware(['auth', 'verified']);
 Route::get('user/{user}/delete', [UserController::class, 'delete'])->middleware(['auth', 'verified']);
 Route::delete('user/{user}/destroy', [UserController::class, 'destroy'])->middleware(['auth', 'verified'])->name('user.destroy');
+
+// Profile picture routes
+Route::get('user/{user}/profile-pictures', [UserController::class, 'showProfilePictures'])->middleware(['auth', 'verified'])->name('user.profile-pictures');
+Route::get('user/{user}/profile-pictures/json', [ProfilePictureController::class, 'getPicturesJson'])->middleware(['auth', 'verified']);
+Route::post('user/{user}/profile-picture/upload', [ProfilePictureController::class, 'store'])->middleware(['auth', 'verified']);
+Route::patch('user/{user}/profile-picture/set-primary', [UserController::class, 'setPrimaryProfilePicture'])->middleware(['auth', 'verified']);
+Route::delete('user/{user}/profile-picture/{pfp}/delete', [ProfilePictureController::class, 'delete'])->middleware(['auth', 'verified']);
+
+Route::middleware(['auth'])->group(function(){
+    Route::post('profit/submit', [ProfitLogsController::class, 'store']);
+});
 
 Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('driver/dashboard', function(){
@@ -95,6 +109,9 @@ Route::middleware(['auth', 'verified'])->group(function(){
     // Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
     Route::patch('vehicle/{vehicle}/update-location', [VehicleController::class, 'updateLocation']);
 
+    Route::get('profit/', [ProfitLogsController::class, 'index']);
+    Route::get('profit/ride/{ride}', [ProfitLogsController::class, 'showFromRide']);
+
     // Saved Ride routes
     Route::get('saved-rides/', [SavedRideController::class, 'index']);
     Route::get('saved-rides/all', [SavedRideController::class, 'all']); // Dashboard-only route for statistics.
@@ -125,8 +142,13 @@ Route::middleware(['auth', 'verified'])->group(function(){
     // Ride routes
     Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');
     Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');
+    Route::get('ride/{ride}/edit', [RideController::class, 'edit'])->name('ride.edit');
     Route::patch('ride/{ride}/update-status', [RideController::class, 'updateStatus']);
+    Route::patch('ride/{ride}/update', [RideController::class, 'update'])->name('ride.update');
+    Route::get('ride/{ride}/delete', [RideController::class, 'delete'])->name('ride.delete');
+    Route::delete('ride/{ride}/destroy', [RideController::class, 'destroy'])->name('ride.destroy');
     Route::post('ride/{ride}/reviews/submit', [ReviewController::class, 'store']);
+    Route::get('ride/search', [RideDestinationController::class, 'search']);
 
     // Ride request routes
     Route::get('ride/requests/created', [RideRequestController::class, 'created']);
@@ -186,8 +208,9 @@ Route::get('form-test', function(){
 Route::get('ride/destinations', [RideDestinationController::class, 'index']);
 Route::get('ride/destinations/{ride}', [RideDestinationController::class, 'get']);
 Route::get('driver/{driver}/ride/', [RideController::class, 'index']);
-Route::get('ride/{ride}', [RideController::class, 'get']);
+Route::get('ride/{ride}', [RideController::class, 'show'])->name('ride.show');
 Route::get('ride/{ride}/reviews', [ReviewController::class, 'getReviews']);
+Route::get('api/ride/{ride}', [RideController::class, 'get']);
 
 Route::get('vehicle', [VehicleController::class, 'index'])->name('vehicle.index');
 Route::get('api/vehicle/{vehicle}', [VehicleController::class, 'get'])->name('vehicle.get');
@@ -204,5 +227,40 @@ Route::get('reviews/{review}/replies', [ReplyController::class, 'getReplies']);
 Route::get('test', function(){
     return view('dist.index');
 });
+
+
+// Protected audit log routes (requires authentication)
+Route::middleware(['auth:sanctum'])->group(function () {
+    
+    // Get all audit logs with optional filters
+    // GET /api/audit-logs?user_id=1&table=rides&event=updated&from=2024-01-01&to=2024-12-31&per_page=50
+    Route::get('/audit-logs', [AuditLogController::class, 'index']);
+    
+    // Get a specific audit log
+    // GET /api/audit-logs/123
+    Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show']);
+    
+    // Get audit logs for the authenticated user
+    // GET /api/audit-logs/my-logs?limit=50
+    Route::get('/audit-logs/my-logs', [AuditLogController::class, 'myLogs']);
+    
+    // Get recent activity
+    // GET /api/audit-logs/recent-activity?limit=20
+    Route::get('/audit-logs/recent-activity', [AuditLogController::class, 'recentActivity']);
+    
+    // Get audit statistics
+    // GET /api/audit-logs/statistics
+    Route::get('/audit-logs/statistics', [AuditLogController::class, 'statistics']);
+    
+    // Get audit logs for a specific record
+    // GET /api/audit-logs/record/rides/123
+    Route::get('/audit-logs/record/{table}/{id}', [AuditLogController::class, 'showRecordLogs']);
+    
+    // Clean old audit logs
+    // POST /api/audit-logs/clean
+    // Body: {"days_to_keep": 90}
+    Route::post('/audit-logs/clean', [AuditLogController::class, 'cleanOldLogs']);
+});
+
 
 require __DIR__.'/auth.php';

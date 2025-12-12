@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\AuditLogService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -76,5 +77,15 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+        
+        // Log user registration
+        $auditService = new AuditLogService();
+        $auditService->log(
+            'user_registered',
+            'users',
+            $user->id,
+            null,
+            ['email' => $user->email, 'user_type' => $user->user_type]
+        );
     }
 }

@@ -2,8 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Picture;
+use App\Models\ProfilePicture;
+use App\Models\UserProfilePicture;
 use App\Models\Driver;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,7 +16,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, Auditable;
+
+    private static $nullProfilePicture = null;
+
+    // Exclude sensitive fields from audit logs
+    protected $auditExclude = ['password', 'remember_token'];
 
     /**
      * The attributes that are mass assignable.
@@ -31,6 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'phone',
         'account_status',
+        'profile_picture_id',
     ];
 
     protected $guarded = [
@@ -95,6 +105,37 @@ class User extends Authenticatable implements MustVerifyEmail
         return Driver::where('user_id', $this->id)->first()?->get()[0] ?? null;
     }
 
+        /**
+     * Retrieves the Picture object set on a User.
+     * 
+     * @return ?ProfilePicture The picture set on a user. May return null.
+     */
+    public function getProfilePicture() : ?ProfilePicture{
+        //$userProfilePicture = UserProfilePicture::where('pfp_id', $this->profile_picture_id)->first();
+        //return $userProfilePicture->profilePicture;
+        $profilePicture = ProfilePicture::where('pfp_id', $this->profile_picture_id)->first();
+
+        if($profilePicture == null){
+            if(self::$nullProfilePicture == null){
+                self::$nullProfilePicture = new ProfilePicture();
+                self::$nullProfilePicture->pfp_xs = '../img/question_mark_xs.png';
+                self::$nullProfilePicture->pfp_small = '../img/question_mark_s.png';
+                self::$nullProfilePicture->pfp_medium = '../img/question_mark_m.png';
+                self::$nullProfilePicture->pfp_large = '../img/question_mark_l.png';
+            }
+            return self::$nullProfilePicture;
+        }
+
+        return $profilePicture;
+    }
+
+    /**
+     * Define the relationship to profile pictures through the pivot table
+     */
+    public function profilePictures(){
+        return $this->belongsToMany(ProfilePicture::class, 'user_profile_picture', 'user_id', 'pfp_id');
+    }
+
     public function getVehicleDriver(){
         return VehicleDriver::where('driver_id', $this->getDriverAccount()?->id ?? 0)->get();
     }
@@ -147,5 +188,22 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->getDriverAccount() != null;
     }
 
-    
+        /**
+     * Get the user's primary profile picture (for compatibility with views)
+     */
+    public function getUserProfilePictureAttribute(){
+        $profilePicture = $this->getProfilePicture();
+        if($profilePicture && !$profilePicture->isNull(ProfilePicture::SIZE_XS_SUFFIX)) {
+            return (object) [
+                'picture' => (object) [
+                    'path' => str_replace('../', '', $profilePicture->pfp_medium ?? $profilePicture->pfp_large ?? $profilePicture->pfp_small ?? $profilePicture->pfp_xs)
+                ]
+            ];
+        }
+        return null;
+    }
+
+    public function getProfilePictures(){
+        return $this->profilePictures()->get();
+    }
 }

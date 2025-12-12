@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RideDestination extends Model
 {
     /** @use HasFactory<\Database\Factories\DestinationFactory> */
-    use HasFactory;
+    use HasFactory, Auditable;
 
     public $timestamps = false;
 
@@ -17,5 +18,6 @@ class RideDestination extends Model
         'latitude',
         'order',
         'ride_id',
+        'ride_address',
     ];
 }

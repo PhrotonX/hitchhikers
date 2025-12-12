@@ -7,6 +7,11 @@
 
 @extends('layouts.app')
 @section('content')
+    <nav style="margin-bottom: 20px;">
+        <a href="/user/{{Auth::user()->id}}">&larr; Back to Profile</a> |
+        <a href="/user/{{Auth::user()->id}}/profile-pictures">Manage Profile Picture</a> |
+        <a href="/settings">Settings</a>
+    </nav>
     <h1>Edit profile</h1>
     <form action="/user/{{Auth::user()->id}}/update" method="POST">
         @method('PATCH')

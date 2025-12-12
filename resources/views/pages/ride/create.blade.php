@@ -2,9 +2,9 @@
 
 <x-map-head/>
 
-{{-- @push('head')
-    @vite('resources/js/Map.js');
-@endpush --}}
+@push('head')
+    @vite('resources/js/ride-destination.js');
+@endpush
 
 @section('content')
     <h1>{{__('string.create_ride')}}</h1>
@@ -21,6 +21,15 @@
         /><br>
         <x-input-error :messages="$errors->get('ride_name')"/>
 
+        <x-input-label>Minimum Fare</x-input-label>
+        <x-text-input
+            :name="'minimum_fare'"
+            :placeholder="'Enter minimum fare'"
+            :value="old('minimum_fare')"
+            :required="true"
+        /><br>
+        <x-input-error :messages="$errors->get('minimum_fare')"/>
+
         <x-input-label>{{__('string.fare_rate')}}</x-input-label>
         <x-text-input
             :name="'fare_rate'"
@@ -31,9 +40,9 @@
         <x-input-error :messages="$errors->get('fare_rate')"/>
 
         <x-input-label>{{__('string.vehicle')}}</x-input-label>
-        <select name="vehicle_id" title="{{__('string.vehicle')}}">
+        <select name="vehicle_id" id="vehicle-select" title="{{__('string.vehicle')}}">
             @foreach ($driverVehicles as $key => $value)
-                <option value="{{$value->vehicle->id}}">{{$value->vehicle->vehicle_name}}</option>
+                <option value="{{$value->vehicle->id}}" data-lat="{{$value->vehicle->latitude}}" data-lng="{{$value->vehicle->longitude}}" data-status="{{$value->vehicle->status}}">{{$value->vehicle->vehicle_name}}</option>
             @endforeach
         </select>
         <x-input-error :messages="$errors->get('vehicle_id')"/>
@@ -50,7 +59,34 @@
                 var map = new MainMap('map', '{{env("NOMINATIM_URL", "")}}', '{{env("APP_URL", "")}}');
                 map.configureMarkerIcon('default', '{{Vite::asset("resources/img/red_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
                 map.configureMarkerIcon('currentPos', '{{Vite::asset("resources/img/current_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+                map.configureMarkerIcon('active_vehicle', '{{Vite::asset("resources/img/blue_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
+                map.configureMarkerIcon('inactive_vehicle', '{{Vite::asset("resources/img/grey_pin.png")}}', '{{Vite::asset("resources/img/shadow_pin.png")}}');
                 map.enableClickToAddMultipleMarkers();
+                
+                // Handle vehicle selection change to display vehicle marker
+                const vehicleSelect = document.getElementById('vehicle-select');
+                
+                function updateVehicleMarker() {
+                    // Clear existing vehicle marker
+                    map.clearMarker('selected-vehicle');
+                    
+                    const selectedOption = vehicleSelect.options[vehicleSelect.selectedIndex];
+                    const lat = parseFloat(selectedOption.getAttribute('data-lat'));
+                    const lng = parseFloat(selectedOption.getAttribute('data-lng'));
+                    const status = selectedOption.getAttribute('data-status');
+                    
+                    if (lat && lng) {
+                        const iconTag = status === 'active' ? 'active_vehicle' : 'inactive_vehicle';
+                        map.addMarker('selected-vehicle', lat, lng, iconTag);
+                        map.setView(lat, lng, 14);
+                    }
+                }
+                
+                // Display initial vehicle marker
+                updateVehicleMarker();
+                
+                // Update marker when vehicle selection changes
+                vehicleSelect.addEventListener('change', updateVehicleMarker);
                 map.onMapClick(function(marker, e, data){
                     // const parser = new DOMParser();
                     // const xmlDoc = parser.parseFromString(data, 'text/xml');
@@ -78,12 +114,11 @@
                                 map.getMap().removeLayer(marker);
                                 destinationList.removeChild(destinationItem);
                             });
-
-                            destinationItem.appendChild(removeButton);
-
                             var destinationCoordinates = document.createElement('p');
                             destinationCoordinates.innerHTML = 'Coordinates: ' + e.latlng.lat + ", " + e.latlng.lng;
                             destinationItem.appendChild(destinationCoordinates);
+
+                            destinationItem.appendChild(removeButton);
 
                             var orderField = document.createElement('input');
                             orderField.setAttribute('type', 'number');
@@ -105,6 +140,16 @@
                             longitudeField.setAttribute('value', e.latlng.lng);
                             longitudeField.setAttribute('hidden', true);
                             destinationItem.appendChild(longitudeField);
+
+                            var rideAddressField = document.createElement('input');
+                            rideAddressField.setAttribute('type', 'text');
+                            rideAddressField.setAttribute('name', 'ride_address[]');
+                            rideAddressField.setAttribute('value', data['display_name']);
+                            rideAddressField.setAttribute('hidden', true);
+                            destinationItem.appendChild(rideAddressField);
+
+                            var horizontalLine = document.createElement('hr');
+                            destinationItem.appendChild(horizontalLine);
 
                         destinationList.appendChild(destinationItem);
                 });
@@ -136,9 +181,8 @@
         </div>
 
         <div id="destination-list">
-            <h3>{{__('string.from')}}</h3>
-            <h3>{{__('string.to')}}</h3>
-            
+            {{-- <h3>From</h3>
+            <h3>To</h3> --}}
         </div>
 
         @if ($errors)

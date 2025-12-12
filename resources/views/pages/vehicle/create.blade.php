@@ -81,6 +81,10 @@
         <br>
 
         <x-input-error :messages="$errors->get('type')"/>
+        
+        <!-- Hidden fields for location -->
+        <input type="hidden" name="latitude" id="vehicle-latitude" value="{{old('latitude')}}">
+        <input type="hidden" name="longitude" id="vehicle-longitude" value="{{old('longitude')}}">
 
         @if (isset($errors))
             <p>{{$errors}}</p>
@@ -89,3 +93,34 @@
         <button type="submit">Submit</button>
     </form>
 @endsection
+
+@push('scripts')
+<script>
+    // Get current location and set it in hidden fields
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                document.getElementById('vehicle-latitude').value = position.coords.latitude;
+                document.getElementById('vehicle-longitude').value = position.coords.longitude;
+                console.log('Vehicle location set:', position.coords.latitude, position.coords.longitude);
+            },
+            function(error) {
+                console.warn('Geolocation error:', error.message);
+                // Set default location if geolocation fails (e.g., Manila, Philippines)
+                document.getElementById('vehicle-latitude').value = 14.5995;
+                document.getElementById('vehicle-longitude').value = 120.9842;
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    } else {
+        console.warn('Geolocation not supported');
+        // Set default location
+        document.getElementById('vehicle-latitude').value = 14.5995;
+        document.getElementById('vehicle-longitude').value = 120.9842;
+    }
+</script>
+@endpush
