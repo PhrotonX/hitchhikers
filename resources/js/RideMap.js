@@ -23,6 +23,7 @@ export default class RideMap extends MainMap{
         this.cachedMarkers = L.markerClusterGroup();
         this.rideMarkers = L.markerClusterGroup();
         this.vehicleMarkers = L.markerClusterGroup();
+        this.polylines = L.layerGroup(); // Track polylines for clearing
         //@TODO: Use proper event listener values and parameters.
         // this.map.on('', () => {
             //@TODO: Remove markers.
@@ -41,6 +42,7 @@ export default class RideMap extends MainMap{
         this.map.addLayer(this.cachedMarkers);
         this.map.addLayer(this.rideMarkers);
         this.map.addLayer(this.vehicleMarkers);
+        this.map.addLayer(this.polylines);
     }
 
     clearRideSelectorList(){
@@ -190,6 +192,9 @@ export default class RideMap extends MainMap{
             }).then((data) => {
                 //Clear the cached ride map markers.
                 this.cachedMarkers.clearLayers();
+                
+                //Clear previous polylines.
+                this.polylines.clearLayers();
 
                 //Populate the map with markers
                 var count = Object.keys(data.results).length;
@@ -227,7 +232,8 @@ export default class RideMap extends MainMap{
                 if(hasLine){
                     var polyline = L.polyline(latlngs, {
                         color: 'blue'
-                    }).addTo(this.map);
+                    });
+                    this.polylines.addLayer(polyline);
                 }
 
                 // Fit bounds to show all markers and lines
