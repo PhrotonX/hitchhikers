@@ -172,8 +172,8 @@ class DriverController extends Controller
 
         // Get active ride (approved or ongoing ride)
         $activeRide = $user->getRides()
-            ->whereIn('status', ['approved', 'ongoing'])
             ->with(['destinations', 'passenger'])
+            ->whereIn('status', ['approved', 'ongoing'])
             ->first();
 
         // Get pending ride requests for all driver's available rides

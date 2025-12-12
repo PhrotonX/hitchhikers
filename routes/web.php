@@ -73,7 +73,9 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::patch('driver/{driver}/update', [DriverController::class, 'update']);
     
     // Driver Dashboard Routes
-    Route::get('driver/dashboard', [DriverController::class, 'dashboard'])->name('driver.dashboard');
+    Route::get('driver/dashboard', function() {
+        return redirect()->route('home');
+    })->name('driver.dashboard');
     Route::get('driver/earnings', [DriverController::class, 'earnings'])->name('driver.earnings');
     Route::get('driver/rides', [DriverController::class, 'rides'])->name('driver.rides');
     
