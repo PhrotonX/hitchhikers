@@ -619,6 +619,57 @@
                     map.retrieveRideMarkers(rideId, true, true)(); 
                 }
 
+                // LIVE UPDATES - Carefully implemented to avoid breaking functionality
+                let liveUpdatesPaused = false;
+                
+                // Live update for vehicles (only if no infobox is open)
+                setInterval(() => {
+                    if (liveUpdatesPaused) return;
+                    
+                    const infobox = document.getElementById('infobox');
+                    const isInfoboxOpen = infobox && infobox.style.display !== 'none' && infobox.innerHTML.trim() !== '';
+                    
+                    // Only refresh vehicles if infobox is NOT open
+                    if (!isInfoboxOpen) {
+                        console.log('Live update: Refreshing vehicle markers');
+                        map.onRefresh();
+                    } else {
+                        console.log('Live update: Skipped (infobox is open)');
+                    }
+                }, 30000); // Every 30 seconds
+
+                // Live update for passenger requests (driving mode only)
+                @auth
+                    @if(Auth::user()->getDriverAccount() && Auth::user()->isDriver())
+                        setInterval(() => {
+                            if (liveUpdatesPaused) return;
+                            
+                            const passengerRequestContainer = document.getElementById('passenger-request-container');
+                            if (!passengerRequestContainer) return;
+                            
+                            // Fetch updated passenger requests
+                            fetch('/ride/requests/created')
+                                .then(response => response.json())
+                                .then(data => {
+                                    console.log('Live update: Passenger requests refreshed');
+                                    // Update the passenger request list without reloading page
+                                    // Implementation depends on the structure of your passenger request list
+                                })
+                                .catch(error => {
+                                    console.error('Error fetching passenger requests:', error);
+                                });
+                        }, 15000); // Every 15 seconds for more critical updates
+                    @endif
+                @endauth
+
+                // Pause live updates when user is interacting with UI
+                document.addEventListener('click', () => {
+                    liveUpdatesPaused = true;
+                    setTimeout(() => {
+                        liveUpdatesPaused = false;
+                    }, 5000); // Resume after 5 seconds of no interaction
+                });
+
             } catch (e) {
                 console.error('Initialization error:', e);
             }

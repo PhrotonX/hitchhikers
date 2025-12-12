@@ -1,17 +1,3 @@
-@import url('ride.css');
-@import url('login.css');
-@import url('footer.css');
-@import url('header.css');
-@import url('driver-dashboard.css');
-@import url('driver_earnings.css');
-@import url('driver_rides.css');
-@import url('driver_notifications.css');
-@import url('profile.css');
-@import url('landingpage.css');
-@import url('frontend-base.css');
-@import url('login-frontend.css');
-@import url('signup.css');
-
 :root {
     /* Light Mode Colors (Original) */
     --primary: #1E3A8A;

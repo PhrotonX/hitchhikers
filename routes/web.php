@@ -62,6 +62,12 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::delete('driver/{driver}/leave', [DriverController::class, 'destroy']);
     Route::get('driver/{driver}/edit', [DriverController::class, 'edit']);
     Route::patch('driver/{driver}/update', [DriverController::class, 'update']);
+    
+    // Driver Dashboard Routes
+    Route::get('driver/dashboard', [DriverController::class, 'dashboard'])->name('driver.dashboard');
+    Route::get('driver/earnings', [DriverController::class, 'earnings'])->name('driver.earnings');
+    Route::get('driver/rides', [DriverController::class, 'rides'])->name('driver.rides');
+    
     Route::get('vehicle/create', [VehicleController::class, 'create'])->name('vehicle.create');
     Route::post('vehicle/create/submit', [VehicleController::class, 'store'])->name('vehicle.submit');
     Route::get('vehicle/{vehicle}/edit', [VehicleController::class, 'edit'])->name('vehicle.edit');
