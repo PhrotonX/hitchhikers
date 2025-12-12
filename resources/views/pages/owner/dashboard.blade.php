@@ -102,7 +102,7 @@
                                 </span>
                             </td>
                             <td>{{ $log->table }}</td>
-                            <td>#{{ $log->record_id }}</td>
+                            <td>#{{ $log->data_id }}</td>
                             <td>{{ $log->created_at->diffForHumans() }}</td>
                         </tr>
                     @endforeach
@@ -160,6 +160,59 @@
         </div>
     </div>
 
+    {{-- Grant Permission Modal --}}
+    <div id="grantPermissionModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Grant Permission</h3>
+                <button class="modal-close" onclick="closeGrantPermissionModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="userSearch" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Search User</label>
+                    <input 
+                        type="text" 
+                        id="userSearch" 
+                        placeholder="Enter name or email..." 
+                        style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem;"
+                        oninput="searchUsersForPermission()"
+                    >
+                </div>
+                
+                <div id="searchResults" style="max-height: 300px; overflow-y: auto; margin-bottom: 1.5rem;">
+                    <div style="text-align: center; color: var(--text-light); padding: 2rem;">
+                        Start typing to search for users...
+                    </div>
+                </div>
+
+                <div id="selectedUserSection" style="display: none;">
+                    <div style="padding: 1rem; background: var(--bg-light); border-radius: 8px; margin-bottom: 1rem;">
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">Selected User:</div>
+                        <div id="selectedUserInfo"></div>
+                    </div>
+
+                    <div style="margin-bottom: 1rem;">
+                        <label for="permissionLevel" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Permission Level</label>
+                        <select 
+                            id="permissionLevel" 
+                            style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem;"
+                        >
+                            <option value="moderator">Moderator</option>
+                            <option value="staff">Staff</option>
+                            <option value="owner">Owner</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="grantPermission()" style="width: 100%;">
+                        <i class="fas fa-check"></i> Grant Permission
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Most Common Events --}}
     <div class="content-section">
         <div class="section-header">
@@ -206,9 +259,96 @@
     }
 
     // Permission management functions
+    let selectedUserId = null;
+    let searchTimeout = null;
+
     function showAddPermissionModal() {
-        // TODO: Implement modal to search and add user permissions
-        alert('Add permission modal - to be implemented');
+        document.getElementById('grantPermissionModal').style.display = 'flex';
+        document.getElementById('userSearch').value = '';
+        document.getElementById('searchResults').innerHTML = '<div style="text-align: center; color: var(--text-light); padding: 2rem;">Start typing to search for users...</div>';
+        document.getElementById('selectedUserSection').style.display = 'none';
+        selectedUserId = null;
+    }
+
+    function closeGrantPermissionModal() {
+        document.getElementById('grantPermissionModal').style.display = 'none';
+    }
+
+    function searchUsersForPermission() {
+        const query = document.getElementById('userSearch').value;
+        
+        if (query.length < 2) {
+            document.getElementById('searchResults').innerHTML = '<div style="text-align: center; color: var(--text-light); padding: 2rem;">Start typing to search for users...</div>';
+            return;
+        }
+
+        // Debounce search
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            fetch(`/owner/search-users?query=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.users.length > 0) {
+                        const resultsHtml = data.users.map(user => `
+                            <div class="user-search-result" onclick="selectUser(${user.id}, '${user.name}', '${user.email}')" style="padding: 1rem; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-light)'" onmouseout="this.style.background='transparent'">
+                                <div style="font-weight: 600;">${user.name}</div>
+                                <div style="font-size: 0.875rem; color: var(--text-light);">${user.email}</div>
+                                <div style="font-size: 0.75rem; margin-top: 0.25rem;">
+                                    <span class="permission-badge ${user.user_type}">${user.user_type}</span>
+                                </div>
+                            </div>
+                        `).join('');
+                        document.getElementById('searchResults').innerHTML = resultsHtml;
+                    } else {
+                        document.getElementById('searchResults').innerHTML = '<div style="text-align: center; color: var(--text-light); padding: 2rem;">No users found</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('searchResults').innerHTML = '<div style="text-align: center; color: red; padding: 2rem;">Error searching users</div>';
+                });
+        }, 300);
+    }
+
+    function selectUser(userId, name, email) {
+        selectedUserId = userId;
+        document.getElementById('selectedUserInfo').innerHTML = `
+            <div style="font-weight: 600;">${name}</div>
+            <div style="font-size: 0.875rem; color: var(--text-light);">${email}</div>
+        `;
+        document.getElementById('selectedUserSection').style.display = 'block';
+        document.getElementById('searchResults').innerHTML = '<div style="text-align: center; color: var(--success); padding: 2rem;"><i class="fas fa-check-circle"></i> User selected</div>';
+    }
+
+    function grantPermission() {
+        if (!selectedUserId) {
+            alert('Please select a user first');
+            return;
+        }
+
+        const permissionLevel = document.getElementById('permissionLevel').value;
+
+        fetch(`/owner/users/${selectedUserId}/permission`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({ user_type: permissionLevel })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeGrantPermissionModal();
+                window.location.reload();
+            } else {
+                alert('Failed to grant permission: ' + (data.message || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while granting permission');
+        });
     }
 
     function changePermission(userId, currentType) {
@@ -235,6 +375,14 @@
                 console.error('Error:', error);
                 alert('An error occurred while updating permission');
             });
+        }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('grantPermissionModal');
+        if (event.target === modal) {
+            closeGrantPermissionModal();
         }
     }
 </script>

@@ -44,6 +44,7 @@
                                 <th>Event</th>
                                 <th>Table</th>
                                 <th>Record ID</th>
+                                <th>Data</th>
                                 <th>Timestamp</th>
                             </tr>
                         </thead>
@@ -58,7 +59,24 @@
                                         </span>
                                     </td>
                                     <td>{{ $log->table }}</td>
-                                    <td>#{{ $log->record_id }}</td>
+                                    <td>#{{ $log->data_id }}</td>
+                                    <td>
+                                        @if($log->event === 'created' && $log->new_values)
+                                            <button class="btn btn-sm btn-secondary" onclick="showDataModal({{ json_encode($log->new_values) }}, 'Created Data')">
+                                                <i class="fas fa-plus-circle"></i> View Created
+                                            </button>
+                                        @elseif($log->event === 'updated' && ($log->old_values || $log->new_values))
+                                            <button class="btn btn-sm btn-secondary" onclick="showChangesModal({{ json_encode($log->old_values ?? []) }}, {{ json_encode($log->new_values ?? []) }})">
+                                                <i class="fas fa-exchange-alt"></i> View Changes
+                                            </button>
+                                        @elseif($log->event === 'deleted' && $log->old_values)
+                                            <button class="btn btn-sm btn-secondary" onclick="showDataModal({{ json_encode($log->old_values) }}, 'Deleted Data')">
+                                                <i class="fas fa-trash-alt"></i> View Deleted
+                                            </button>
+                                        @else
+                                            <span style="color: var(--text-light); font-size: 0.875rem;">No data</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $log->created_at->format('M d, Y H:i:s') }}</td>
                                 </tr>
                             @endforeach
@@ -76,7 +94,105 @@
                     </div>
                 @endif
             </div>
+
+            {{-- Data Modal --}}
+            <div id="dataModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 id="dataModalTitle"><i class="fas fa-database"></i> Record Data</h3>
+                        <button class="modal-close" onclick="closeDataModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="dataModalContent" style="max-height: 500px; overflow-y: auto;">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 </div>
+
+@push('scripts')
+<script>
+    function showDataModal(data, title) {
+        document.getElementById('dataModalTitle').innerHTML = `<i class="fas fa-database"></i> ${title}`;
+        
+        let html = '<table class="audit-table" style="margin: 0;">';
+        html += '<thead><tr><th>Field</th><th>Value</th></tr></thead><tbody>';
+        
+        for (const [key, value] of Object.entries(data)) {
+            if (key !== 'password' && key !== 'remember_token') {
+                const displayValue = formatValue(value);
+                html += `<tr>
+                    <td style="font-weight: 600;">${formatFieldName(key)}</td>
+                    <td>${displayValue}</td>
+                </tr>`;
+            }
+        }
+        
+        html += '</tbody></table>';
+        document.getElementById('dataModalContent').innerHTML = html;
+        document.getElementById('dataModal').style.display = 'flex';
+    }
+
+    function showChangesModal(oldData, newData) {
+        document.getElementById('dataModalTitle').innerHTML = '<i class="fas fa-exchange-alt"></i> Changes Made';
+        
+        let html = '<table class="audit-table" style="margin: 0;">';
+        html += '<thead><tr><th>Field</th><th>Old Value</th><th>New Value</th></tr></thead><tbody>';
+        
+        const allKeys = new Set([...Object.keys(oldData || {}), ...Object.keys(newData || {})]);
+        
+        for (const key of allKeys) {
+            if (key !== 'password' && key !== 'remember_token' && key !== 'updated_at') {
+                const oldValue = oldData?.[key];
+                const newValue = newData?.[key];
+                
+                if (oldValue !== newValue) {
+                    html += `<tr>
+                        <td style="font-weight: 600;">${formatFieldName(key)}</td>
+                        <td style="color: #dc2626;">${formatValue(oldValue)}</td>
+                        <td style="color: #16a34a;">${formatValue(newValue)}</td>
+                    </tr>`;
+                }
+            }
+        }
+        
+        html += '</tbody></table>';
+        document.getElementById('dataModalContent').innerHTML = html;
+        document.getElementById('dataModal').style.display = 'flex';
+    }
+
+    function closeDataModal() {
+        document.getElementById('dataModal').style.display = 'none';
+    }
+
+    function formatFieldName(field) {
+        return field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    function formatValue(value) {
+        if (value === null || value === undefined) {
+            return '<span style="color: var(--text-light); font-style: italic;">null</span>';
+        }
+        if (typeof value === 'boolean') {
+            return value ? '<span style="color: #16a34a;">✓ Yes</span>' : '<span style="color: #dc2626;">✗ No</span>';
+        }
+        if (typeof value === 'object') {
+            return '<code style="background: var(--bg-light); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">' + JSON.stringify(value) + '</code>';
+        }
+        return String(value);
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('dataModal');
+        if (event.target === modal) {
+            closeDataModal();
+        }
+    }
+</script>
+@endpush
 @endsection

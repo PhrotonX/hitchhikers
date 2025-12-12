@@ -151,11 +151,47 @@ class OwnerController extends Controller
             abort(403, 'Access denied. Owner privileges required.');
         }
 
-        $users = User::with('driverAccount')
-            ->orderBy('created_at', 'desc')
+        $users = User::orderBy('created_at', 'desc')
             ->paginate(20);
 
         return view('pages.owner.users', compact('users'));
+    }
+
+    /**
+     * Search users for granting permissions (AJAX)
+     */
+    public function searchUsers(Request $request)
+    {
+        if (!Auth::user()->isPrivileged('owner')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied.'
+            ], 403);
+        }
+
+        $query = $request->get('query', '');
+        
+        $users = User::where(function($q) use ($query) {
+                $q->where('first_name', 'LIKE', "%{$query}%")
+                  ->orWhere('last_name', 'LIKE', "%{$query}%")
+                  ->orWhere('email', 'LIKE', "%{$query}%");
+            })
+            ->where('user_type', 'member') // Only show members for permission upgrade
+            ->limit(10)
+            ->get()
+            ->map(function($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->getFullName(),
+                    'email' => $user->email,
+                    'user_type' => $user->user_type
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'users' => $users
+        ]);
     }
 
     /**

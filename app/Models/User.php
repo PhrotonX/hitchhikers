@@ -136,6 +136,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(ProfilePicture::class, 'user_profile_picture', 'user_id', 'pfp_id');
     }
 
+    /**
+     * Define the relationship to driver account
+     */
+    public function driverAccount(){
+        return $this->hasOne(Driver::class, 'user_id');
+    }
+
     public function getVehicleDriver(){
         return VehicleDriver::where('driver_id', $this->getDriverAccount()?->id ?? 0)->get();
     }

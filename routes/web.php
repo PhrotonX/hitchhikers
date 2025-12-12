@@ -83,6 +83,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('owner/dashboard', [OwnerController::class, 'dashboard'])->name('owner.dashboard');
     Route::get('owner/users', [OwnerController::class, 'users'])->name('owner.users');
     Route::get('owner/audit-logs', [OwnerController::class, 'auditLogs'])->name('owner.audit-logs');
+    Route::get('owner/search-users', [OwnerController::class, 'searchUsers'])->name('owner.search-users');
     Route::patch('owner/users/{user}/permission', [OwnerController::class, 'updateUserPermission'])->name('owner.users.permission');
     Route::get('owner/statistics', [OwnerController::class, 'statistics'])->name('owner.statistics');
     
