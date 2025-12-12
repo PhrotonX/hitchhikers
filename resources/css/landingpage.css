@@ -176,7 +176,7 @@ section {
 ================================================*/
 .section1 {
   width: 100%;
-  min-height: 125vh;
+  min-height: 100vh;
   padding: 100px 60px 60px;
   display: flex;
   justify-content: space-between;
@@ -524,11 +524,9 @@ section {
 ================================================*/
 .section4 {
   width: 100%;
-  height: 1000px;
   padding: 120px 50px;
   color: white;
   text-align: center;
-  align-items: right;
   position: relative;
   background: linear-gradient(to bottom, #F9FAFB 0%, #FFFFFF 100%);
   min-height: 100vh;
@@ -551,10 +549,10 @@ section {
 
 .section4 .trust-grid {
   display: flex;
-  justify-content: flex-end;  /* keep text on the left */
-  align-items: center;
-  padding: 20px;
-  min-height: 200px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 40px;
+  min-height: 500px;
 
   background-image: url("Images/happy-friends-looking-camera.jpg");
   background-size: cover;
@@ -562,22 +560,27 @@ section {
   background-repeat: no-repeat;
   border-radius: 20px;
 
-  color: #fff; /* if needed depending on image contrast */
+  color: #fff;
+}
+
+.trust-items {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 300px;
 }
 
 .trust-item {
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(255,255,255,0.12);
-  max-width: 250px; /* to prevent text stretching too wide */
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
   border-radius: 16px;
-  padding: 20px 16px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  padding: 24px 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
   transition: 0.35s ease;
-  margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  align-content: right;
-  gap: 20px;
+  gap: 8px;
 }
 
 .trust-item:hover {
@@ -677,13 +680,15 @@ section {
 ================================================*/
 .section6 {
   width: 100%;
-  height: 650px;
   padding: 120px 100px;
   background: linear-gradient(to bottom, #F9FAFB 0%, #FFFFFF 100%);
   color: var(--text-dark);
   text-align: center;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  align-content: center;
+  align-items: center;
 }
 
 .section6 h2 {
@@ -795,4 +800,107 @@ section {
 .reveal.visible.scale-up {
   transform: translate(0, 0) scale(1);
   opacity: 1;
+}
+
+/*================================================
+                FOOTER
+================================================*/
+.footer {
+  width: 100%;
+  padding: 60px 40px 30px;
+  background: #1a1a2e;
+  color: white;
+}
+
+.footer .container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.footer-section h3 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.footer-section p {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 15px;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 12px;
+}
+
+.footer-links a {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--primary);
+}
+
+.social-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.social-link {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s ease;
+}
+
+.social-link:hover {
+  color: var(--primary);
+}
+
+.social-link i {
+  width: 20px;
+}
+
+.footer-bottom {
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.footer-bottom a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-bottom a:hover {
+  color: var(--primary);
 }
