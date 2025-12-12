@@ -70,6 +70,7 @@ class RideController extends Controller
         $validated = $request->validated();
         $ride->driver_id = Auth::user()->getDriverAccount()->id;
         $ride->ride_name = $validated['ride_name'];
+        $ride->minimum_fare = $validated['minimum_fare'];
         $ride->fare_rate = $validated['fare_rate'];
         $ride->vehicle_id = $validated['vehicle_id'];
         $ride->rating = 0;
@@ -87,6 +88,7 @@ class RideController extends Controller
             $destinations->latitude = $validated['latitude'][$i];
             $destinations->longitude = $validated['longitude'][$i];
             $destinations->order = $validated['order'][$i];
+            $destinations->ride_address = $validated['ride_address'][$i];
             $destinations->save();
         }
 
@@ -145,6 +147,7 @@ class RideController extends Controller
 
         $validated = $request->validated();
         $ride->ride_name = $validated['ride_name'];
+        $ride->minimum_fare = $validated['minimum_fare'];
         $ride->fare_rate = $validated['fare_rate'];
         $ride->vehicle_id = $validated['vehicle_id'];
 
@@ -164,6 +167,7 @@ class RideController extends Controller
             $destinations->latitude = $validated['latitude'][$i];
             $destinations->longitude = $validated['longitude'][$i];
             $destinations->order = $validated['order'][$i];
+            $destinations->ride_address = $validated['ride_address'][$i];
             $destinations->save();
         }
 

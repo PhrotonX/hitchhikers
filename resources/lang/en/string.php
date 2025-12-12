@@ -12,6 +12,7 @@ return [
     */
     'create_ride' => 'Create Ride',
     'edit_ride' => 'Edit Ride',
+    'coordinates' => 'Coordinates',
     'delete_ride' => 'Delete Ride',
     'delete' => 'Delete',
     'destinations' => 'Destinations',

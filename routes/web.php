@@ -110,6 +110,7 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('ride/{ride}/delete', [RideController::class, 'delete'])->name('ride.delete');
     Route::delete('ride/{ride}/destroy', [RideController::class, 'destroy'])->name('ride.destroy');
     Route::post('ride/{ride}/reviews/submit', [ReviewController::class, 'store']);
+    Route::get('ride/search', [RideController::class, 'search']);
 
     // Ride request routes
     Route::get('ride/requests/created', [RideRequestController::class, 'created']);

@@ -41,6 +41,32 @@ class RideDestinationController extends Controller
         ]);
     }
 
+    public function search(Request $request){
+        $ride_address = $request->input('ride_address');
+        // $ride_name = $request->input('ride_name');
+
+        $results = RideDestination::where('ride_address', 'LIKE', "%$ride_address%")->get();
+
+        $rides = [];
+        $vehicles = [];
+
+        foreach ($results as $key => $value) {
+            $ride = Ride::find($value->ride_id);
+            $rides[$value->ride_id] = $ride;
+        }
+
+        foreach ($rides as $key => $value) {
+            $vehicle = Vehicle::find($value->vehicle_id);
+            $vehicles[$value->vehicle_id] = $vehicle;
+        }
+
+        return response()->json([
+            'ride_destinations' => $results,
+            'rides' => $rides,
+            'vehicles' => $vehicles,
+        ]);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

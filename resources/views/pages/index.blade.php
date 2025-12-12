@@ -21,18 +21,20 @@
                 <p>Find rides, connect with drivers, and travel affordably.</p>
             </section> -->
 
+            <!-- @TODO: Search Bar here... -->
+
             <!-- Map area from existing app (preserved) -->
             <section style="margin-top:16px">
                 <div id="map"></div>
             </section>
 
-            <section class="mid-section" style="margin-top:16px">
+            <!-- <section class="mid-section" style="margin-top:16px">
                 <h3>Mid Section</h3>
             </section>
 
             <section class="bottom-section" style="margin-top:16px">
                 <h3>Bottom Section</h3>
-            </section>
+            </section> -->
 
             <!-- Backend-driven UI blocks (reviews, driving mode, requests) preserved below -->
             @auth

@@ -141,6 +141,13 @@
                             longitudeField.setAttribute('hidden', true);
                             destinationItem.appendChild(longitudeField);
 
+                            var rideAddressField = document.createElement('input');
+                            rideAddressField.setAttribute('type', 'text');
+                            rideAddressField.setAttribute('name', 'ride_address[]');
+                            rideAddressField.setAttribute('value', data['display_name']);
+                            rideAddressField.setAttribute('hidden', true);
+                            destinationItem.appendChild(rideAddressField);
+
                             var horizontalLine = document.createElement('hr');
                             destinationItem.appendChild(horizontalLine);
 

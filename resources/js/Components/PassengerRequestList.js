@@ -19,31 +19,31 @@ export default class PassengerRequestList extends Component{
         title.setAttribute('id', this.id + '-title');
         this.element.appendChild(title);
 
-        var rideSelector = document.createElement('select');
-        rideSelector.setAttribute('id', this.id + '-ride-selector');
-        this.element.appendChild(rideSelector);
+        // var rideSelector = document.createElement('select');
+        // rideSelector.setAttribute('id', this.id + '-ride-selector');
+        // this.element.appendChild(rideSelector);
         
-        fetch(this.appUrl + '/driver/'+this.driverId+'/ride/')
-        .then((response) => {
-            return response.json();
-        })
-        .then((data) => {
+        // fetch(this.appUrl + '/driver/'+this.driverId+'/ride/')
+        // .then((response) => {
+        //     return response.json();
+        // })
+        // .then((data) => {
 
-            console.log(data);
+        //     console.log(data);
 
-            let count = Object.keys(data).length;
+        //     let count = Object.keys(data).length;
 
-            for(let i = 0; i < count; i++){    
-                var rideSelectorItem = document.createElement('option');
-                rideSelectorItem.value = data[0][i].id;
-                rideSelectorItem.innerHTML = data[0][i].ride_name;
+        //     for(let i = 0; i < count; i++){    
+        //         var rideSelectorItem = document.createElement('option');
+        //         rideSelectorItem.value = data[0][i].id;
+        //         rideSelectorItem.innerHTML = data[0][i].ride_name;
 
-                rideSelector.appendChild(rideSelectorItem);
-            }
-        })
-        .catch((error) => {
-            throw new Error(error);
-        });
+        //         rideSelector.appendChild(rideSelectorItem);
+        //     }
+        // })
+        // .catch((error) => {
+        //     throw new Error(error);
+        // });
 
         this.list = document.createElement('div');
         this.list.setAttribute('id', this.id + '-items');
