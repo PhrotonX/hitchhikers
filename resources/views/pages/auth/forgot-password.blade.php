@@ -1,35 +1,46 @@
 @extends('layouts.app')
-{{-- 
+
 @push('head')
-    @vite(['resources/css/form.css'])
-@endpush --}}
+    <x-auth-styles />
+@endpush
 
 @section('content')
-<main>
-    <!-- Session Status -->
-    {{-- <x-status :class="'auth-session-status'" :status="session('status')" /> --}}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-key"></i> {{ __('passwords.password_reset_form') }}</h1>
+            <p>{{ __('passwords.password_reset_form_text') }}</p>
+        </div>
 
-    <h1>{{__('passwords.password_reset_form')}}</h1>
-    <form method="POST" action="{{ route('password.email') }}">
-        <p>{{ __('passwords.password_reset_form_text') }}</p>
-        @csrf
-        <label>{{__('credentials.email')}}</label>
-        <input
-            placeholder="{{__('credentials.email_hint')}}"
-            id="email"
-            name="email"
-            value="{{old('email')}}"
-            autocomplete="email"
-            required
-            autofocus
-            type="email"
-        >
+        @if (session('status'))
+            <div class="success-message">
+                <i class="fas fa-check-circle"></i> {{ session('status') }}
+            </div>
+        @endif
 
-        {{-- <x-input-error :messages="$errors->get('email')" />     --}}
-            
-        <button type="submit">
-            <p>{{ __('credentials.email_password_reset_link') }}</p>
-        </button>
-    </form>
-</main>
+        @if($errors->any())
+            <div class="error-message">
+                @foreach($errors->all() as $error)
+                    <div><i class="fas fa-exclamation-circle"></i> {{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('password.email') }}">
+            @csrf
+            <div class="input-group">
+                <label><i class="fas fa-envelope"></i> {{__('credentials.email')}}</label>
+                <input type="email" name="email" value="{{old('email')}}" placeholder="{{__('credentials.email_hint')}}" required autofocus>
+            </div>
+
+            <button type="submit" class="auth-btn">
+                <i class="fas fa-paper-plane"></i> {{ __('credentials.email_password_reset_link') }}
+            </button>
+
+            <div class="auth-footer">
+                Remember your password? <a href="/login">Sign in</a>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
