@@ -1,8 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<x-sidebar-nav />
-<div class="main-content">
+<div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
     <div class="page-header">
         <h1><i class="fas fa-cog"></i> Account Settings</h1>
     </div>

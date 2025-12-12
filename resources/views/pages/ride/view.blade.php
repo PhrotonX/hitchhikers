@@ -3,8 +3,7 @@
 <x-map-head/>
 
 @section('content')
-<x-sidebar-nav />
-<div class="main-content">
+<div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
     @if(session('success'))
         <div style="background: #d4edda; border: 1px solid #c3e6cb; border-radius: 6px; padding: 15px; margin-bottom: 20px; color: #155724;">
             <i class="fas fa-check-circle"></i> {{ session('success') }}
