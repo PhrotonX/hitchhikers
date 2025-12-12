@@ -338,15 +338,6 @@
                                 if (viewReviewsBtn) viewReviewsBtn.hidden = true;
                                 if (viewDetailsBtn) viewDetailsBtn.style.display = 'none';
                             }else{
-                                @auth
-                                    @if (Auth::user()->isDriver())
-                                        if (passengerRequest) {
-                                            passengerRequest.destroyItems();
-                                            passengerRequest.displayItems(rideId);
-                                        }
-                                    @endif
-                                @endauth
-
                                 if (reviewForm) reviewForm.hidden = false;
                                 if (reviewFormSubmit) reviewFormSubmit.hidden = false;
                                 if (reviewFormEdit) reviewFormEdit.hidden = true;
