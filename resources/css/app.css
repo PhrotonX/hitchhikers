@@ -11,6 +11,9 @@
 @import url('frontend-base.css');
 @import url('login-frontend.css');
 @import url('signup.css');
+@import url('about-contact.css');
+@import url('404.css');
+@import url('500.css');
 
 :root {
     /* Light Mode Colors (Original) */

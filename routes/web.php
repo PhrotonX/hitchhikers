@@ -20,7 +20,11 @@ use App\Http\Controllers\ProfilePictureController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('pages.index');
+    // Show landing page for guests, dashboard for authenticated users
+    if (Auth::check()) {
+        return view('pages.index');
+    }
+    return view('pages.landing');
 })->name('home');
 
 Route::get('login', function(){
