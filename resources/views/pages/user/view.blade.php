@@ -63,7 +63,7 @@
                         $profilePicture = $user->getProfilePicture();
                         $profilePicUrl = $profilePicture && $profilePicture->getPath() 
                             ? asset('storage/' . $profilePicture->getPath()) 
-                            : asset('storage/default-avatar.png');
+                            : Vite::asset('resources/img/question_mark.png');
                     @endphp
                     <div style="flex-shrink: 0;">
                         <img src="{{$profilePicUrl}}" alt="{{$user->getFullName()}}" 

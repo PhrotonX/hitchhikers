@@ -129,7 +129,7 @@
                     $profilePicture = $driverUser ? $driverUser->getProfilePicture() : null;
                     $profilePicUrl = $profilePicture && $profilePicture->getPath() 
                         ? asset('storage/' . $profilePicture->getPath()) 
-                        : asset('storage/default-avatar.png');
+                        : Vite::asset('resources/img/question_mark.png');
                 @endphp
                 <div style="display: flex; gap: 20px; align-items: center;">
                     <img src="{{$profilePicUrl}}" alt="Driver" 

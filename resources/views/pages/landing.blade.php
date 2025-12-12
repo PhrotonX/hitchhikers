@@ -191,7 +191,7 @@
 
     <div class="map-wrapper">
         <div class="map-track">
-            <img src="{{ asset('storage/wide-map.png') }}" class="wide-map" alt="Map">
+            <img src="{{Vite::asset('resources/img/White Car.png')}}" class="wide-map" alt="Map">
         </div>
 
         <div class="map-points-row">
