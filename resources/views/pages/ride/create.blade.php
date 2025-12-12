@@ -3,13 +3,21 @@
 <x-map-head/>
 
 @push('head')
-    @vite('resources/js/ride-destination.js');
+    @vite(['resources/js/ride-destination.js', 'resources/css/driver-dashboard.css']);
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 @endpush
 
 @section('content')
-    <h1>{{__('string.create_ride')}}</h1>
+<div class="main-layout">
+    <x-sidebar-nav />
 
-    <form action="/ride/create/submit" method="POST" id="rider-create-form">
+    <main class="main-content">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">{{__('string.create_ride')}}</h2>
+            </div>
+            <div class="card-body">
+                <form action="/ride/create/submit" method="POST" id="rider-create-form">
         @csrf
 
         <x-input-label>{{__('string.ride_name')}}</x-input-label>
@@ -185,15 +193,22 @@
             <h3>To</h3> --}}
         </div>
 
-        @if ($errors)
-            <p>{{$errors}}</p>
+        @if ($errors->any())
+            <div class="alert alert-danger" style="margin-top: 20px; padding: 15px; background: var(--error); color: white; border-radius: 8px;">
+                @foreach ($errors->all() as $error)
+                    <p style="margin: 5px 0;">{{ $error }}</p>
+                @endforeach
+            </div>
         @endif
 
-        <button type="submit">
-            <p>{{__('string.submit')}}</p>
+        <button type="submit" class="btn btn-primary" style="margin-top: 20px;">
+            <i class="fa-solid fa-check"></i> {{__('string.submit')}}
         </button>
     </form>
-    
+            </div>
+        </div>
+    </main>
+</div>
 @endsection
 
 @push('scripts')
