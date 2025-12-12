@@ -3,7 +3,6 @@
  * Front-end API for the Web.
  */
 
-// @phpstan-ignore-next-line
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\RideDestinationController;
 use App\Http\Controllers\UserController;
@@ -19,7 +18,6 @@ use App\Http\Controllers\SavedRideController;
 use App\Http\Controllers\SavedRideFolderController;
 use App\Http\Controllers\ProfilePictureController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('pages.index');
@@ -59,42 +57,6 @@ Route::middleware(['auth'])->group(function(){
 });
 
 Route::middleware(['auth', 'verified'])->group(function(){
-    Route::get('driver/dashboard', function(){
-        return view('pages.driver.dashboard', [
-            'availableRideRequests' => \App\Models\RideRequest::where('status', 'pending')->take(10)->get(),
-        ]);
-    })->name('driver.dashboard');
-    Route::get('driver/earnings', function(){
-        $driver = Auth::user()->getDriverAccount();
-        $todayEarnings = $driver ? $driver->rides()->whereDate('created_at', today())->sum('fare') : 0;
-        $todayTransactions = $driver ? $driver->rides()->whereDate('created_at', today())->get() : collect();
-        $totalEarnings = $driver ? $driver->rides()->sum('fare') : 0;
-        $pendingPayout = $driver ? ($todayEarnings * 0.8) : 0;
-        $nextPayoutDate = now()->addDays(3);
-        
-        return view('pages.driver.earnings', [
-            'todayEarnings' => $todayEarnings,
-            'todayTransactions' => $todayTransactions,
-            'totalEarnings' => $totalEarnings,
-            'pendingPayout' => $pendingPayout,
-            'nextPayoutDate' => $nextPayoutDate,
-        ]);
-    })->name('driver.earnings');
-    Route::get('driver/notifications', function(){
-        $allNotifications = Auth::user()->notifications()->latest()->get();
-        $newNotifications = $allNotifications->where('read_at', null);
-        $earlierNotifications = $allNotifications->where('read_at', '!=', null);
-        
-        return view('pages.driver.notifications', [
-            'newNotifications' => $newNotifications,
-            'earlierNotifications' => $earlierNotifications,
-        ]);
-    })->name('driver.notifications');
-    Route::get('driver/rides', function(){
-        return view('pages.driver.rides', [
-            'availableRideRequests' => \App\Models\RideRequest::where('status', 'pending')->take(10)->get(),
-        ]);
-    })->name('driver.rides');
     Route::get('driver/enroll', [DriverController::class, 'create']);
     Route::post('driver/enroll/submit', [DriverController::class, 'store']);
     Route::delete('driver/{driver}/leave', [DriverController::class, 'destroy']);
@@ -166,13 +128,6 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::post('messages/submit', [MessageController::class, 'store']);
 });
 
-Route::get('profile', function(){
-    return view('pages.user.profile');
-})->middleware(['auth', 'verified'])->name('profile');
-
-Route::get('dashboard', function(){
-    return view('pages.dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('settings', function(){
     return view('pages.user.settings', [
@@ -180,30 +135,6 @@ Route::get('settings', function(){
     ]);
 })->middleware(['auth'])->name('settings');
 
-Route::get('legal', function(){
-    return view('pages.legal');
-})->name('legal');
-
-Route::get('success', function(){
-    return view('pages.success');
-})->name('success');
-
-Route::get('abuse', function(){
-    return view('pages.abuse-complaints');
-})->name('abuse');
-
-Route::get('ride-details/{ride}', function(){
-    return view('pages.ride-details');
-})->name('ride.details');
-
-Route::get('addresses', function(){
-    $addresses = Auth::user()->addresses ?? collect();
-    return view('pages.user.addresses', ['addresses' => $addresses]);
-})->middleware(['auth', 'verified'])->name('addresses');
-
-Route::get('form-test', function(){
-    return view('pages.form-test');
-})->name('form.test');
 
 Route::get('ride/destinations', [RideDestinationController::class, 'index']);
 Route::get('ride/destinations/{ride}', [RideDestinationController::class, 'get']);
