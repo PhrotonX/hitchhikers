@@ -7,6 +7,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\RideDestinationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\RideRequestController;
 use App\Http\Controllers\MessagesController;
@@ -22,6 +23,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     // Show landing page for guests, dashboard for authenticated users
     if (Auth::check()) {
+        // Redirect owners to owner dashboard
+        if (Auth::user()->isPrivileged('owner')) {
+            return redirect()->route('owner.dashboard');
+        }
         return view('pages.index');
     }
     return view('pages.landing');
@@ -71,6 +76,11 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('driver/dashboard', [DriverController::class, 'dashboard'])->name('driver.dashboard');
     Route::get('driver/earnings', [DriverController::class, 'earnings'])->name('driver.earnings');
     Route::get('driver/rides', [DriverController::class, 'rides'])->name('driver.rides');
+    
+    // Owner Dashboard Routes (permission check done in controller)
+    Route::get('owner/dashboard', [OwnerController::class, 'dashboard'])->name('owner.dashboard');
+    Route::patch('owner/users/{user}/permission', [OwnerController::class, 'updateUserPermission'])->name('owner.users.permission');
+    Route::get('owner/statistics', [OwnerController::class, 'statistics'])->name('owner.statistics');
     
     Route::get('vehicle/create', [VehicleController::class, 'create'])->name('vehicle.create');
     Route::post('vehicle/create/submit', [VehicleController::class, 'store'])->name('vehicle.submit');
