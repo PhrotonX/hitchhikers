@@ -324,8 +324,11 @@ export default class RideMap extends MainMap{
                     const rideItem = e.target.closest('.ride-selector-list-item');
                     if(rideItem && this.onVehicleMarkerClick){
                         const vehicleId = rideItem.getAttribute('data-vehicle-id');
+                        const rideId = rideItem.getAttribute('data-ride-id');
                         const vehicleData = this.rideSelectorList._vehicleData[vehicleId];
                         if(vehicleData){
+                            // Pass the ride ID for auto-selection in the infobox
+                            vehicleData.autoSelectRideId = rideId;
                             this.onVehicleMarkerClick(e, vehicleData);
                             this.setView(vehicleData.latitude, vehicleData.longitude);
                         }
@@ -410,6 +413,12 @@ export default class RideMap extends MainMap{
                     
         // Store vehicle data for click handler
         this.rideSelectorList._vehicleData[vehicle_id] = data.results[i];
+        
+        // Store ride data for each vehicle
+        if(!this.rideSelectorList._rideData){
+            this.rideSelectorList._rideData = {};
+        }
+        this.rideSelectorList._rideData[vehicle_id] = data.rides[vehicle_id];
 
         var rideCount = Object.keys(data.rides[vehicle_id]).length;
         for(let j = 0; j < rideCount; j++){
@@ -420,6 +429,7 @@ export default class RideMap extends MainMap{
             var rideSelectorListItem = document.createElement('div');
             rideSelectorListItem.setAttribute('class', 'ride-selector-list-item');
             rideSelectorListItem.setAttribute('data-vehicle-id', vehicle_id);
+            rideSelectorListItem.setAttribute('data-ride-id', data.rides[vehicle_id][j].id);
 
                 // console.log(data.rides[vehicle_id]);
                 var rideSelectorListItemTitle = document.createElement('p');

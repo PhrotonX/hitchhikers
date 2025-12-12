@@ -275,6 +275,10 @@
                 // Functionality for viewing vehicle information
                 map.setOnVehicleMarkerClick((e, data) => {
                     if (!infobox) return; // Guard against missing infobox
+                    
+                    // Store the auto-select ride ID if passed as a property
+                    const autoSelectRideId = data.autoSelectRideId || null;
+                    
                     infobox.innerHTML =
                         '<div id="ride-popup"><button type="button" id="ride-popup-close-btn">Close</button><br>' + 
                         "<p><strong>"+data.vehicle_name+"</strong></p>" + 
@@ -311,9 +315,9 @@
                         if (rideLocation) rideLocation.innerHTML = location.display_name;
                     });
 
-                    map.retrieveRides(data.id)().then((data) => {
+                    map.retrieveRides(data.id)().then((ridesData) => {
                         if (!rideList) return;
-                        var count = Object.keys(data.rides).length;
+                        var count = Object.keys(ridesData.rides).length;
                         rideList.innerHTML = "";
                         for(let i = -1; i < count; i++){
                             var option = document.createElement("option");
@@ -322,11 +326,23 @@
                                 option.setAttribute("selected", true);
                                 option.innerHTML = "---";
                             }else{
-                                option.setAttribute("id", "ride-option-"+data.rides[i].id);
-                                option.setAttribute("value", data.rides[i].id);
-                                option.innerHTML = data.rides[i].ride_name;
+                                option.setAttribute("id", "ride-option-"+ridesData.rides[i].id);
+                                option.setAttribute("value", ridesData.rides[i].id);
+                                option.innerHTML = ridesData.rides[i].ride_name;
                             }
                             rideList.appendChild(option);
+                        }
+                        
+                        // Auto-select the ride if specified
+                        if (autoSelectRideId) {
+                            setTimeout(() => {
+                                const rideOption = rideList.querySelector('option[value="' + autoSelectRideId + '"]');
+                                if (rideOption) {
+                                    rideList.value = autoSelectRideId;
+                                    const event = new Event('change');
+                                    rideList.dispatchEvent(event);
+                                }
+                            }, 100);
                         }
 
                         var viewReviewsBtn = document.getElementById('ride-view-review-btn');
@@ -534,7 +550,7 @@
                             if (!drivingModeOption) return;
                             //Retrieves data needed to be processed.
                             var selectedDrivingModeOption = document.getElementById("ride-option" + "-" + drivingModeOption.value);
-                            var infobox = document.getElementById("driving-mode-infobox");
+                            var drivingModeInfobox = document.getElementById("driving-mode-infobox");
                             status = selectedDrivingModeOption.getAttribute('data-status');
 
                             // Toggles button state.
@@ -551,24 +567,45 @@
                             passengerRequest.displayItems(drivingModeOption.value);
 
                             // Zoom into the position of associated vehicle from a selected ride.
-                            fetch('{{env("APP_URL", "")}}' + '/ride/'+drivingModeOption.value)
+                            fetch('{{env("APP_URL", "")}}' + '/api/ride/'+drivingModeOption.value)
                             .then((response) => {
                                 return response.json();
                             }).then((data) => {
+                                console.log('Ride data:', data);
 
                                 fetch('{{env("APP_URL", "")}}' + '/api/vehicle/'+data.ride.vehicle_id)
                                 .then((response) => {
                                     return response.json();
                                 }).then((vehicleData) => {
+                                    console.log('Vehicle data:', vehicleData);
+                                    
                                     // Displays information into driving-mode-infobox.
-                                    infobox.innerHTML = "<p>"+vehicleData.vehicle.vehicle_name+"</p>";
+                                    drivingModeInfobox.innerHTML = "<p>"+vehicleData.vehicle.vehicle_name+"</p>";
 
                                     map.getMap().setView([vehicleData.vehicle.latitude, vehicleData.vehicle.longitude], 16);
+                                    
+                                    // Trigger the vehicle marker click handler to open infobox popup
+                                    var vehicleMarkerClickHandler = map.getOnVehicleMarkerClick();
+                                    console.log('Vehicle marker click handler:', vehicleMarkerClickHandler);
+                                    console.log('Infobox element:', infobox);
+                                    
+                                    if (vehicleMarkerClickHandler) {
+                                        // Pass the ride ID to auto-select in the dropdown
+                                        vehicleData.vehicle.autoSelectRideId = drivingModeOption.value;
+                                        console.log('Calling vehicle marker click handler with:', vehicleData.vehicle);
+                                        vehicleMarkerClickHandler({ target: null }, vehicleData.vehicle);
+                                        console.log('Infobox display after click:', infobox.style.display);
+                                        console.log('Infobox innerHTML:', infobox.innerHTML);
+                                    } else {
+                                        console.error('Vehicle marker click handler not found!');
+                                    }
                                 }).catch((error) => {
+                                    console.error('Error fetching vehicle:', error);
                                     throw new Error(error);
                                 });
 
                             }).catch((error) => {
+                                console.error('Error fetching ride:', error);
                                 throw new Error(error);
                             });
                         }
