@@ -9,10 +9,10 @@ class StoreReplyRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
-    {
-        return false;
-    }
+    // public function authorize(): bool
+    // {
+        
+    // }
 
     /**
      * Get the validation rules that apply to the request.
@@ -22,7 +22,10 @@ class StoreReplyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'description' => ['required', 'string', 'max:255'],
+            'mentioned_account_id' => ['required', 'numeric'],
+            // 'replied_review_id' => ['required', 'numeric'],
+            'ride_id' => ['required', 'numeric'],
         ];
     }
 }

@@ -3,12 +3,33 @@
  * Front-end API for the Web.
  */
 
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\RideDestinationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DriverController;
+use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\RideController;
+use App\Http\Controllers\RideRequestController;
+use App\Http\Controllers\MessagesController;
+use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\ProfitLogsController;
+use App\Http\Controllers\ReplyController;
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SavedRideController;
+use App\Http\Controllers\SavedRideFolderController;
+use App\Http\Controllers\ProfilePictureController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('pages.index');
+    // Show landing page for guests, dashboard for authenticated users
+    if (Auth::check()) {
+        // Redirect owners to owner dashboard
+        if (Auth::user()->isPrivileged('owner')) {
+            return redirect()->route('owner.dashboard');
+        }
+        return view('pages.index');
+    }
+    return view('pages.landing');
 })->name('home');
 
 Route::get('login', function(){
@@ -19,11 +40,30 @@ Route::get('register', function(){
     return view('pages.auth.register');
 });
 
+Route::get('about', function(){
+    return view('pages.about');
+});
+
+Route::get('forgot-password', function(){
+    return view('pages.auth.reset-password');
+});
+
 Route::get('user/{user}', [UserController::class, 'show'])->name('user.view');
 Route::get('user/{user}/edit', [UserController::class, 'edit'])->middleware(['auth']);
 Route::patch('user/{user}/update', [UserController::class, 'update'])->middleware(['auth', 'verified']);
 Route::get('user/{user}/delete', [UserController::class, 'delete'])->middleware(['auth', 'verified']);
 Route::delete('user/{user}/destroy', [UserController::class, 'destroy'])->middleware(['auth', 'verified'])->name('user.destroy');
+
+// Profile picture routes
+Route::get('user/{user}/profile-pictures', [UserController::class, 'showProfilePictures'])->middleware(['auth', 'verified'])->name('user.profile-pictures');
+Route::get('user/{user}/profile-pictures/json', [ProfilePictureController::class, 'getPicturesJson'])->middleware(['auth', 'verified']);
+Route::post('user/{user}/profile-picture/upload', [ProfilePictureController::class, 'store'])->middleware(['auth', 'verified']);
+Route::patch('user/{user}/profile-picture/set-primary', [UserController::class, 'setPrimaryProfilePicture'])->middleware(['auth', 'verified']);
+Route::delete('user/{user}/profile-picture/{pfp}/delete', [ProfilePictureController::class, 'delete'])->middleware(['auth', 'verified']);
+
+Route::middleware(['auth'])->group(function(){
+    Route::post('profit/submit', [ProfitLogsController::class, 'store']);
+});
 
 Route::middleware(['auth', 'verified'])->group(function(){
     Route::get('driver/enroll', [DriverController::class, 'create']);
@@ -31,6 +71,86 @@ Route::middleware(['auth', 'verified'])->group(function(){
     Route::delete('driver/{driver}/leave', [DriverController::class, 'destroy']);
     Route::get('driver/{driver}/edit', [DriverController::class, 'edit']);
     Route::patch('driver/{driver}/update', [DriverController::class, 'update']);
+    
+    // Driver Dashboard Routes
+    Route::get('driver/dashboard', function() {
+        return redirect()->route('home');
+    })->name('driver.dashboard');
+    Route::get('driver/earnings', [DriverController::class, 'earnings'])->name('driver.earnings');
+    Route::get('driver/rides', [DriverController::class, 'rides'])->name('driver.rides');
+    
+    // Owner Dashboard Routes (permission check done in controller)
+    Route::get('owner/dashboard', [OwnerController::class, 'dashboard'])->name('owner.dashboard');
+    Route::get('owner/users', [OwnerController::class, 'users'])->name('owner.users');
+    Route::get('owner/audit-logs', [OwnerController::class, 'auditLogs'])->name('owner.audit-logs');
+    Route::get('owner/search-users', [OwnerController::class, 'searchUsers'])->name('owner.search-users');
+    Route::patch('owner/users/{user}/permission', [OwnerController::class, 'updateUserPermission'])->name('owner.users.permission');
+    Route::get('owner/statistics', [OwnerController::class, 'statistics'])->name('owner.statistics');
+    
+    Route::get('vehicle/create', [VehicleController::class, 'create'])->name('vehicle.create');
+    Route::post('vehicle/create/submit', [VehicleController::class, 'store'])->name('vehicle.submit');
+    Route::get('vehicle/{vehicle}/edit', [VehicleController::class, 'edit'])->name('vehicle.edit');
+    Route::patch('vehicle/{vehicle}/update', [VehicleController::class, 'update'])->name('vehicle.update');
+    
+    Route::delete('vehicle/{vehicle}/delete', [VehicleController::class, 'destroy'])->name('vehicle.delete');
+    // Route::patch('user/{user}/vehicle/', [VehicleController::class, 'update'])->name('vehicle.update');
+    Route::patch('vehicle/{vehicle}/update-location', [VehicleController::class, 'updateLocation']);
+
+    Route::get('profit/', [ProfitLogsController::class, 'index']);
+    Route::get('profit/ride/{ride}', [ProfitLogsController::class, 'showFromRide']);
+
+    // Saved Ride routes
+    Route::get('saved-rides/', [SavedRideController::class, 'index']);
+    Route::get('saved-rides/all', [SavedRideController::class, 'all']); // Dashboard-only route for statistics.
+    Route::get('saved-rides/folders/{savedRideFolder}/rides', [SavedRideController::class, 'get']);
+    Route::post('saved-rides/submit', [SavedRideController::class, 'store']);
+    Route::get('saved-rides/{savedRide}', [SavedRideController::class, 'show']);
+    Route::put('saved-rides/{savedRide}/update', [SavedRideController::class, 'update']);
+    Route::delete('saved-rides/{savedRide}/delete', [SavedRideController::class, 'delete']);
+
+    Route::patch('saved-rides/{savedRide}/modify-folders', [SavedRideController::class, 'modifyFolders']);
+
+    // Saved Ride Folder routes
+    Route::get('saved-rides/folders', [SavedRideFolderController::class, 'index']);
+    Route::get('saved-rides/folders/{savedRideFolder}', [SavedRideFolderController::class, 'show']);
+    Route::post('saved-rides/folders/submit', [SavedRideFolderController::class, 'store']);
+    Route::put('saved-rides/folders/{savedRideFolder}/update', [SavedRideFolderController::class, 'update']);
+    Route::delete('saved-rides/folders/{savedRideFolder}/delete', [SavedRideFolderController::class, 'destroy']);
+
+    // Review routes
+    Route::put('reviews/{review}/update', [ReviewController::class, 'update']);
+    Route::delete('reviews/{review}/delete', [ReviewController::class, 'destroy']);
+
+    // Reply routes
+    Route::post('reviews/{review}/replies/submit', [ReplyController::class, 'store']);
+    Route::put('replies/{reply}/update', [ReplyController::class, 'update']);
+    Route::delete('replies/{reply}/delete', [ReplyController::class, 'destroy']);
+
+    // Ride routes
+    Route::get('ride/create', [RideController::class, 'create'])->name('ride.create');
+    Route::post('ride/create/submit', [RideController::class, 'store'])->name('ride.submit');
+    Route::get('ride/{ride}/edit', [RideController::class, 'edit'])->name('ride.edit');
+    Route::patch('ride/{ride}/update-status', [RideController::class, 'updateStatus']);
+    Route::patch('ride/{ride}/update', [RideController::class, 'update'])->name('ride.update');
+    Route::get('ride/{ride}/delete', [RideController::class, 'delete'])->name('ride.delete');
+    Route::delete('ride/{ride}/destroy', [RideController::class, 'destroy'])->name('ride.destroy');
+    Route::post('ride/{ride}/reviews/submit', [ReviewController::class, 'store']);
+    Route::get('ride/search', [RideDestinationController::class, 'search']);
+
+    // Ride request routes
+    Route::get('ride/requests/created', [RideRequestController::class, 'created']);
+    Route::get('ride/{ride}/requests/', [RideRequestController::class, 'index']);
+    Route::get('ride/{ride}/requests/create', [RideRequestController::class, 'create']);
+    Route::post('ride/requests/create/submit', [RideRequestController::class, 'store']);
+    Route::get('ride/{ride}/requests/{rideRequest}', [RideRequestController::class, 'show']);
+    Route::put('ride/{ride}/requests/{rideRequest}/update', [RideRequestController::class, 'update']);
+    Route::delete('ride/requests/{rideRequest}/delete', [RideRequestController::class, 'destroy']);
+    Route::patch('ride/requests/{rideRequest}/update-status', [RideRequestController::class, 'updateStatus']);
+
+    // Vehicle routes
+    Route::patch('vehicle/{vehicle}/update-status', [VehicleController::class, 'updateStatus']);
+
+    Route::post('messages/submit', [MessageController::class, 'store']);
 });
 
 
@@ -40,6 +160,63 @@ Route::get('settings', function(){
     ]);
 })->middleware(['auth'])->name('settings');
 
+
+Route::get('ride/destinations', [RideDestinationController::class, 'index']);
+Route::get('ride/destinations/{ride}', [RideDestinationController::class, 'get']);
+Route::get('driver/{driver}/ride/', [RideController::class, 'index']);
+Route::get('ride/{ride}', [RideController::class, 'show'])->name('ride.show');
+Route::get('ride/{ride}/reviews', [ReviewController::class, 'getReviews']);
+Route::get('api/ride/{ride}', [RideController::class, 'get']);
+
+Route::get('vehicle', [VehicleController::class, 'index'])->name('vehicle.index');
+Route::get('api/vehicle/{vehicle}', [VehicleController::class, 'get'])->name('vehicle.get');
+Route::get('vehicle/{vehicle}', [VehicleController::class, 'show'])->name('vehicle.show');
+Route::get('vehicle/{vehicle}/rides', [VehicleController::class, 'getRides'])->name('vehicle.rides');
+
+Route::get('replies/', [ReplyController::class, 'index']);
+Route::get('replies/{reply}', [ReplyController::class, 'show']);
+
+Route::get('reviews/', [ReviewController::class, 'index']);
+Route::get('reviews/{review}', [ReviewController::class, 'show']);
+Route::get('reviews/{review}/replies', [ReplyController::class, 'getReplies']);
+
+Route::get('test', function(){
+    return view('dist.index');
+});
+
+
+// Protected audit log routes (requires authentication)
+Route::middleware(['auth:sanctum'])->group(function () {
+    
+    // Get all audit logs with optional filters
+    // GET /api/audit-logs?user_id=1&table=rides&event=updated&from=2024-01-01&to=2024-12-31&per_page=50
+    Route::get('/audit-logs', [AuditLogController::class, 'index']);
+    
+    // Get a specific audit log
+    // GET /api/audit-logs/123
+    Route::get('/audit-logs/{auditLog}', [AuditLogController::class, 'show']);
+    
+    // Get audit logs for the authenticated user
+    // GET /api/audit-logs/my-logs?limit=50
+    Route::get('/audit-logs/my-logs', [AuditLogController::class, 'myLogs']);
+    
+    // Get recent activity
+    // GET /api/audit-logs/recent-activity?limit=20
+    Route::get('/audit-logs/recent-activity', [AuditLogController::class, 'recentActivity']);
+    
+    // Get audit statistics
+    // GET /api/audit-logs/statistics
+    Route::get('/audit-logs/statistics', [AuditLogController::class, 'statistics']);
+    
+    // Get audit logs for a specific record
+    // GET /api/audit-logs/record/rides/123
+    Route::get('/audit-logs/record/{table}/{id}', [AuditLogController::class, 'showRecordLogs']);
+    
+    // Clean old audit logs
+    // POST /api/audit-logs/clean
+    // Body: {"days_to_keep": 90}
+    Route::post('/audit-logs/clean', [AuditLogController::class, 'cleanOldLogs']);
+});
 
 
 require __DIR__.'/auth.php';

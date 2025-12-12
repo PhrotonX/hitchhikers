@@ -154,4 +154,130 @@ class DriverController extends Controller
     protected function onDestroy(Driver $driver){
         $driver->delete();
     }
+
+    /**
+     * Display driver dashboard with active ride and pending requests
+     */
+    public function dashboard()
+    {
+        $user = Auth::user();
+        $driverAccount = $user->getDriverAccount();
+
+        if (!$driverAccount) {
+            return redirect()->route('home')->with('error', 'You must enroll as a driver first.');
+        }
+
+        // Get the driver's vehicle (first active vehicle)
+        $vehicle = $user->getRides()->first()?->vehicle;
+
+        // Get active ride (approved or ongoing ride)
+        $activeRide = $user->getRides()
+            ->with(['destinations', 'passenger'])
+            ->whereIn('status', ['approved', 'ongoing'])
+            ->first();
+
+        // Get pending ride requests for all driver's available rides
+        $rideRequests = \App\Models\RideRequest::whereHas('ride', function($query) use ($user) {
+                $query->where('driver_id', $user->id)
+                      ->where('status', 'available');
+            })
+            ->where('status', 'pending')
+            ->with(['passenger', 'ride.destinations'])
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        return view('pages.driver.dashboard', compact('user', 'driverAccount', 'vehicle', 'activeRide', 'rideRequests'));
+    }
+
+    /**
+     * Display driver earnings page
+     */
+    public function earnings()
+    {
+        $user = Auth::user();
+        $driverAccount = $user->getDriverAccount();
+
+        if (!$driverAccount) {
+            return redirect()->route('home')->with('error', 'You must enroll as a driver first.');
+        }
+
+        // Get all completed ride requests for this driver
+        $completedRequests = \App\Models\RideRequest::whereHas('ride', function($query) use ($user) {
+                $query->where('driver_id', $user->id);
+            })
+            ->where('status', 'approved')
+            ->with(['passenger'])
+            ->get();
+
+        // Calculate earnings
+        $totalEarnings = $completedRequests->sum('price');
+        $completedRidesCount = $completedRequests->count();
+
+        // Today's earnings
+        $todayEarnings = $completedRequests->filter(function($request) {
+            return $request->created_at->isToday();
+        })->sum('price');
+
+        // This week's earnings
+        $weekEarnings = $completedRequests->filter(function($request) {
+            return $request->created_at->isCurrentWeek();
+        })->sum('price');
+        $weekRidesCount = $completedRequests->filter(function($request) {
+            return $request->created_at->isCurrentWeek();
+        })->count();
+
+        // This month's earnings
+        $monthEarnings = $completedRequests->filter(function($request) {
+            return $request->created_at->isCurrentMonth();
+        })->sum('price');
+        $monthRidesCount = $completedRequests->filter(function($request) {
+            return $request->created_at->isCurrentMonth();
+        })->count();
+
+        // Recent transactions (last 30 days)
+        $recentTransactions = $completedRequests->filter(function($request) {
+            return $request->created_at->greaterThanOrEqualTo(now()->subDays(30));
+        })->map(function($request) {
+            return [
+                'created_at' => $request->created_at->toISOString(),
+                'price' => $request->price,
+                'passenger_name' => $request->passenger->getFullName(),
+            ];
+        })->values();
+
+        return view('pages.driver.earnings', compact(
+            'user',
+            'totalEarnings',
+            'todayEarnings',
+            'weekEarnings',
+            'monthEarnings',
+            'completedRidesCount',
+            'weekRidesCount',
+            'monthRidesCount',
+            'recentTransactions'
+        ));
+    }
+
+    /**
+     * Display driver rides management page
+     */
+    public function rides()
+    {
+        $user = Auth::user();
+        $driverAccount = $user->getDriverAccount();
+
+        if (!$driverAccount) {
+            return redirect()->route('home')->with('error', 'You must enroll as a driver first.');
+        }
+
+        // Get all rides for this driver
+        $rides = $user->getRides()
+            ->with(['vehicle', 'destinations', 'rideRequests.passenger'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pages.driver.rides', compact('user', 'rides'));
+    }
 }
+

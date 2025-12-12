@@ -13,6 +13,7 @@ services:
       - ./routes:/var/www/routes
       - ./tests:/var/www/tests
       - ./resources:/var/www/resources
+      - ./database:/var/www/database # Unmount on production
       - ./.env:/var/www/.env
       - ./public/build:/var/www/public/build
       - vendor_dir:/var/www/vendor
@@ -38,6 +39,7 @@ services:
       - .env
     volumes:
     # - .:/var/www
+      - ./public:/var/www/public
       - ./app:/var/www/app
       - ./routes:/var/www/routes
       - ./resources:/var/www/resources
@@ -102,6 +104,16 @@ services:
     networks:
       - laravel
 
+  nominatim:
+    image: mediagis/nominatim:5.1
+    container_name: hitchhikers_nominatim
+    ports:
+      - 8080:8080
+    environment:
+      - PBF_URL=https://download.geofabrik.de/asia/philippines-latest.osm.pbf #https://download.geofabrik.de/europe/monaco-latest.osm.pbf #646KB #https://download.geofabrik.de/asia/philippines-latest.osm.pbf #554MB
+    volumes:
+      - nominatim_data:/var/lib/postgresql/14/main
+
 networks:
   laravel:
 
@@ -110,3 +122,4 @@ volumes:
   app_storage:
   app_cache:
   vendor_dir:
+  nominatim_data:

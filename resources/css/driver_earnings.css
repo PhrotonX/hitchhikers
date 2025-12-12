@@ -1,0 +1,170 @@
+.driver-nav { display: flex; flex-direction: column; gap: 5px; margin: -10px; }
+.driver-nav-link { display: flex; align-items: center; gap: 15px; padding: 15px 20px; text-decoration: none; font-weight: 500; font-size: 1rem; color: var(--text-light); transition: all 0.2s ease-in-out; }
+.driver-nav-link i { width: 20px; }
+.driver-nav-link:hover { background-color: var(--background-hover); color: var(--primary); }
+.driver-nav-link.active { background-color: var(--primary-light); color: white; border-right: 4px solid var(--accent); }
+body.dark-mode .driver-nav-link:hover { color: var(--accent); }
+body.dark-mode .driver-nav-link.active { background-color: var(--primary); }
+
+/* --- Page Layout --- */
+.earnings-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr; /* 2/3 column for main, 1/3 for summary */
+    gap: 30px;
+    align-items: flex-start;
+}
+
+@media (max-width: 1024px) {
+    .earnings-layout { grid-template-columns: 1fr; }
+}
+
+/* --- Generic Card Style --- */
+.card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 30px;
+}
+body.dark-mode .card {
+    background-color: #1a243d;
+    border: 1px solid #334155;
+}
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+}
+body.dark-mode .card-title { color: white; }
+
+/* --- Button Styles --- */
+.btn {
+    padding: 12px 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+.btn-primary { background-color: var(--primary); color: white; }
+.btn-primary:hover { background-color: var(--primary-light); }
+.btn-secondary { background-color: var(--border); color: var(--text-dark); }
+.btn-secondary:hover { background-color: #d1d5db; }
+
+/* --- Earnings Summary Cards --- */
+.earnings-summary-card {
+    text-align: center;
+}
+.earnings-label {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-light);
+    margin-bottom: 10px;
+}
+.earnings-amount {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+}
+body.dark-mode .earnings-amount {
+    color: var(--accent);
+}
+.payout-info {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-top: 15px;
+}
+
+/* --- Earnings Filter Tabs --- */
+.earnings-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+}
+.tab-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-light);
+    border-bottom: 3px solid transparent;
+}
+.tab-button.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+body.dark-mode .tab-button.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+/* --- Transaction List --- */
+.transaction-list {
+    list-style: none;
+    padding: 0;
+}
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 10px;
+    border-bottom: 1px solid var(--border);
+}
+.transaction-item:last-child {
+    border-bottom: none;
+}
+.transaction-details {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.transaction-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.transaction-icon.ride {
+    background-color: #d1fae5; /* Light green */
+    color: #065f46; /* Dark green */
+}
+.transaction-icon.payout {
+    background-color: #dbeafe; /* Light blue */
+    color: #1e40af; /* Dark blue */
+}
+.transaction-info p {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+body.dark-mode .transaction-info p { color: white; }
+.transaction-info span {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+.transaction-amount {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--secondary);
+}
+.transaction-amount.negative {
+    color: var(--error);
+}

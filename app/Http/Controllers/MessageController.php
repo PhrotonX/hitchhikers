@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
 use App\Models\Message;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class MessageController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
@@ -29,7 +32,14 @@ class MessageController extends Controller
      */
     public function store(StoreMessageRequest $request)
     {
-        //
+        $message = new Message();
+        $message->fill($request->validated());
+
+        $message->save();
+
+        return response()->json([
+            'status' => 'OK',
+        ]);
     }
 
     /**

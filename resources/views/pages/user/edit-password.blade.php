@@ -1,57 +1,48 @@
-{{-- @props([
-    'gender' => [
-        'male' => __('gender.male'),
-        'female' => __('gender.female'),
-    ],
-])
-
-@extends('layouts.app')
-@section('content') --}}
-<header>
-    <h2>
-        {{ __('passwords.update_password') }}
-    </h2>
-
-    <p>
-        {{ __('passwords.update_password_msg') }}
-    </p>
-</header>
-
-<form action="{{ route('password.update') }}" method="POST">
-    @csrf
-    @method('PUT')
-    
-    <div>
-        <x-input-label for="update_password_current_password" :value="__('passwords.current_password')" />
-        <x-text-input id="update_password_current_password" name="current_password" type="password"  autocomplete="current-password" />
-        <x-input-error :messages="$errors->get('current_password')"/>
+<div class="card" style="margin-top: 20px;">
+    <div class="card-header">
+        <h2 class="card-title"><i class="fas fa-lock"></i> {{ __('passwords.update_password') }}</h2>
+        <p style="margin: 5px 0 0 0; font-size: 14px; color: #666;">{{ __('passwords.update_password_msg') }}</p>
     </div>
+    <div class="card-body">
+        <form action="{{ route('password.update') }}" method="POST">
+            @csrf
+            @method('PUT')
+            
+            <div style="margin-bottom: 20px;">
+                <label><i class="fas fa-key"></i> {{ __('passwords.current_password') }}</label>
+                <input id="update_password_current_password" name="current_password" type="password" autocomplete="current-password" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" placeholder="Enter current password">
+                @error('current_password')
+                    <span style="color: #dc3545; font-size: 14px; display: block; margin-top: 5px;">{{ $message }}</span>
+                @enderror
+            </div>
 
-    <div>
-        <x-input-label for="update_password_password" :value="__('passwords.new_password')" />
-        <x-text-input id="update_password_password" name="password" type="password" autocomplete="new-password" />
-        <x-input-error :messages="$errors->get('password')"/>
+            <div style="margin-bottom: 20px;">
+                <label><i class="fas fa-lock"></i> {{ __('passwords.new_password') }}</label>
+                <input id="update_password_password" name="password" type="password" autocomplete="new-password" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" placeholder="Enter new password">
+                @error('password')
+                    <span style="color: #dc3545; font-size: 14px; display: block; margin-top: 5px;">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label><i class="fas fa-lock"></i> {{ __('passwords.password_confirmation') }}</label>
+                <input id="update_password_password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;" placeholder="Confirm new password">
+                @error('password_confirmation')
+                    <span style="color: #dc3545; font-size: 14px; display: block; margin-top: 5px;">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> {{ __('string.save') }}
+                </button>
+
+                @if (session('status') === 'password-updated')
+                    <span style="color: #28a745; margin-left: 15px;">
+                        <i class="fas fa-check-circle"></i> {{ __('Saved.') }}
+                    </span>
+                @endif
+            </div>
+        </form>
     </div>
-
-    <div>
-        <x-input-label for="update_password_password_confirmation" :value="__('passwords.password_confirmation')" />
-        <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" />
-        <x-input-error :messages="$errors->get('password_confirmation')"/>
-    </div>
-
-    <div>
-        <button type="submit">
-            {{ __('string.save') }}
-        </button>
-
-        @if (session('status') === 'password-updated')
-            <p
-                x-data="{ show: true }"
-                x-show="show"
-                x-transition
-                x-init="setTimeout(() => show = false, 2000)"
-            >{{ __('Saved.') }}</p>
-        @endif
-    </div>
-</form>
-{{-- @endsection --}}
+</div>

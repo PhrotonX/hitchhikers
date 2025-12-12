@@ -1,35 +1,37 @@
 @extends('layouts.app')
 
-{{-- @push('head')
-    @vite(['resources/css/form.css'])
-@endpush --}}
+@push('head')
+    <x-auth-styles />
+@endpush
 
 @section('content')
-<main>
-    <div>
-        {{ __('passwords.secure_area_of_app') }}
-    </div>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1><i class="fas fa-shield-halved"></i> {{__('passwords.confirm_password')}}</h1>
+            <p>{{ __('passwords.secure_area_of_app') }}</p>
+        </div>
 
-    <form method="POST" action="{{ route('password.confirm') }}" class="form">
-        @csrf
-        {{-- <x-form-section-content :title="__('passwords.confirm_password')"> --}}
-            <!-- Password -->
-            <div>
-                <x-input-label for="password" :value="__('credentials.password')" />
+        @if($errors->any())
+            <div class="error-message">
+                @foreach($errors->all() as $error)
+                    <div><i class="fas fa-exclamation-circle"></i> {{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
 
-                <x-text-input 
-                            id="password"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+        <form method="POST" action="{{ route('password.confirm') }}">
+            @csrf
 
-                <x-input-error :messages="$errors->get('password')"/>
+            <div class="input-group">
+                <label><i class="fas fa-lock"></i> {{__('credentials.password')}}</label>
+                <input id="password" type="password" name="password" required autocomplete="current-password" placeholder="Enter your password">
             </div>
 
-            <button type="submit">
-                <p>{{ __('string.confirm') }}</p>
+            <button type="submit" class="auth-btn">
+                <i class="fas fa-check"></i> {{ __('string.confirm') }}
             </button>
-        {{-- </x-form-section-content> --}}
-    </form>
-</main>
+        </form>
+    </div>
+</div>
 @endsection

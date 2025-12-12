@@ -1,0 +1,579 @@
+import MainMap from '../js/MainMap.js';
+
+/**
+ * Displays a map with ride and vehicle handling.
+ * Expects the following marker icon to be loaded: current, defaultPos, active_vehicle, inactive_vehicle.
+ */
+export default class RideMap extends MainMap{
+    constructor(mapId, nominatimUrl, webUrl, properties){
+        super(mapId, nominatimUrl, webUrl);
+        this.isAuth = properties.is_auth ?? false;
+        this.isDriver = properties.is_driver ?? false;
+        this.rideDestinationUrl = '/ride/destinations';
+        this.rideMarkers = new Object();
+        this.vehicleMarkers = new Object();
+        this.trackingId = null;
+        this.rideSelectorList = null;
+        this.vehicleId = null;
+        this.vehicleMarker = null;
+        this.vehicleUrl = '/vehicle';
+        this.onVehicleMarkerClick = null;
+        this.onRideMarkerClick = null;
+        
+        this.cachedMarkers = L.markerClusterGroup();
+        this.rideMarkers = L.markerClusterGroup();
+        this.vehicleMarkers = L.markerClusterGroup();
+        this.polylines = L.layerGroup(); // Track polylines for clearing
+        this.routingControls = []; // Track routing controls for proper removal
+        //@TODO: Use proper event listener values and parameters.
+        // this.map.on('', () => {
+            //@TODO: Remove markers.
+            //var data = this.getRideDestinations();
+        // });
+        // console.log("data: " + data);
+
+        // var data = this.loadRideDestinations();
+
+        // data.results.forEach(element => {
+        //     console.log(element);
+        // });
+
+        // this.loadRideDestinations();
+
+        this.map.addLayer(this.cachedMarkers);
+        this.map.addLayer(this.rideMarkers);
+        this.map.addLayer(this.vehicleMarkers);
+        this.map.addLayer(this.polylines);
+    }
+
+    clearRideSelectorList(){
+        this.rideSelectorList.innerHTML = "";
+    }
+
+    enablePanToRetrieveAllRideMarkers(){
+        // Prevent adding duplicate listeners
+        if(!this._rideRetrievalEnabled){
+            this._rideRetrievalEnabled = true;
+            this.map.on('moveend', this.retrieveAllRideMarkers());
+        }
+    }
+
+    /**
+     * Replaces existing map pan event into an event that retrieves all map markers within the bounding box of the map view.
+     */
+    enablePanToRetrieveVehicles(){
+        // Prevent adding duplicate listeners
+        if(!this._vehicleRetrievalEnabled){
+            this._vehicleRetrievalEnabled = true;
+            this.map.on('moveend', this.retrieveVehicles());
+        }
+    }
+
+    setOnRideMarkerClick(callback){
+        this.onRideMarkerClick = callback;
+    }
+
+    setOnVehicleMarkerClick(callback){
+        this.onVehicleMarkerClick = callback;
+    }
+
+    getOnVehicleMarkerClick(){
+        return this.onVehicleMarkerClick;
+    }
+
+    /**
+     * Retrieves all map markers within a map boundary.
+     * 
+     * Returns a callback function.
+     */
+    retrieveAllRideMarkers(){
+        return () => {
+            // console.log("Map panned!");
+
+            //Obtain map bounds to specify the area of map where markers must be obtained.
+            const bounds = this.map.getBounds();
+            const northWest = bounds.getNorthEast();
+            const southEast = bounds.getSouthEast();
+
+            var url = this.webUrl + this.rideDestinationUrl + "?" +
+                'lat-north=' + northWest.lat + '&lng-west=' + northWest.lng +
+                '&lat-south=' + southEast.lat + '&lng-east=' + southEast.lng;
+
+            // console.log("Url: " + url);
+
+            fetch(url
+            ).then((response) => {
+                return response.json();
+            }).then((data) => {
+
+                //Populate the map with markers
+                var count = Object.keys(data.results).length;
+                for(let i = 0; i < count; i++){
+                    
+                    // Skip markers with null/invalid coordinates
+                    if (!data.results[i].latitude || !data.results[i].longitude) {
+                        console.log('Skipping ride destination with null coordinates:', data.results[i].id);
+                        continue;
+                    }
+
+                    //Check if the marker already exists to avoid marker duplication.
+                    if(!this.rideMarkers.hasLayer(this.markers["ride-" + data.results[i].id])){
+                        var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]});
+
+                        //Setup marker click listener.
+                        marker.on('click', (e) => {
+                            if(this.onRideMarkerClick){
+                                this.onRideMarkerClick(e, data.results[i]);
+                            }
+                        });
+
+                        //Obtain marker ID for duplication detection.
+                        this.markers["ride-" + data.results[i].id] = marker;
+
+                        // Add the marker into the map.
+                        this.rideMarkers.addLayer(marker);
+                    }
+                }
+
+                // console.log("Count: " + Object.keys(this.markers).length);
+
+            }).catch((error) => {
+                throw new Error(error);
+            });
+        }
+    }
+
+    /**
+     * Retrieves rides based on a vehicle ID.
+     * 
+     * Returns a callback function.
+     */
+    retrieveRides(vehicleId){
+        return () => {
+            var url = this.webUrl + this.vehicleUrl + "/" + vehicleId + "/rides";
+
+            // console.log("Url: " + url);
+
+            return fetch(url
+                ).then((response) => {
+                    return response.json();
+                }).then((data) => {
+                    return data;
+                }).catch((error) => {
+                    throw new Error(error);
+                });
+        }
+    }
+
+    /**
+     * Retrieves map markers of a ride destination for a specific ride and stores the markers. This function
+     * also removes the ride-specific map markers before populating the map with markers.
+     * Returns a callback function.
+     * @param {*} rideId 
+     * @returns 
+     */
+    retrieveRideMarkers(rideId, hasLine = false, fitBounds = false){
+        return () => {
+            // console.log("Map panned!");
+
+            //Obtain map bounds to specify the area of map where markers must be obtained.
+            const bounds = this.map.getBounds();
+            const northWest = bounds.getNorthEast();
+            const southEast = bounds.getSouthEast();
+
+            var url = this.webUrl + this.rideDestinationUrl + "/" + rideId;
+
+            var latlngs = [];
+
+            // console.log("Url: " + url);
+
+            fetch(url
+            ).then((response) => {
+                return response.json();
+            }).then((data) => {
+                //Clear the cached ride map markers.
+                this.cachedMarkers.clearLayers();
+                
+                //Clear previous polylines.
+                this.polylines.clearLayers();
+                
+                //Clear previous routing controls.
+                this.routingControls.forEach(control => {
+                    this.map.removeControl(control);
+                });
+                this.routingControls = [];
+
+                //Populate the map with markers
+                var count = Object.keys(data.results).length;
+                for(let i = 0; i < count; i++){
+                    
+                    // Skip markers with null/invalid coordinates
+                    if (!data.results[i].latitude || !data.results[i].longitude) {
+                        console.log('Skipping ride marker with null coordinates:', data.results[i].id);
+                        continue;
+                    }
+
+                    //Check if the marker already exists to avoid marker duplication.
+                    if(!this.cachedMarkers.hasLayer(this.markers["ride-" + data.results[i].id])){
+                        var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: this.markerIcons["default"]});
+
+                        latlngs.push([data.results[i].latitude, data.results[i].longitude]);
+
+
+                        //Setup marker click listener.
+                        marker.on('click', (e) => {
+                            if(this.onRideMarkerClick){
+                                this.onRideMarkerClick(e, data.results[i]);
+                            }
+                        });
+
+                        //Obtain marker ID for duplication detection.
+                        this.markers["ride-" + data.results[i].id] = marker;
+
+                        // Add the marker into the map.
+                        this.cachedMarkers.addLayer(marker);
+                    }
+                }
+
+                // Draw the line on the map following roads.
+                if(hasLine && latlngs.length > 1){
+                    // Convert latlngs to waypoints for routing
+                    const waypoints = latlngs.map(coord => L.latLng(coord[0], coord[1]));
+                    
+                    // Create routing control with custom options
+                    const routingControl = L.Routing.control({
+                        waypoints: waypoints,
+                        routeWhileDragging: false,
+                        addWaypoints: false,
+                        draggableWaypoints: false,
+                        fitSelectedRoutes: false,
+                        showAlternatives: false,
+                        lineOptions: {
+                            styles: [{color: 'blue', opacity: 0.7, weight: 5}],
+                            extendToWaypoints: true,
+                            missingRouteTolerance: 0
+                        },
+                        createMarker: function() { return null; }, // Don't create markers at waypoints
+                        router: L.Routing.osrmv1({
+                            serviceUrl: 'https://router.project-osrm.org/route/v1'
+                        })
+                    });
+                    
+                    // Add the routing control to the map
+                    routingControl.addTo(this.map);
+                    
+                    // Track the routing control for later removal
+                    this.routingControls.push(routingControl);
+                }
+
+                // Fit bounds to show all markers and lines
+                if(fitBounds && latlngs.length > 0){
+                    // Include vehicle markers in bounds calculation
+                    let allPoints = [...latlngs];
+                    
+                    // Add vehicle marker positions if they exist
+                    this.vehicleMarkers.eachLayer((layer) => {
+                        allPoints.push(layer.getLatLng());
+                    });
+                    
+                    if(allPoints.length > 0){
+                        const boundsToFit = L.latLngBounds(allPoints);
+                        this.map.fitBounds(boundsToFit, {padding: [50, 50]});
+                    }
+                }
+
+                // console.log("Count: " + Object.keys(this.markers).length);
+
+                return data;
+
+            }).catch((error) => {
+                throw new Error(error);
+            });
+        }
+    }
+
+    /**
+     * Retrieves vehicle markers and displays it on a map.
+     * @returns A callback function.
+     */
+    retrieveVehicles(){
+        return () => {
+            // console.log("Map panned!");
+
+            //Obtain map bounds to specify the area of map where markers must be obtained.
+            const bounds = this.map.getBounds();
+            const northWest = bounds.getNorthEast();
+            const southEast = bounds.getSouthEast();
+
+            var url = this.webUrl + this.vehicleUrl + "?" +
+                'lat-north=' + northWest.lat + '&lng-west=' + northWest.lng +
+                '&lat-south=' + southEast.lat + '&lng-east=' + southEast.lng;
+
+            // console.log("Url: " + url);
+
+            var rideSelector = document.getElementById('ride-selector');
+
+            if(this.rideSelectorList == null){
+                this.rideSelectorList = document.createElement('div');
+                this.rideSelectorList.setAttribute('class', 'ride-selector-list');
+                rideSelector.appendChild(this.rideSelectorList);
+                
+                // Add click listener only once when creating the list
+                this.rideSelectorList.addEventListener('click', (e) => {
+                    // Find the clicked ride item and get its data
+                    const rideItem = e.target.closest('.ride-selector-list-item');
+                    if(rideItem && this.onVehicleMarkerClick){
+                        const vehicleId = rideItem.getAttribute('data-vehicle-id');
+                        const rideId = rideItem.getAttribute('data-ride-id');
+                        const vehicleData = this.rideSelectorList._vehicleData[vehicleId];
+                        if(vehicleData){
+                            // Pass the ride ID for auto-selection in the infobox
+                            vehicleData.autoSelectRideId = rideId;
+                            this.onVehicleMarkerClick(e, vehicleData);
+                            this.setView(vehicleData.latitude, vehicleData.longitude);
+                        }
+                    }
+                });
+            }else{
+                // Avoid duplicate items.
+                this.clearRideSelectorList();
+            }
+            
+            // Store vehicle data for the click handler
+            if(!this.rideSelectorList._vehicleData){
+                this.rideSelectorList._vehicleData = {};
+            }
+            
+            
+            fetch(url
+            ).then((response) => {
+                return response.json();
+            }).then((data) => {
+
+                //Populate the map with markers
+                var count = Object.keys(data.results).length;
+                for(let i = 0; i < count; i++){
+                    
+                    // Skip vehicles with null/invalid coordinates
+                    if (!data.results[i].latitude || !data.results[i].longitude) {
+                        console.log('Skipping vehicle with null coordinates:', data.results[i].id);
+                        continue;
+                    }
+
+                    if(!this.isDriver){
+                        this.buildRideSelector(data, i);
+                    }
+
+                    //Check if the marker already exists to avoid marker duplication.
+                    if(!this.vehicleMarkers.hasLayer(this.markers["vehicle-" + data.results[i].id])){
+                        //Decide on the marker icon depending on the marker state [INCOMPLETE].
+                        var markerIcon;
+                        if(data.results[i].status == "active"){
+                            markerIcon = this.markerIcons["active_vehicle"];
+                        }else{
+                            markerIcon = this.markerIcons["inactive_vehicle"];
+                        }
+                        
+                        var marker = L.marker([data.results[i].latitude, data.results[i].longitude], {icon: markerIcon});
+
+                        //Setup marker click listener.
+                        marker.on('click', (e) => {
+
+                            //Get vehicle rides.
+
+                            if(this.onVehicleMarkerClick){
+                                this.onVehicleMarkerClick(e, data.results[i]);
+                                this.setView(data.results[i].latitude, data.results[i].longitude);
+                            }
+                        });
+
+                        //Obtain marker ID for duplication detection.
+                        this.markers["vehicle-" + data.results[i].id] = marker;
+
+                        // Add the marker into the map.
+                        this.vehicleMarkers.addLayer(marker);
+                    }
+                }
+
+                // var count = Object.keys(data.rides).length;
+                // for(let i = 0; i < count; i++){
+                    
+                // }
+
+                // console.log("Count: " + Object.keys(this.markers).length);
+
+            }).catch((error) => {
+                throw new Error(error);
+            });
+        }
+    }
+
+    buildRideSelector(data, i){
+        let vehicle_id = data.results[i].id;
+                    
+        // Store vehicle data for click handler
+        this.rideSelectorList._vehicleData[vehicle_id] = data.results[i];
+        
+        // Store ride data for each vehicle
+        if(!this.rideSelectorList._rideData){
+            this.rideSelectorList._rideData = {};
+        }
+        this.rideSelectorList._rideData[vehicle_id] = data.rides[vehicle_id];
+
+        var rideCount = Object.keys(data.rides[vehicle_id]).length;
+        for(let j = 0; j < rideCount; j++){
+            // if(data.rides[vehicle_id][j] != "active"){
+            //     continue;
+            // }
+
+            var rideSelectorListItem = document.createElement('div');
+            rideSelectorListItem.setAttribute('class', 'ride-selector-list-item');
+            rideSelectorListItem.setAttribute('data-vehicle-id', vehicle_id);
+            rideSelectorListItem.setAttribute('data-ride-id', data.rides[vehicle_id][j].id);
+
+                // console.log(data.rides[vehicle_id]);
+                var rideSelectorListItemTitle = document.createElement('p');
+                rideSelectorListItemTitle.setAttribute('class', 'title');
+                rideSelectorListItemTitle.innerHTML = data.rides[vehicle_id][j].ride_name;
+                rideSelectorListItem.appendChild(rideSelectorListItemTitle);
+
+                // Removed description paragraph as requested
+                
+                var rideSelectorListItemOn = document.createElement('p');
+                rideSelectorListItemOn.innerHTML = "Currently on: Obtaining location..." ;
+                
+                // Use closure to capture the correct element reference for each iteration
+                ((locationElement) => {
+                    this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
+                        locationElement.innerHTML = "Currently on: " + result.display_name;
+                    }).catch((error) => {
+                        console.error("Reverse geocode error:", error);
+                        locationElement.innerHTML = "Currently on: Location unavailable";
+                    });
+                })(rideSelectorListItemOn);
+                
+                rideSelectorListItem.appendChild(rideSelectorListItemOn);
+
+                // var rideSelectorListItemFrom = document.createElement('p');
+                // rideSelectorListItemFrom.innerHTML = "From: Obtaining location..." ;
+                // this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
+                //     rideSelectorListItemFrom.innerHTML = "Currently on: " + result.display_name;
+                // });
+                // rideSelectorListItem.appendChild(rideSelectorListItemFrom);
+            
+            this.rideSelectorList.appendChild(rideSelectorListItem);
+        }
+    }
+
+    /**
+     * Sets the URL or the route where the marker data is retrieved.
+     * @param {*} url The JSON data based on RideDestination[] model.
+     */
+    setRideDestinationUrl(url){
+        this.rideDestinationUrl = url;
+    }
+
+    /**
+     * Tracks the vehicle location in real-time
+     * @param {*} vehicle_id 
+     */
+    startLiveTracking(vehicle_id){
+        this.vehicleId = vehicle_id;
+        //Get current location
+        if(navigator.geolocation){
+            // Use high accuracy and minimal caching for better tracking
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0  // Don't use cached position
+            };
+            
+            this.trackingId = navigator.geolocation.watchPosition((position) => {
+                var latitude = position.coords.latitude;
+                var longitude = position.coords.longitude;
+
+                console.log("Live Marker: Latitude: " + latitude);
+                console.log("Live Marker: Longitude: " + longitude);
+                console.log("Accuracy: " + position.coords.accuracy + " meters");
+
+                //@TODO: Change the map marker color from gray to blue.
+
+                //Position the map where the current location is pointing to.
+                this.map.setView([latitude, longitude], 16);
+
+                //Update the position of the marker indicating the vehicle's position.
+                this.markers.currentPos.setLatLng([latitude, longitude]);
+
+                //Save the position data into the database.
+                //=========================================
+                fetch(this.webUrl + '/vehicle/'+this.vehicleId+'/update-location', {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                        latitude: latitude,
+                        longitude: longitude,
+                    }),
+                    headers: {
+                        "Content-type": "application/json",
+                        "Accept": "application/json",
+                        "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
+                    },
+                }).then((response) => {
+                    return response.json();
+                }).then((data) => {
+                    console.log("Location updated:", data);
+                }).catch((error) => {
+                    console.error("Location update error:", error);
+                });
+                //=========================================
+
+            }, (error) => {
+                console.error("Geolocation error code: " + error.code);
+                console.error("Geolocation error message: " + error.message);
+                
+                // For testing: if geolocation fails, you can uncomment this to simulate movement
+                // this.simulateMovement();
+            }, options);
+        }else{
+            alert("Geolocation is turned off or not supported by this device");
+        }
+    }
+    
+    /**
+     * Simulate small movements for testing purposes when real GPS is unavailable
+     * Uncomment the call in startLiveTracking error handler to use
+     */
+    simulateMovement() {
+        let lat = 14.5995; // Default Manila coordinates
+        let lng = 120.9842;
+        
+        this.trackingId = setInterval(() => {
+            // Add small random changes to simulate movement
+            lat += (Math.random() - 0.5) * 0.001;
+            lng += (Math.random() - 0.5) * 0.001;
+            
+            console.log("Simulated position:", lat, lng);
+            
+            this.map.setView([lat, lng], 16);
+            this.markers.currentPos.setLatLng([lat, lng]);
+            
+            fetch(this.webUrl + '/vehicle/'+this.vehicleId+'/update-location', {
+                method: "PATCH",
+                body: JSON.stringify({
+                    latitude: lat,
+                    longitude: lng,
+                }),
+                headers: {
+                    "Content-type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-Token": document.querySelector('meta[name=csrf-token]').content,
+                },
+            }).then(response => response.json())
+            .then(data => console.log("Simulated location updated:", data))
+            .catch(error => console.error("Simulation update error:", error));
+        }, 5000); // Update every 5 seconds
+    }
+
+    stopLiveTracking(tag){
+        navigator.geolocation.clearWatch(this.trackingId);
+    }
+}
