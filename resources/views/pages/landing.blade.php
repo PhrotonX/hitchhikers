@@ -61,7 +61,7 @@
         <a href="{{ url('register') }}" class="section1-btn reveal scale-up">Get Started!</a>
     </div>
 
-    <img src="{{Vite::asset('resources/img/Background Img.png')}}" class="section1-img reveal fade-right" alt="Hitchhike Hero">
+    <img src="" class="section1-img reveal fade-right" alt="">
 </section>
 
 {{-- SECTION 2 (FEATURES) --}}
@@ -190,7 +190,7 @@
 
     <div class="map-wrapper">
         <div class="map-track">
-            <img src="{{Vite::asset('resources/img/White Car.png')}}" class="wide-map" alt="Map">
+            <img src="{{Vite::asset('resources/img/Wide Map.png')}}" class="wide-map">
         </div>
 
         <div class="map-points-row">
