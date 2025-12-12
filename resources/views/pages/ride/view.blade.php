@@ -127,7 +127,8 @@
                 @php
                     $driverUser = $ride->driver->user;
                     $profilePicture = $driverUser ? $driverUser->getProfilePicture() : null;
-                    $profilePicUrl = $profilePicture && $profilePicture->getPath(\App\Models\ProfilePicture::SIZE_MEDIUM_SUFFIX) 
+                    $hasValidPicture = $profilePicture && !$profilePicture->isNull(\App\Models\ProfilePicture::SIZE_MEDIUM_SUFFIX);
+                    $profilePicUrl = $hasValidPicture
                         ? asset('storage/' . $profilePicture->getPath(\App\Models\ProfilePicture::SIZE_MEDIUM_SUFFIX)) 
                         : Vite::asset('resources/img/question_mark.png');
                 @endphp

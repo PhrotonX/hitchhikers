@@ -61,7 +61,8 @@
                 <div style="display: flex; gap: 30px; align-items: start; margin-bottom: 30px;">
                     @php
                         $profilePicture = $user->getProfilePicture();
-                        $profilePicUrl = $profilePicture && $profilePicture->getPath(\App\Models\ProfilePicture::SIZE_LARGE_SUFFIX) 
+                        $hasValidPicture = $profilePicture && !$profilePicture->isNull(\App\Models\ProfilePicture::SIZE_LARGE_SUFFIX);
+                        $profilePicUrl = $hasValidPicture
                             ? asset('storage/' . $profilePicture->getPath(\App\Models\ProfilePicture::SIZE_LARGE_SUFFIX)) 
                             : Vite::asset('resources/img/question_mark.png');
                     @endphp
