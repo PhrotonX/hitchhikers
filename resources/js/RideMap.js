@@ -437,16 +437,21 @@ export default class RideMap extends MainMap{
                 rideSelectorListItemTitle.innerHTML = data.rides[vehicle_id][j].ride_name;
                 rideSelectorListItem.appendChild(rideSelectorListItemTitle);
 
-                var rideSelectorListItemDescription = document.createElement('p');
-                rideSelectorListItemDescription.setAttribute('class', 'description');
-                rideSelectorListItemDescription.innerHTML = "Description: " + data.rides[vehicle_id][j].description;
-                rideSelectorListItem.appendChild(rideSelectorListItemDescription);
-
+                // Removed description paragraph as requested
+                
                 var rideSelectorListItemOn = document.createElement('p');
                 rideSelectorListItemOn.innerHTML = "Currently on: Obtaining location..." ;
-                this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
-                    rideSelectorListItemOn.innerHTML = "Currently on: " + result.display_name;
-                });
+                
+                // Use closure to capture the correct element reference for each iteration
+                ((locationElement) => {
+                    this.reverseGeocode(data.results[i].latitude, data.results[i].longitude).then((result) => {
+                        locationElement.innerHTML = "Currently on: " + result.display_name;
+                    }).catch((error) => {
+                        console.error("Reverse geocode error:", error);
+                        locationElement.innerHTML = "Currently on: Location unavailable";
+                    });
+                })(rideSelectorListItemOn);
+                
                 rideSelectorListItem.appendChild(rideSelectorListItemOn);
 
                 // var rideSelectorListItemFrom = document.createElement('p');

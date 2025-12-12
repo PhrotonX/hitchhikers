@@ -11,10 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Most foreign keys already exist with cascade from previous migrations
-        // This migration only fixes the ones that are missing or don't have cascade
-        
-        // rides.driver_id - needs to be added (was added without foreign key in 2025_10_20_021031)
         Schema::table('rides', function (Blueprint $table) {
             $table->foreign('driver_id')
                   ->references('id')
@@ -33,9 +29,6 @@ return new class extends Migration
                   ->on('vehicles')
                   ->onDelete('cascade');
         });
-
-        // All other foreign keys (reviews, replies, reports, passengers, etc.) 
-        // already have cascade from their respective migrations
     }
 
     /**
