@@ -1,100 +1,32 @@
-<!--HEADER / TOOLBAR-->
-<header class="toolbar">
-    <div class="container toolbar-content">
-        <!--LOGO-->
-        <a href="/" class="logo">
-            <img src="{{ Vite::asset('resources/img/Hitchhike Logo.png') }}" alt="Hitchhike Logo" class="logo-img">
-            <span class="logo-text">Hitchhike</span>
-        </a>
-
-        <!--SEARCH BAR-->
-        <div class="search-bar">
-            <input type="text" class="search-input" placeholder="Where are you going?">
-            <button class="search-button">Find Rides</button>
-        </div>
-
-        <!--NAVIGATION LINKS-->
-        <div class="nav-links">
-            <a href="/">Home</a>
-            @auth
-                @if (Auth::user()->isDriver())
-                    <a href="{{ route('driver.dashboard') }}">Driver Dashboard</a>
-                @else
-                    <a href="/ride/requests/created">My Trips</a>
-                @endif
-            @else
-                <a href="/about">About</a>
-            @endauth
-            <a href="#">Help</a>
-        </div>
-
-        <div class="user-actions">
-            <!--THEME TOGGLE-->
-            <button class="theme-toggle" id="theme-toggle">
-                <i class="fa-solid fa-toggle-off"></i>
-            </button>
-
-            @auth
-                <!--NOTIFICATION-->
-                <div class="notif">
-                    <div class="notif-icon" id="notif-icon">
-                        <i class="fa-regular fa-bell"></i>
-                        <span class="notif-badge" id="notif-badge">0</span>
-                    </div>
-                </div>
-
-                <div class="notif-list" id="notif-list">
-                    <label class="notif-label">Notifications</label>
-                    <ul>
-                        <li><a href="#">No new notifications</a></li>
-                    </ul>
-                    <div class="view-all">
-                        <a href="#" class="viewAll-link">View All</a>
-                    </div>
-                </div>
-                
-                <!--USER ICON-->
-                <div class="user-icon" id="user-icon">
-                    <i class="fa-solid fa-user"></i>
-                </div>
-
-                <!--SIDEBAR DROPDOWN MENU-->
-                <div class="sidebar" id="sidebar-menu">
-                    <!--PROFILE SECTION-->
-                    <div class="sidebar-top">
-                        <div class="profile">
-                            <h3 id="user-name">{{ Auth::user()->getFullName() }}</h3>
-                            <a href="{{ route('user.view', Auth::user()) }}" class="edit-profile">Edit profile  >  </a>        
-                        </div>
-                    </div>
-                
-                    <!--DASHBOARD/MESSAGES/HISTORY SECTION-->
-                    <div class="sidebar-section">
-                        @if (Auth::user()->isPrivileged('owner'))
-                            <a href="{{ route('owner.dashboard') }}" class="sidebar-menu-links">Owner Dashboard</a>
-                        @elseif (Auth::user()->isDriver())
-                            <a href="{{ route('driver.dashboard') }}" class="sidebar-menu-links">Driver Dashboard</a>
-                        @else
-                            <a href="/" class="sidebar-menu-links">Dashboard</a>
-                        @endif
-                        <a href="#Messages" class="sidebar-menu-links">Messages</a> 
-                        <a href="/ride/requests/created" class="sidebar-menu-links">History</a>       
-                    </div>
-
-                    <!--SETTINGS & LOGOUT-->
-                    <div class="sidebar-section">
-                        <a href="#" class="sidebar-menu-links">Settings</a>
-                        <div class="logout-icon">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            <a href="/logout" class="logout-link">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            @else
-                <!--GUEST ACTIONS-->
-                <a href="/login" class="btn btn-primary" style="margin-right: 10px;">Login</a>
-                <a href="/register" class="btn btn-secondary">Get Started</a>
-            @endauth
-        </div> 
+<header class="main-header">
+    <div class="header-logo">
+        <img src="{{Vite::asset("resources/img/Hitchhike Logo.png")}}" alt="Logo">
+        <span>Hitchhike</span>
     </div>
+
+    <nav class="header-nav">
+        <span class="separator">|</span> 
+        <a href="/">Home</a>
+        @auth
+            @if (Auth::user()->isPrivileged('owner'))
+                <a href="{{ route('owner.dashboard') }}">Owner Dashboard</a>
+            @elseif (Auth::user()->isDriver())
+                <a href="{{ route('driver.dashboard') }}">Driver Dashboard</a>
+            @endif
+        @endauth
+        <a href="/about">About</a>
+        @auth
+            <a href="/logout">Logout</a>
+        @else
+            <a href="/login">Login</a>
+        @endauth
+        
+        @auth
+            @if (!Auth::user()->isDriver() && !Auth::user()->isPrivileged('owner'))
+                <a href="/ride/requests/created">My Ride Requests</a>
+            @endif
+        @endauth
+    </nav>
+
+    <a href="/register" class="header-btn">Get Started</a>
 </header>
