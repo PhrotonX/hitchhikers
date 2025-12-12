@@ -188,7 +188,7 @@ section {
       rgba(30, 58, 138, 0.6),
       rgba(59, 95, 207, 0.3),
       rgba(59, 95, 207, 0)),
-    url("Images/Road BG.avif");
+    url("../img/Road BG.avif");
   background-size: 200% 200%, cover;
   background-position: 0% 50%, center;
   background-repeat: no-repeat;
@@ -356,7 +356,7 @@ section {
 .section3 {
   width: 100%;
   padding: 140px 100px;
-  background-image: url("Images/Background\ Img\ Geometry.png");
+  background-image: url("../img/Background Img Geometry.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -554,7 +554,7 @@ section {
   padding: 40px;
   min-height: 500px;
 
-  background-image: url("Images/happy-friends-looking-camera.jpg");
+  background-image: url("../img/happy-friends-looking-camera.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
