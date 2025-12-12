@@ -285,7 +285,7 @@
                         '<p id="ride-location">Retrieving location...</p>' +
                         "<p><strong>Status:</strong>" + data.status + "</p>" +
                         "<p>"+data.latitude+", "+data.longitude+"</p>" + 
-                        '<button type="button" id="ride-view-review-btn">View Reviews</button><br>';
+                        '<button type="button" id="ride-view-review-btn" style="display: none;">View Reviews</button><br>';
                     infobox.style.display = "block";
                     infobox.innerHTML += '<strong>Available rides: </strong><select id="ride-list" name="ride-list"></select>';
                     infobox.innerHTML += '<br><button type="button" id="ride-view-details-btn" style="margin-top: 10px; display: none;">View Ride Details</button>';

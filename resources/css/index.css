@@ -52,3 +52,9 @@
     padding: 5px;
     font-size: 12px;
 }
+
+/* Hide saved rides and reviews (out of scope, kept for backwards compatibility) */
+#saved-ride-list,
+#review-box {
+    display: none !important;
+}
