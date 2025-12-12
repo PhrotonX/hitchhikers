@@ -81,6 +81,8 @@ Route::middleware(['auth', 'verified'])->group(function(){
     
     // Owner Dashboard Routes (permission check done in controller)
     Route::get('owner/dashboard', [OwnerController::class, 'dashboard'])->name('owner.dashboard');
+    Route::get('owner/users', [OwnerController::class, 'users'])->name('owner.users');
+    Route::get('owner/audit-logs', [OwnerController::class, 'auditLogs'])->name('owner.audit-logs');
     Route::patch('owner/users/{user}/permission', [OwnerController::class, 'updateUserPermission'])->name('owner.users.permission');
     Route::get('owner/statistics', [OwnerController::class, 'statistics'])->name('owner.statistics');
     

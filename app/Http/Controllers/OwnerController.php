@@ -31,7 +31,7 @@ class OwnerController extends Controller
             'total_rides' => Ride::count(),
             'active_rides' => Ride::whereIn('status', ['available', 'ongoing'])->count(),
             'total_drivers' => Driver::count(),
-            'pending_verifications' => Driver::where('verification', 'pending')->count(),
+            'pending_verifications' => Driver::where('account_status', 'pending')->count(),
             'total_logs' => AuditLog::count(),
             'logs_today' => AuditLog::whereDate('created_at', today())->count(),
             'most_common_events' => AuditLog::selectRaw('event, COUNT(*) as count')
@@ -123,8 +123,8 @@ class OwnerController extends Controller
             ],
             'drivers' => [
                 'total' => Driver::count(),
-                'verified' => Driver::where('verification', 'verified')->count(),
-                'pending' => Driver::where('verification', 'pending')->count(),
+                'verified' => Driver::where('account_status', 'active')->count(),
+                'pending' => Driver::where('account_status', 'pending')->count(),
             ],
             'audit_logs' => [
                 'total' => AuditLog::count(),
@@ -140,5 +140,37 @@ class OwnerController extends Controller
             'success' => true,
             'data' => $stats
         ]);
+    }
+
+    /**
+     * Show all users page
+     */
+    public function users()
+    {
+        if (!Auth::user()->isPrivileged('owner')) {
+            abort(403, 'Access denied. Owner privileges required.');
+        }
+
+        $users = User::with('driverAccount')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('pages.owner.users', compact('users'));
+    }
+
+    /**
+     * Show audit logs page
+     */
+    public function auditLogs()
+    {
+        if (!Auth::user()->isPrivileged('owner')) {
+            abort(403, 'Access denied. Owner privileges required.');
+        }
+
+        $logs = AuditLog::with('user')
+            ->orderBy('created_at', 'desc')
+            ->paginate(50);
+
+        return view('pages.owner.audit-logs', compact('logs'));
     }
 }

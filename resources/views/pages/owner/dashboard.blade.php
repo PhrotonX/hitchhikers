@@ -15,10 +15,10 @@
             <a href="{{ route('owner.dashboard') }}" class="driver-nav-link active">
                 <i class="fa-solid fa-chart-line"></i> Statistics
             </a>
-            <a href="#" class="driver-nav-link">
+            <a href="{{ route('owner.audit-logs') }}" class="driver-nav-link">
                 <i class="fa-solid fa-clipboard-list"></i> Audit Logs
             </a>
-            <a href="#" class="driver-nav-link">
+            <a href="{{ route('owner.users') }}" class="driver-nav-link">
                 <i class="fa-solid fa-users"></i> Users
             </a>
             <a href="{{ route('user.view', $user) }}" class="driver-nav-link">
@@ -78,7 +78,7 @@
     <div class="content-section">
         <div class="section-header">
             <h2><i class="fas fa-history"></i> Recent Activity</h2>
-            <a href="/audit-logs" class="btn btn-secondary">View All Logs</a>
+            <a href="{{ route('owner.audit-logs') }}" class="btn btn-secondary">View All Logs</a>
         </div>
 
         @if($recentActivity->count() > 0)
@@ -171,7 +171,7 @@
         </div>
     </div>
 </div>
-@endsection
+{{-- @endsection --}}
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
