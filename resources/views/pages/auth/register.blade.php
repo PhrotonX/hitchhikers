@@ -48,6 +48,24 @@
             border: 1px solid var(--border);
         }
 
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: var(--border);
+            border-radius: 8px;
+            height: 8px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 100%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+            border-radius: 8px;
+        }
+
         .signup-header {
             text-align: center;
             margin-bottom: 32px;
@@ -166,6 +184,11 @@
             <p>Join Hitchhike and start your journey</p>
         </div>
 
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar"></div>
+        </div>
+
         @if($errors->any())
             <div class="error-message">
                 <strong><i class="fas fa-exclamation-circle"></i> Please fix the following errors:</strong>
@@ -177,7 +200,7 @@
             </div>
         @endif
 
-        <form action="register" method="POST">
+        <form action="register" method="POST" id="registerForm">
             @method('POST')
             @csrf
 
@@ -248,4 +271,25 @@
         </form>
     </div>
 </div>
+
+<script>
+    // Progress bar animation on form interaction
+    const form = document.getElementById('registerForm');
+    const progressBar = document.querySelector('.progress-bar');
+    const inputs = form.querySelectorAll('input[required], select[required]');
+    
+    function updateProgress() {
+        const filled = Array.from(inputs).filter(input => input.value.trim() !== '').length;
+        const percentage = (filled / inputs.length) * 100;
+        progressBar.style.width = percentage + '%';
+    }
+    
+    inputs.forEach(input => {
+        input.addEventListener('input', updateProgress);
+        input.addEventListener('change', updateProgress);
+    });
+    
+    // Initial check
+    updateProgress();
+</script>
 @endsection

@@ -6,25 +6,94 @@
 @endpush
 
 @section('content')
-<div class="main-layout">
-    <x-sidebar-nav />
+<div class="main-layout container">
+    <aside class="mlay-side">
+        @auth
+            @if (Auth::user()->isPrivileged('owner'))
+                <nav class="driver-nav">
+                    <a href="{{ route('owner.dashboard') }}" class="driver-nav-link">
+                        <i class="fa-solid fa-chart-line"></i> Statistics
+                    </a>
+                    <a href="#" class="driver-nav-link">
+                        <i class="fa-solid fa-clipboard-list"></i> Audit Logs
+                    </a>
+                    <a href="#" class="driver-nav-link">
+                        <i class="fa-solid fa-users"></i> Users
+                    </a>
+                    <a href="{{ route('user.view', Auth::user()) }}" class="driver-nav-link active">
+                        <i class="fa-solid fa-user-gear"></i> Profile
+                    </a>
+                </nav>
+            @elseif (Auth::user()->isDriver())
+                <nav class="driver-nav">
+                    <a href="{{ route('driver.dashboard') }}" class="driver-nav-link">
+                        <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="{{ route('driver.earnings') }}" class="driver-nav-link">
+                        <i class="fa-solid fa-dollar-sign"></i> Earnings
+                    </a>
+                    <a href="{{ route('user.view', Auth::user()) }}" class="driver-nav-link active">
+                        <i class="fa-solid fa-user-gear"></i> Profile
+                    </a>
+                </nav>
+            @else
+                <nav class="driver-nav">
+                    <a href="{{ route('home') }}" class="driver-nav-link">
+                        <i class="fa-solid fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <a href="/ride/requests/created" class="driver-nav-link">
+                        <i class="fa-solid fa-car"></i> My Ride Requests
+                    </a>
+                    <a href="{{ route('user.view', Auth::user()) }}" class="driver-nav-link active">
+                        <i class="fa-solid fa-user-gear"></i> Profile
+                    </a>
+                </nav>
+            @endif
+        @endauth
+    </aside>
 
     <main class="main-content">
         <div class="card">
             <div class="card-header">
-                <h2 class="card-title">{{$user->getFullName()}}</h2>
+                <h2 class="card-title"><i class="fas fa-user-circle"></i> User Profile</h2>
             </div>
             <div class="card-body">
-                <p><strong>Date joined: </strong>{{$user->created_at->format('F d, Y')}}</p>
+                <div style="display: flex; gap: 30px; align-items: start; margin-bottom: 30px;">
+                    @php
+                        $profilePicture = $user->getProfilePicture();
+                        $profilePicUrl = $profilePicture && $profilePicture->getPath() 
+                            ? asset('storage/' . $profilePicture->getPath()) 
+                            : asset('storage/default-avatar.png');
+                    @endphp
+                    <div style="flex-shrink: 0;">
+                        <img src="{{$profilePicUrl}}" alt="{{$user->getFullName()}}" 
+                             style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #e5e7eb;">
+                    </div>
+                    <div style="flex-grow: 1;">
+                        <h2 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700;">{{$user->getFullName()}}</h2>
+                        <p style="margin: 0 0 5px 0; color: #666;"><i class="fas fa-envelope"></i> {{$user->email}}</p>
+                        <p style="margin: 0 0 5px 0; color: #666;"><i class="fas fa-phone"></i> {{$user->phone ?? 'Not provided'}}</p>
+                        <p style="margin: 0 0 15px 0; color: #666;"><i class="fas fa-calendar-plus"></i> Member since {{$user->created_at->format('F d, Y')}}</p>
+                        
+                        @auth
+                            @if ($user->id == Auth::user()->id)
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <a href="/settings" class="btn btn-primary"><i class="fas fa-cog"></i> Settings</a>
+                                    <a href="/user/{{$user->id}}/profile-pictures" class="btn btn-secondary"><i class="fas fa-camera"></i> Manage Profile Pictures</a>
+                                </div>
+                            @endif
+                        @endauth
+                    </div>
+                </div>
 
-                @auth
-                    @if ($user->id == Auth::user()->id)
-                        <div style="margin-top: 20px;">
-                            <a href="/settings" class="btn btn-primary">Settings</a>
-                            <a href="/user/{{$user->id}}/profile-pictures" class="btn btn-secondary">Manage Profile Pictures</a>
-                        </div>
-                    @endif
-                @endauth
+                @if($user->isDriver())
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="margin: 0 0 10px 0; color: #1e3a8a;"><i class="fas fa-id-card"></i> Driver Information</h3>
+                        <p style="margin: 5px 0;"><strong>Driver Account:</strong> {{$user->driverAccount->driver_account_name ?? 'N/A'}}</p>
+                        <p style="margin: 5px 0;"><strong>Driver Type:</strong> {{$user->driverAccount ? __('driver_type.' . $user->driverAccount->driver_type) : 'N/A'}}</p>
+                        <p style="margin: 5px 0;"><strong>Company:</strong> {{$user->driverAccount->company ?? 'Independent'}}</p>
+                    </div>
+                @endif
 
                 @if ($user->isDriver())
                     <div class="card" style="margin-top: 20px;">

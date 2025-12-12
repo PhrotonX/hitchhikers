@@ -17,7 +17,7 @@
 {{-- HEADER --}}
 <header class="main-header">
     <div class="header-logo">
-        <img src="{{ asset('storage/hitchhike-logo.png') }}" alt="Hitchhike Logo">
+        <img src="{{Vite::asset('resources/img/Hitchhike Logo.png')}}" alt="Hitchhike Logo">
         <span>Hitchhike</span>
     </div>
 
@@ -62,7 +62,7 @@
         <a href="{{ url('register') }}" class="section1-btn reveal scale-up">Get Started!</a>
     </div>
 
-    <img src="{{ asset('storage/hero-image.png') }}" class="section1-img reveal fade-right" alt="Hitchhike Hero">
+    <img src="{{Vite::asset('resources/img/Background Img.png')}}" class="section1-img reveal fade-right" alt="Hitchhike Hero">
 </section>
 
 {{-- SECTION 2 - FEATURES --}}

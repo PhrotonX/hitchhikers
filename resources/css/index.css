@@ -58,3 +58,141 @@
 #review-box {
     display: none !important;
 }
+
+/* Available Rides Section Styling */
+#ride-selector-wrapper {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-top: 20px;
+}
+
+#ride-selector-wrapper h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#ride-selector-wrapper h2::before {
+    content: "🚗";
+    font-size: 28px;
+}
+
+#ride-selector {
+    display: grid;
+    gap: 16px;
+}
+
+.ride-selector-list-item {
+    background: #f8f9fa;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.ride-selector-list-item:hover {
+    border-color: #1e3a8a;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Infobox Styling */
+#infobox {
+    display: none;
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    margin-top: 20px;
+    border: 2px solid #1e3a8a;
+}
+
+#ride-popup {
+    position: relative;
+}
+
+#ride-popup-close-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+#ride-popup-close-btn:hover {
+    background: #c82333;
+}
+
+#infobox p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+#infobox strong {
+    color: #1e3a8a;
+    font-weight: 600;
+}
+
+#ride-list {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 16px;
+    margin: 10px 0;
+    background: white;
+    cursor: pointer;
+}
+
+#ride-list:focus {
+    outline: none;
+    border-color: #1e3a8a;
+}
+
+#ride-view-details-btn,
+#btn-make-ride-request,
+#ride-view-review-btn {
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 10px 5px 0 0;
+    transition: background 0.2s;
+    display: inline-block;
+    text-decoration: none;
+}
+
+#ride-view-details-btn:hover,
+#btn-make-ride-request:hover,
+#ride-view-review-btn:hover {
+    background: #3b5fcf;
+}
+
+#driving-mode-infobox {
+    background: #d4edda;
+    border: 2px solid #28a745;
+    border-radius: 10px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+#driving-mode-infobox p {
+    margin: 8px 0;
+    color: #155724;
+}

@@ -124,14 +124,27 @@
         </div>
         <div class="card-body">
             @if($ride->driver)
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-                    <div>
-                        <strong><i class="fas fa-id-card"></i> {{ __('driver.driver_name') }}:</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 16px;">{{ $ride->driver->driver_account_name }}</p>
-                    </div>
-                    <div>
-                        <strong><i class="fas fa-building"></i> {{ __('driver.company') }}:</strong>
-                        <p style="margin: 5px 0 0 0; font-size: 16px;">{{ $ride->driver->company ?: __('string.independent') }}</p>
+                @php
+                    $driverUser = $ride->driver->user;
+                    $profilePicture = $driverUser ? $driverUser->getProfilePicture() : null;
+                    $profilePicUrl = $profilePicture && $profilePicture->getPath() 
+                        ? asset('storage/' . $profilePicture->getPath()) 
+                        : asset('storage/default-avatar.png');
+                @endphp
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <img src="{{$profilePicUrl}}" alt="Driver" 
+                         style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #e5e7eb;">
+                    <div style="flex-grow: 1;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                            <div>
+                                <strong><i class="fas fa-id-card"></i> {{ __('driver.driver_name') }}:</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 16px;">{{ $ride->driver->driver_account_name }}</p>
+                            </div>
+                            <div>
+                                <strong><i class="fas fa-building"></i> {{ __('driver.company') }}:</strong>
+                                <p style="margin: 5px 0 0 0; font-size: 16px;">{{ $ride->driver->company ?: __('string.independent') }}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             @else
